@@ -1,1 +1,0 @@
-from sapextractor.change_tables import extract_change
