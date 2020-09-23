@@ -3,8 +3,7 @@ from datetime import datetime
 
 
 def read_cdhdr(con):
-    df = pd.read_sql("SELECT CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM CDHDR", con)
-    df.columns = [x.upper() for x in df.columns]
+    df = con.execute_sql("SELECT CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM CDHDR")
     df["UDATE"] = pd.to_datetime(df["UDATE"]).apply(lambda x: x.timestamp())
     df["UTIME"] = pd.to_datetime(df["UTIME"]).apply(lambda x: x.timestamp())
     df["time:timestamp"] = df["UDATE"] + df["UTIME"]
@@ -13,8 +12,7 @@ def read_cdhdr(con):
 
 
 def read_cdpos(con):
-    df = pd.read_sql("SELECT CHANGENR, OBJECTID FROM CDPOS", con)
-    df.columns = [x.upper() for x in df.columns]
+    df = con.execute_sql("SELECT CHANGENR, OBJECTID FROM CDPOS")
     return df
 
 
