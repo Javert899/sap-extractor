@@ -21,6 +21,7 @@ def apply_static(con, doc_types=None):
         Shared.vbtyp_dictio = apply(con)
     ret = copy(Shared.vbtyp_dictio)
     if doc_types is not None:
-        for d in doc_types:
+        diff = set(doc_types).difference(set(Shared.vbtyp_dictio.keys()))
+        for d in diff:
             ret[d] = str(d)
     return ret
