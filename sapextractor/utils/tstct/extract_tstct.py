@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def read_tstct(con, target_language="E"):
     df = con.execute_sql("SELECT SPRSL, TCODE, TTEXT FROM TSTCT")
     df = df[df["SPRSL"] == target_language]
