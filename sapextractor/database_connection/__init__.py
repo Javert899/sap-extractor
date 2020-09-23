@@ -1,1 +1,1 @@
-from sapextractor.database_connection import sqlite
+from sapextractor.database_connection import interface, sqlite
