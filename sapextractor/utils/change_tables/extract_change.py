@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from sapextractor.utils.tstct import extract_tstct
 
 
 class Shared:
@@ -12,6 +13,10 @@ def read_cdhdr(con):
     df["UTIME"] = pd.to_datetime(df["UTIME"]).apply(lambda x: x.timestamp())
     df["time:timestamp"] = df["UDATE"] + df["UTIME"]
     df["time:timestamp"] = df["time:timestamp"].apply(lambda x: datetime.fromtimestamp(x))
+    df = df.sort_values("time:timestamp")
+    transactions = set(df["TCODE"].unique())
+    tstct = extract_tstct.apply_static(con, transactions=transactions)
+    df["concept:name"] = df["TCODE"].map(tstct)
     return df
 
 
