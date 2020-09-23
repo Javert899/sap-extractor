@@ -22,5 +22,5 @@ def apply_static(con, transactions=None):
     if transactions is not None:
         transactions = set(transactions).difference(set(ret.keys()))
         for t in transactions:
-            ret[t] = t
+            ret[t] = str(t)
     return ret
