@@ -21,6 +21,9 @@ class SqliteConnection(DatabaseConnection):
         tables = [x[0] for x in tables]
         return tables
 
+    def write_dataframe(self, dataframe, table_name):
+        dataframe.to_sql(table_name, con=self.con)
+
 
 def apply(path):
     return SqliteConnection(path)

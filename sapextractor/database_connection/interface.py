@@ -7,3 +7,6 @@ class DatabaseConnection(object):
 
     def get_list_tables(self):
         raise Exception("not implemented")
+
+    def write_dataframe(self, dataframe, table_name):
+        raise Exception("not implemented")

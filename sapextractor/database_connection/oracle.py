@@ -21,6 +21,9 @@ class OracleConnection(DatabaseConnection):
         tables = [x[0] for x in tables]
         return tables
 
+    def write_dataframe(self, dataframe, table_name):
+        dataframe.to_sql(table_name, con=self.con)
+
 
 def apply(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
     return OracleConnection(hostname=hostname, port=port, sid=sid, username=username, password=password)
