@@ -14,6 +14,13 @@ class SqliteConnection(DatabaseConnection):
         df.columns = [x.upper() for x in df.columns]
         return df
 
+    def get_list_tables(self):
+        cursor = self.con.cursor()
+        cursor.execute('SELECT name from sqlite_master where type= "table"')
+        tables = cursor.fetchall()
+        tables = [x[0] for x in tables]
+        return tables
+
 
 def apply(path):
     return SqliteConnection(path)
