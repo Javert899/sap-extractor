@@ -24,6 +24,13 @@ class OracleConnection(DatabaseConnection):
     def write_dataframe(self, dataframe, table_name):
         dataframe.to_sql(table_name, con=self.con)
 
+    def get_columns(self, table_name):
+        cursor = self.con.cursor()
+        cursor.execute("select col.column_name from sys.dba_tab_columns col where col.table_name = '%s'" % table_name)
+        columns = cursor.fetchall()
+        columns = [x[0] for x in columns]
+        return columns
+
 
 def apply(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
     return OracleConnection(hostname=hostname, port=port, sid=sid, username=username, password=password)

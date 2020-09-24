@@ -24,6 +24,13 @@ class SqliteConnection(DatabaseConnection):
     def write_dataframe(self, dataframe, table_name):
         dataframe.to_sql(table_name, con=self.con)
 
+    def get_columns(self, table_name):
+        cursor = self.con.cursor()
+        cursor.execute("SELECT name FROM PRAGMA_TABLE_INFO('%s')" % table_name)
+        columns = cursor.fetchall()
+        columns = [x[0] for x in columns]
+        return columns
+
 
 def apply(path):
     return SqliteConnection(path)

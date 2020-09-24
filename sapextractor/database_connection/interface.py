@@ -10,3 +10,6 @@ class DatabaseConnection(object):
 
     def write_dataframe(self, dataframe, table_name):
         raise Exception("not implemented")
+
+    def get_columns(self, table_name):
+        raise Exception("not implemented")
