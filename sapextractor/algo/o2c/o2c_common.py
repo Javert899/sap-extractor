@@ -15,7 +15,7 @@ def vbfa_closure(vbfa):
 
 
 def apply(con):
-    vbfa = con.execute_sql("SELECT ERDAT, ERZET, VBELN, VBELV, VBTYP_N, VBTYP_V FROM VBFA")
+    vbfa = con.execute_read_sql("SELECT ERDAT, ERZET, VBELN, VBELV, VBTYP_N, VBTYP_V FROM VBFA")
     vbfa["ERDAT"] = pd.to_datetime(vbfa["ERDAT"]).apply(lambda x: x.timestamp())
     vbfa["ERZET"] = pd.to_datetime(vbfa["ERZET"]).apply(lambda x: x.timestamp())
     vbfa["time:timestamp"] = vbfa["ERDAT"] + vbfa["ERZET"]

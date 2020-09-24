@@ -9,7 +9,7 @@ class SqliteConnection(DatabaseConnection):
         self.con = sqlite3.connect(self.path)
         DatabaseConnection.__init__(self)
 
-    def execute_sql(self, sql):
+    def execute_read_sql(self, sql):
         df = pd.read_sql(sql, self.con)
         df.columns = [x.upper() for x in df.columns]
         return df
