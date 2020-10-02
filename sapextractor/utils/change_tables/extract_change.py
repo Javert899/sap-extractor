@@ -11,12 +11,12 @@ def read_cdhdr(con):
     df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"])
     df["UDATE"] = pd.to_datetime(df["UDATE"]).apply(lambda x: x.timestamp())
     df["UTIME"] = pd.to_datetime(df["UTIME"]).apply(lambda x: x.timestamp())
-    df["time:timestamp"] = df["UDATE"] + df["UTIME"]
-    df["time:timestamp"] = df["time:timestamp"].apply(lambda x: datetime.fromtimestamp(x))
-    df = df.sort_values("time:timestamp")
+    df["event_timestamp"] = df["UDATE"] + df["UTIME"]
+    df["event_timestamp"] = df["event_timestamp"].apply(lambda x: datetime.fromtimestamp(x))
+    df = df.sort_values("event_timestamp")
     transactions = set(df["TCODE"].unique())
     tstct = extract_tstct.apply_static(con, transactions=transactions)
-    df["concept:name"] = df["TCODE"].map(tstct)
+    df["event_activity"] = df["TCODE"].map(tstct)
     return df
 
 
