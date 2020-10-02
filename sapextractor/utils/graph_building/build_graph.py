@@ -54,5 +54,3 @@ def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
     dataframe = pd.DataFrame(list_corresp).sort_values("node")
 
     return dataframe
-
-
