@@ -49,7 +49,7 @@ def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
         all_descendants = set(nx.ancestors(G, node))
         all_nodes = all_ancestors.union(all_descendants).union({node})
         for n2 in all_nodes:
-            list_corresp.append({"node": n2, "type": types[n2], "case:concept:name": index})
+            list_corresp.append({"node": n2, "type": types[n2], "case:concept:name": str(index)})
 
     dataframe = pd.DataFrame(list_corresp).sort_values("node")
 

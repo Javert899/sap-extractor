@@ -46,7 +46,7 @@ def apply(con, keep_first=True):
             cols[x] = "event_" + x
     vbfa = vbfa.rename(columns=cols)
     vbfa["event_activity"] = "Create " + vbfa["event_VBTYP_N"]
-    if keep_first:
+    if not keep_first:
         vbfa["event_activity"] = vbfa["event_activity"] + " Item"
     vbfa["ORDER_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + ORDER_DOC_SEP + vbfa["event_VBELN"].astype(str)
     vbfa["ORDER_DOCUMENTS"] = vbfa["ORDER_DOCUMENTS"].apply(set_order_documents)
