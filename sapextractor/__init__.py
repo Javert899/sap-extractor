@@ -6,7 +6,7 @@ def connect_sqlite(path):
 
 
 def connect_oracle(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
-    return database_connection.sqlite.apply(hostname=hostname, port=port, sid=sid, username=username, password=password)
+    return database_connection.oracle.apply(hostname=hostname, port=port, sid=sid, username=username, password=password)
 
 
 def get_o2c_classic_event_log(con, ref_type="Invoice", keep_first=True):

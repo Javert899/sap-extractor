@@ -23,7 +23,7 @@ class OracleConnection(DatabaseConnection):
         return tables
 
     def write_dataframe(self, dataframe, table_name):
-        dataframe.to_sql(table_name, con=self.con)
+        raise Exception("not implemented")
 
     def get_columns(self, table_name):
         cursor = self.con.cursor()
