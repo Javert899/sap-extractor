@@ -31,8 +31,8 @@ def extract_bseg(con, doc_first_dates, doc_types):
     bseg = bseg.dropna(subset=["BELNR", "AUGBL"], how="any")
     cols = {x: "event_" + x for x in bseg.columns}
     bseg = bseg.rename(columns=cols)
-    bseg["event_ONLYACT"] = "Clear Document"
     bseg["event_timestamp"] = bseg["event_AUGBL"].map(doc_first_dates)
+    bseg = bseg.dropna(subset=["event_timestamp"], how="any")
+    bseg["event_ONLYACT"] = "Clear Document"
     bseg["event_DOCTYPE"] = bseg["event_BELNR"].map(doc_types)
-
     return bseg
