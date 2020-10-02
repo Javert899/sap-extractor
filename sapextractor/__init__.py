@@ -1,6 +1,14 @@
 from sapextractor import algo, database_connection, utils
 
 
+__version__ = '0.0.1'
+__doc__ = "SAP Extractor"
+__author__ = 'PADS'
+__author_email__ = 'alessandro.berti89@gmail.com'
+__maintainer__ = 'PADS'
+__maintainer_email__ = 'alessandro.berti89@gmail.com'
+
+
 def connect_sqlite(path):
     return database_connection.sqlite.apply(path)
 
