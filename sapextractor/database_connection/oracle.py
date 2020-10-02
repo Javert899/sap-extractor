@@ -1,6 +1,7 @@
 from sapextractor.database_connection.interface import DatabaseConnection
 from sapextractor.utils.string_matching import find_corr
 import pandas as pd
+from getpass import getpass
 
 
 class OracleConnection(DatabaseConnection):
@@ -47,5 +48,27 @@ class OracleConnection(DatabaseConnection):
         dataframe.columns = columns
         return dataframe
 
+
 def apply(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
     return OracleConnection(hostname=hostname, port=port, sid=sid, username=username, password=password)
+
+
+def cli():
+    print("\n\n")
+    print("== Connection to an Oracle database == \n\n")
+    hostname = str(input("Insert the hostname (default: 127.0.0.1):"))
+    if not hostname:
+        hostname = "127.0.0.1"
+    port = str(input("Insert the port (default: 1521):"))
+    if not port:
+        port = "1521"
+    sid = str(input("Insert the SID (default: xe):"))
+    if not sid:
+        sid = "xe"
+    username = str(input("Insert the username of a DB user (default: system):"))
+    if not username:
+        username = "system"
+    password = str(getpass("Insert the password of the DB user (default: oracle):"))
+    if not password:
+        password = "oracle"
+    return apply(hostname=hostname, port=port, sid=sid, username=username, password=password)

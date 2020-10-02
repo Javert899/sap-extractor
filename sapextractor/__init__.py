@@ -1,4 +1,4 @@
-from sapextractor import algo, database_connection, utils
+from sapextractor import algo, database_connection, utils, main
 
 
 __version__ = '0.0.1'
@@ -35,3 +35,7 @@ def get_ap_ar_single_doc_transactions_dataframe(con):
 
 def get_ap_ar_single_doc_transactions_log(con):
     return algo.ap_ar.single_doc_transactions_log.apply(con)
+
+
+def cli():
+    return main.main()

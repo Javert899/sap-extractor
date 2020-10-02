@@ -50,3 +50,13 @@ class SqliteConnection(DatabaseConnection):
 
 def apply(path):
     return SqliteConnection(path)
+
+
+def cli():
+    print("\n\n")
+    print("== Connection to a SQLite database == \n\n")
+    path = input("Insert the path to the SQLite database (default: ./sap.sqlite):")
+    if not path:
+        path = "./sap.sqlite"
+    con = apply(path)
+    return con
