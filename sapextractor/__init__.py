@@ -19,3 +19,11 @@ def get_o2c_classic_dataframe(con, ref_type="Invoice", keep_first=True):
 
 def get_o2c_mdl_dataframe(con):
     pass
+
+
+def get_ap_ar_single_doc_transactions_dataframe(con):
+    return algo.ap_ar.single_doc_transactions_dataframe.apply(con)
+
+
+def get_ap_ar_single_doc_transactions_log(con):
+    return algo.ap_ar.single_doc_transactions_log.apply(con)
