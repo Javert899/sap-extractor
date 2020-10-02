@@ -5,7 +5,7 @@ from sapextractor.utils.graph_building import build_graph
 def apply(con, ref_type="Invoice", keep_first=True):
     dataframe = o2c_common.apply(con, keep_first=keep_first)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
-    cols = {x: x.split("event_")[1] for x in dataframe.columns}
+    cols = {x: x.split("event_")[-1] for x in dataframe.columns}
     cols["event_activity"] = "concept:name"
     cols["event_timestamp"] = "time:timestamp"
     dataframe = dataframe.rename(columns=cols)

@@ -10,4 +10,5 @@ def apply(dataframe, dt_column, tm_column, target_column):
     dataframe[target_column] = dataframe[dt_column] + dataframe[tm_column]
     dataframe[target_column] = dataframe[target_column].apply(lambda x: datetime.fromtimestamp(x))
     dataframe = dataframe.sort_values("event_timestamp")
+    dataframe = dataframe.dropna(subset=["event_timestamp"], how="any")
     return dataframe

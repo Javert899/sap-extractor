@@ -1,5 +1,6 @@
 from sapextractor.utils.tstct import extract_tstct
 from sapextractor.utils.blart import extract_blart
+from sapextractor.utils.change_tables import extract_change
 import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
@@ -9,6 +10,7 @@ def extract_bkpf(con):
     bkpf = bkpf.dropna(subset=["BELNR", "TCODE", "BLART"], how="any")
     transactions = set(bkpf["TCODE"].unique())
     doc_types = set(bkpf["BLART"].unique())
+    #changes = extract_change.apply_static(con)
     tcodes = extract_tstct.apply_static(con, transactions=transactions)
     blart = extract_blart.apply_static(con, doc_types=doc_types)
     cols = {x: "event_" + x for x in bkpf.columns}
