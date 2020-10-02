@@ -43,8 +43,9 @@ class OracleConnection(DatabaseConnection):
 
     def prepare_and_execute_query(self, table_name, columns):
         query = self.prepare_query(table_name, columns)
-        return self.execute_read_sql(query)
-
+        dataframe = self.execute_read_sql(query)
+        dataframe.columns = columns
+        return dataframe
 
 def apply(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
     return OracleConnection(hostname=hostname, port=port, sid=sid, username=username, password=password)

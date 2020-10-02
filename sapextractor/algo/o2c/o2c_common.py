@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from sapextractor.utils.vbtyp import extract_vbtyp
+from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
 
 ORDER_DOC_SEP = "@#@#@#"
@@ -8,7 +9,7 @@ ORDER_DOC_SEP = "@#@#@#"
 
 def vbfa_closure(vbfa):
     vbeln_unique = set(vbfa["VBELN"].unique())
-    vbfa_vbelv_types = list((x["VBELV"], x["VBTYP_V"]) for x in vbfa[["VBELV", "VBTYP_V"]].to_dict("r") if
+    vbfa_vbelv_types = list((x["VBELV"], x["VBTYP_V"]) for x in vbfa[["VBELV", "VBTYP_V"]].to_dict("records") if
                             x["VBELV"] not in vbeln_unique)
     # default the timestamp
     closure_events = {"VBELN": [x[0] for x in vbfa_vbelv_types], "VBTYP_N": [x[1] for x in vbfa_vbelv_types],
@@ -28,10 +29,7 @@ def set_order_documents(content):
 
 def apply(con, keep_first=True):
     vbfa = con.execute_read_sql("SELECT ERDAT, ERZET, VBELN, VBELV, VBTYP_N, VBTYP_V FROM VBFA")
-    vbfa["ERDAT"] = pd.to_datetime(vbfa["ERDAT"]).apply(lambda x: x.timestamp())
-    vbfa["ERZET"] = pd.to_datetime(vbfa["ERZET"]).apply(lambda x: x.timestamp())
-    vbfa["event_timestamp"] = vbfa["ERDAT"] + vbfa["ERZET"]
-    vbfa["event_timestamp"] = vbfa["event_timestamp"].apply(lambda x: datetime.fromtimestamp(x))
+    timestamp_column_from_dt_tm.apply(vbfa, "ERDAT", "ERZET", "event_timestamp")
     doc_types = set(vbfa["VBTYP_N"].unique()).union(set(vbfa["VBTYP_V"].unique()))
     vbtyp = extract_vbtyp.apply_static(con, doc_types=doc_types)
     vbfa["VBTYP_N"] = vbfa["VBTYP_N"].map(vbtyp)

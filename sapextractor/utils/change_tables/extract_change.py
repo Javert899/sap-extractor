@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 from sapextractor.utils.tstct import extract_tstct
-
+from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
 class Shared:
     change_dictio = {}
@@ -9,10 +9,7 @@ class Shared:
 
 def read_cdhdr(con):
     df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"])
-    df["UDATE"] = pd.to_datetime(df["UDATE"]).apply(lambda x: x.timestamp())
-    df["UTIME"] = pd.to_datetime(df["UTIME"]).apply(lambda x: x.timestamp())
-    df["event_timestamp"] = df["UDATE"] + df["UTIME"]
-    df["event_timestamp"] = df["event_timestamp"].apply(lambda x: datetime.fromtimestamp(x))
+    df = timestamp_column_from_dt_tm.apply(df, "UDATE", "UTIME", "event_timestamp")
     df = df.sort_values("event_timestamp")
     transactions = set(df["TCODE"].unique())
     tstct = extract_tstct.apply_static(con, transactions=transactions)
@@ -33,7 +30,7 @@ def apply(con):
     for name, group in grouped_cdhdr:
         change_dictio[name] = group
     del grouped_cdhdr
-    cdpos = cdpos.to_dict('r')
+    cdpos = cdpos.to_dict('records')
     for el in cdpos:
         changenr = el["CHANGENR"]
         objectid = el["OBJECTID"]

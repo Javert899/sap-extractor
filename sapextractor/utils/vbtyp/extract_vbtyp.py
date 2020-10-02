@@ -9,7 +9,7 @@ def apply(con, target_language="E"):
     df = con.prepare_and_execute_query("DD07T", ["DOMNAME", "DDLANGUAGE", "DDTEXT", "DOMVALUE_L"])
     df = df[df["DOMNAME"] == "VBTYP"]
     df = df[df["DDLANGUAGE"] == target_language]
-    stream = df.to_dict('r')
+    stream = df.to_dict('records')
     dictio = {}
     for el in stream:
         dictio[el["DOMVALUE_L"]] = el["DDTEXT"]

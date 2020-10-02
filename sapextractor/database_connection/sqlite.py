@@ -43,7 +43,9 @@ class SqliteConnection(DatabaseConnection):
 
     def prepare_and_execute_query(self, table_name, columns):
         query = self.prepare_query(table_name, columns)
-        return self.execute_read_sql(query)
+        dataframe = self.execute_read_sql(query)
+        dataframe.columns = columns
+        return dataframe
 
 
 def apply(path):

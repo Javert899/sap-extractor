@@ -8,7 +8,7 @@ def apply(df, prev, curr, prev_type, curr_type):
     all_nodes = prev_nodes.union(succ_nodes)
     edges = set()
     df = df.dropna(subset=[prev, curr], how="any")
-    stream = df[[prev, curr, prev_type, curr_type]].to_dict('r')
+    stream = df[[prev, curr, prev_type, curr_type]].to_dict('records')
     types = {}
     for el in stream:
         source = el[prev]
