@@ -8,7 +8,7 @@ class Shared:
 
 
 def read_cdhdr(con):
-    df = con.execute_read_sql("SELECT CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM CDHDR")
+    df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"])
     df["UDATE"] = pd.to_datetime(df["UDATE"]).apply(lambda x: x.timestamp())
     df["UTIME"] = pd.to_datetime(df["UTIME"]).apply(lambda x: x.timestamp())
     df["time:timestamp"] = df["UDATE"] + df["UTIME"]
@@ -21,7 +21,7 @@ def read_cdhdr(con):
 
 
 def read_cdpos(con):
-    df = con.execute_read_sql("SELECT CHANGENR, OBJECTID FROM CDPOS")
+    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID"])
     return df
 
 

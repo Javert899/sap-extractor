@@ -6,7 +6,7 @@ class Shared:
 
 
 def apply(con, target_language="E"):
-    df = con.execute_read_sql("SELECT DOMNAME, DDLANGUAGE, DDTEXT, DOMVALUE_L FROM DD07T")
+    df = con.prepare_and_execute_query("DD07T", ["DOMNAME", "DDLANGUAGE", "DDTEXT", "DOMVALUE_L"])
     df = df[df["DOMNAME"] == "VBTYP"]
     df = df[df["DDLANGUAGE"] == target_language]
     stream = df.to_dict('r')

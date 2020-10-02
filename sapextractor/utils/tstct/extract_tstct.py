@@ -6,7 +6,7 @@ class Shared:
 
 
 def apply(con, target_language="E"):
-    df = con.execute_read_sql("SELECT SPRSL, TCODE, TTEXT FROM TSTCT")
+    df = con.prepare_and_execute_query("TSTCT", ["SPRSL", "TCODE", "TTEXT"])
     df = df[df["SPRSL"] == target_language]
     stream = df.to_dict('r')
     dictio = {}

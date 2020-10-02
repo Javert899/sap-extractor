@@ -1,2 +1,3 @@
 pm4py==1.5.1
 pm4pymdl==0.0.25
+stringdist

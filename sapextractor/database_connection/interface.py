@@ -13,3 +13,12 @@ class DatabaseConnection(object):
 
     def get_columns(self, table_name):
         raise Exception("not implemented")
+
+    def format_table_name(self, table_name):
+        raise Exception("not implemented")
+
+    def prepare_query(self, table_name, columns):
+        raise Exception("not implemented")
+
+    def prepare_and_execute_query(self, table_name, columns):
+        raise Exception("not implemented")

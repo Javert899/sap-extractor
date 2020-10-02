@@ -1,4 +1,5 @@
 from sapextractor.database_connection.interface import DatabaseConnection
+from sapextractor.utils.string_matching import find_corr
 import sqlite3
 import pandas as pd
 
@@ -30,6 +31,19 @@ class SqliteConnection(DatabaseConnection):
         columns = cursor.fetchall()
         columns = [x[0] for x in columns]
         return columns
+
+    def format_table_name(self, table_name):
+        return table_name
+
+    def prepare_query(self, table_name, columns):
+        table_name = self.format_table_name(table_name)
+        table_columns = self.get_columns(table_name)
+        columns = find_corr.apply(columns, table_columns)
+        return "SELECT "+",".join(columns)+" FROM "+table_name
+
+    def prepare_and_execute_query(self, table_name, columns):
+        query = self.prepare_query(table_name, columns)
+        return self.execute_read_sql(query)
 
 
 def apply(path):
