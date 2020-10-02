@@ -12,5 +12,6 @@ def apply(con):
     ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
                                                        ref_type="Order")
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'))
+    dataframe = dataframe.reset_index()
     dataframe = dataframe.sort_values("time:timestamp")
     return dataframe
