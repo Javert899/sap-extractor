@@ -26,7 +26,7 @@ def set_order_documents(content):
     return ret
 
 
-def apply(con):
+def apply(con, keep_first=True):
     vbfa = con.execute_read_sql("SELECT ERDAT, ERZET, VBELN, VBELV, VBTYP_N, VBTYP_V FROM VBFA")
     vbfa["ERDAT"] = pd.to_datetime(vbfa["ERDAT"]).apply(lambda x: x.timestamp())
     vbfa["ERZET"] = pd.to_datetime(vbfa["ERZET"]).apply(lambda x: x.timestamp())
@@ -45,6 +45,9 @@ def apply(con):
         else:
             cols[x] = "event_" + x
     vbfa = vbfa.rename(columns=cols)
+    vbfa["event_activity"] = "Create " + vbfa["event_VBTYP_N"]
+    if keep_first:
+        vbfa["event_activity"] = vbfa["event_activity"] + " Item"
     vbfa["ORDER_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + ORDER_DOC_SEP + vbfa["event_VBELN"].astype(str)
     vbfa["ORDER_DOCUMENTS"] = vbfa["ORDER_DOCUMENTS"].apply(set_order_documents)
     vbfa = vbfa.reset_index()

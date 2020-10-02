@@ -13,8 +13,8 @@ def get_o2c_classic_event_log(con):
     return algo.o2c.o2c_1d_log_extractor.apply(con)
 
 
-def get_o2c_classic_dataframe(con):
-    return algo.o2c.o2c_1d_dataframe_extractor.apply(con)
+def get_o2c_classic_dataframe(con, ref_type="Order", keep_first=True):
+    return algo.o2c.o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first)
 
 
 def get_o2c_mdl_dataframe(con):
