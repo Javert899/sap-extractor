@@ -10,7 +10,9 @@ def main():
     print("1) SQLite")
     print("2) Oracle")
     print()
-    connector = input("Please insert your choice -> ")
+    connector = input("Please insert your choice (default: 1) -> ")
+    if not connector:
+        connector = "1"
     con = None
     if connector == "1":
         con = sqlite.cli()
@@ -21,7 +23,9 @@ def main():
     print("a) O2C")
     print("b) Accounting (AP/AR)")
     print()
-    process = input("Please insert your choice -> ")
+    process = input("Please insert your choice (default: a) -> ")
+    if not process:
+        process = "a"
     if process == "a":
         return o2c_cli.cli(con)
     elif process == "b":
@@ -31,4 +35,3 @@ def main():
 def extraction_with_arguments(db_type, db_con_arg, process, ext_type, ext_arg):
     con = conn_factory.apply(db_type, db_con_arg)
     return algo_factory.apply(con, process, ext_type, ext_arg)
-
