@@ -31,4 +31,8 @@ def cli(con):
         keep_first = True
     else:
         keep_first = False
-    return apply(con, ref_type=ref_type, keep_first=keep_first)
+    dataframe = apply(con, ref_type=ref_type, keep_first=keep_first)
+    path = input("Insert the path where the dataframe should be saved (default: o2c.csv):")
+    if not path:
+        path = "o2c.csv"
+    dataframe.to_csv(path, index=False)

@@ -1,6 +1,7 @@
 from sapextractor.algo.o2c import o2c_1d_dataframe_extractor
 from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.log.util import sorting
+from pm4py.objects.log.exporter.xes import exporter as xes_exporter
 
 
 def apply(con, ref_type="Invoice", keep_first=True):
@@ -22,4 +23,8 @@ def cli(con):
         keep_first = True
     else:
         keep_first = False
-    return apply(con, ref_type=ref_type, keep_first=keep_first)
+    log = apply(con, ref_type=ref_type, keep_first=keep_first)
+    path = input("Insert the path where the log should be saved (default: o2c.xes):")
+    if not path:
+        path = "o2c.xes"
+    xes_exporter.apply(log, path)

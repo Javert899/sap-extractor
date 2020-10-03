@@ -18,4 +18,8 @@ def apply(con):
 
 def cli(con):
     print("\n\nAccounting - Transactions for the single document (dataframe)\n")
-    return apply(con)
+    dataframe = apply(con)
+    path = input("Insert the path where the dataframe should be saved (default: bkpf.csv):")
+    if not path:
+        path = "bkpf.csv"
+    dataframe.to_csv(path, index=False)
