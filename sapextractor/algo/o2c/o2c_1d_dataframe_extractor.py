@@ -27,9 +27,10 @@ def cli(con):
     ext_type = input("Do you want to extract the document log, or the items log (default: document):")
     if not ext_type:
         ext_type = "document"
+    keep_first = True
     if ext_type == "document":
         keep_first = True
-    else:
+    elif ext_type == "items":
         keep_first = False
     dataframe = apply(con, ref_type=ref_type, keep_first=keep_first)
     path = input("Insert the path where the dataframe should be saved (default: o2c.csv):")
