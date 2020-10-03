@@ -39,3 +39,7 @@ def get_ap_ar_single_doc_transactions_log(con):
 
 def cli():
     return main.main()
+
+
+def extraction_with_arguments(db_con_arg, ext_type, ext_arg):
+    pass

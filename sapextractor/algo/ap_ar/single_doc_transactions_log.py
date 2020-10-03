@@ -3,7 +3,8 @@ from pm4py.objects.conversion.log import converter as log_converter
 from pm4py.objects.log.util import sorting
 from pm4py.objects.log.exporter.xes import exporter as xes_exporter
 
-def apply(con):
+
+def apply(con, **ext_arg):
     dataframe = single_doc_transactions_dataframe.apply(con)
     log = log_converter.apply(dataframe)
     log = sorting.sort_timestamp(log, "time:timestamp")

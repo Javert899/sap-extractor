@@ -2,7 +2,7 @@ from sapextractor.algo.ap_ar import ap_ar_common
 import pandas as pd
 
 
-def apply(con):
+def apply(con, **ext_arg):
     bkpf, doc_first_dates, doc_types = ap_ar_common.extract_bkpf(con)
     bseg = ap_ar_common.extract_bseg(con, doc_first_dates, doc_types)
     bkpf = pd.concat([bkpf, bseg])
