@@ -48,7 +48,7 @@ class SqliteConnection(DatabaseConnection):
         return dataframe
 
 
-def apply(path):
+def apply(path='./sap.sqlite'):
     return SqliteConnection(path)
 
 

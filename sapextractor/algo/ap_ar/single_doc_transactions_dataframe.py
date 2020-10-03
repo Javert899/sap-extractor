@@ -13,5 +13,4 @@ def apply(con):
     bkpf = bkpf.rename(columns=ren_cols)
     bkpf["case:concept:name"] = bkpf["BELNR"]
     bkpf = bkpf.sort_values("time:timestamp")
-    bkpf.info()
     return bkpf

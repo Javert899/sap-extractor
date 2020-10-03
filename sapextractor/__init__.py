@@ -9,8 +9,8 @@ __maintainer__ = 'PADS'
 __maintainer_email__ = 'alessandro.berti89@gmail.com'
 
 
-def connect_sqlite(path):
-    return database_connection.sqlite.apply(path)
+def connect_sqlite(path='./sap.sqlite'):
+    return database_connection.sqlite.apply(path=path)
 
 
 def connect_oracle(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
