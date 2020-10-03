@@ -6,7 +6,7 @@ from pm4py.objects.log.exporter.xes import exporter as xes_exporter
 
 def apply(con, ref_type="Invoice", keep_first=True):
     dataframe = o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first)
-    log = log_converter.apply(dataframe)
+    log = log_converter.apply(dataframe, parameters={"stream_postprocessing": True})
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log
 
