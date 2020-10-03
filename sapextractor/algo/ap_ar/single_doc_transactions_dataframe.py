@@ -14,3 +14,8 @@ def apply(con):
     bkpf["case:concept:name"] = bkpf["BELNR"]
     bkpf = bkpf.sort_values("time:timestamp")
     return bkpf
+
+
+def cli(con):
+    print("\n\nAccounting - Transactions for the single document (dataframe)\n")
+    return apply(con)

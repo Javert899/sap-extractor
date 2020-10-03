@@ -17,3 +17,18 @@ def apply(con, ref_type="Invoice", keep_first=True):
         dataframe = dataframe.groupby("VBELN").first()
     dataframe = dataframe.sort_values("time:timestamp")
     return dataframe
+
+
+def cli(con):
+    print("\n\nO2C dataframe extractor\n")
+    ref_type = input("Insert the central document type of the extraction (default: Invoice): ")
+    if not ref_type:
+        ref_type = "Invoice"
+    ext_type = input("Do you want to extract the document log, or the items log (default: document):")
+    if not ext_type:
+        ext_type = "document"
+    if ext_type == "document":
+        keep_first = True
+    else:
+        keep_first = False
+    return apply(con, ref_type=ref_type, keep_first=keep_first)

@@ -8,3 +8,8 @@ def apply(con):
     log = log_converter.apply(dataframe)
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log
+
+
+def cli(con):
+    print("\n\nAccounting - Transactions for the single document (XES log)\n")
+    return apply(con)
