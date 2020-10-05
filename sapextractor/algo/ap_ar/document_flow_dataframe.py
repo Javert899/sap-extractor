@@ -10,7 +10,7 @@ def apply(con, ref_type="Goods receipt"):
     bkpf = bkpf.merge(anc_succ, left_on="event_BELNR", right_on="node", suffixes=('', '_r'), how="right")
     bkpf = bkpf.reset_index()
     bkpf["event_activity"] = bkpf["event_BLART"]
-    ren_cols = {"event_activity": "concept:name", "event_timestamp": "time:timestamp"}
+    ren_cols = {"event_activity": "concept:name", "event_timestamp": "time:timestamp", "event_USNAM": "org:resource"}
     bkpf = bkpf.rename(columns=ren_cols)
     ren_cols = {x: x.split("event_")[-1] for x in bkpf.columns}
     bkpf = bkpf.rename(columns=ren_cols)
