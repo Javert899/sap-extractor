@@ -2,9 +2,7 @@ import pandas as pd
 from datetime import datetime
 from sapextractor.utils.vbtyp import extract_vbtyp
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
-
-
-ORDER_DOC_SEP = "@#@#@#"
+from sapextractor.utils import constants
 
 
 def vbfa_closure(vbfa):
@@ -16,15 +14,6 @@ def vbfa_closure(vbfa):
                       "event_timestamp": datetime.fromtimestamp(10000000)}
     closure_df = pd.DataFrame(closure_events)
     return pd.concat([vbfa, closure_df]).sort_values("event_timestamp")
-
-
-def set_order_documents(content):
-    ret = []
-    content = content.split(ORDER_DOC_SEP)
-    for x in content:
-        if str(x).lower() != "nan":
-            ret.append(x)
-    return ret
 
 
 def apply(con, keep_first=True):
@@ -46,8 +35,8 @@ def apply(con, keep_first=True):
     vbfa["event_activity"] = "Create " + vbfa["event_VBTYP_N"]
     if not keep_first:
         vbfa["event_activity"] = vbfa["event_activity"] + " Item"
-    vbfa["ORDER_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + ORDER_DOC_SEP + vbfa["event_VBELN"].astype(str)
-    vbfa["ORDER_DOCUMENTS"] = vbfa["ORDER_DOCUMENTS"].apply(set_order_documents)
+    vbfa["INVOLVED_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + constants.DOC_SEP + vbfa["event_VBELN"].astype(str)
+    vbfa["INVOLVED_DOCUMENTS"] = vbfa["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     vbfa = vbfa.reset_index()
     return vbfa
 

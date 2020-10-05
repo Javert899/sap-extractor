@@ -4,6 +4,7 @@ from sapextractor.utils.change_tables import extract_change
 import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from datetime import datetime
+from sapextractor.utils import constants
 
 
 def extract_bkpf(con):
@@ -18,6 +19,9 @@ def extract_bkpf(con):
     bkpf = bkpf.rename(columns=cols)
     bkpf["event_ONLYACT"] = bkpf["event_TCODE"].map(tcodes)
     bkpf["event_BLART"] = bkpf["event_BLART"].map(blart)
+    bkpf = bkpf.dropna(subset=["event_ONLYACT", "event_BLART"], how="any")
+    bkpf["INVOLVED_DOCUMENTS"] = bkpf["event_BELNR"].astype(str)
+    bkpf["INVOLVED_DOCUMENTS"] = bkpf["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     bkpf = timestamp_column_from_dt_tm.apply(bkpf, "event_CPUDT", "event_CPUTM", "event_timestamp")
     bkpf_first = bkpf.groupby("event_BELNR").first().reset_index()
     first_stream = bkpf_first[["event_BELNR", "event_timestamp", "event_BLART"]].to_dict("records")
@@ -33,6 +37,8 @@ def extract_bseg(con, doc_first_dates, doc_types):
     bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
     bseg["AUGBL_TYPE"] = bseg["AUGBL"].map(doc_types)
     bseg = bseg.dropna(subset=["BELNR_TYPE", "AUGBL_TYPE"])
+    bseg["INVOLVED_DOCUMENTS"] = bseg["event_BELNR"].astype(str) + constants.DOC_SEP + bseg["event_AUGBL"].astype(str)
+    bseg["INVOLVED_DOCUMENTS"] = bseg["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
     bseg["AUGDT"] = bseg["AUGDT"].apply(lambda x: x.timestamp())
     bseg["AUGDT"] += 86399
@@ -44,4 +50,5 @@ def extract_bseg(con, doc_first_dates, doc_types):
     bseg = bseg.dropna(subset=["event_timestamp"], how="any")
     bseg["event_ONLYACT"] = "Clear Document"
     bseg["event_DOCTYPE"] = bseg["event_BELNR"].map(doc_types)
+    
     return bseg
