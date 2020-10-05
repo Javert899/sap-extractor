@@ -21,8 +21,9 @@ setup(
     include_package_data=True,
     packages=['sapextractor', 'sapextractor.algo', 'sapextractor.algo.o2c', 'sapextractor.algo.ap_ar',
               'sapextractor.utils', 'sapextractor.utils.blart', 'sapextractor.utils.dates', 'sapextractor.utils.tstct',
-              'sapextractor.utils.vbtyp', 'sapextractor.utils.change_tables', 'sapextractor.utils.graph_building',
-              'sapextractor.utils.string_matching', 'sapextractor.database_connection'],
+              'sapextractor.utils.vbtyp', 'sapextractor.utils.filters', 'sapextractor.utils.change_tables',
+              'sapextractor.utils.graph_building', 'sapextractor.utils.string_matching',
+              'sapextractor.database_connection'],
     url='http://www.pm4py.org',
     license='GPL 3.0',
     install_requires=[
