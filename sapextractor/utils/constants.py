@@ -1,5 +1,5 @@
 DOC_SEP = "@#@#@#"
-MAX_CASE_SIZE = 75
+MAX_CASE_SIZE = 130
 
 
 def set_documents(content):
