@@ -6,6 +6,8 @@ from sapextractor.utils import constants
 
 def apply(con, ref_type="EKKO"):
     dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con)
+    dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
+    print(len(dataframe))
     anc_succ = build_graph.get_ancestors_successors_from_graph(G, nodes_types, ref_type=ref_type)
     dataframe = dataframe.merge(anc_succ, left_on="event_node", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.dropna(subset=["event_activity", "event_timestamp"])

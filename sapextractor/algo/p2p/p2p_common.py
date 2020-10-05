@@ -6,6 +6,7 @@ import pandas as pd
 def extract_tables_and_graph(con):
     G = nx.DiGraph()
     nodes_types = {}
+    nodes_connections = {}
     eban, eban_nodes_types = eban_processing.apply(con)
     for n in eban_nodes_types:
         G.add_node(n)
@@ -18,6 +19,11 @@ def extract_tables_and_graph(con):
     for edge in eban_ekpo_connection:
         if edge[0] in G.nodes and edge[1] in G.nodes:
             G.add_edge(edge[0], edge[1])
+        if not edge[0] in nodes_connections:
+            nodes_connections[edge[0]] = {edge[0]}
+        nodes_connections[edge[0]].add(edge[1])
+    nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
     dataframe = pd.concat([eban, ekko])
     dataframe = dataframe.sort_values("event_timestamp")
+    dataframe = dataframe.merge(nodes_connections, left_on="event_node", right_on="node", suffixes=('', '_r'), how="left")
     return dataframe, G, nodes_types
