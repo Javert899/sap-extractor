@@ -8,4 +8,7 @@ def apply(con):
     eban["event_timestamp"] = pd.to_datetime(eban["event_timestamp"])
     eban["event_activity"] = "Create Purchase Requisition"
     eban["event_FROMTABLE"] = "EBAN"
-    return eban
+    eban["event_node"] = eban["event_BANFN"]
+    eban = eban.dropna(subset=["event_node"])
+    eban_nodes_types = {x: "EBAN" for x in eban["event_node"].unique()}
+    return eban, eban_nodes_types

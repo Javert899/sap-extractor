@@ -40,6 +40,11 @@ def get_conn_comp(df, prev, curr, prev_type, curr_type):
 
 def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
     G, types = apply(df, prev, curr, prev_type, curr_type)
+
+    return get_ancestors_successors_from_graph(G, types, ref_type=ref_type)
+
+
+def get_ancestors_successors_from_graph(G, types, ref_type=""):
     list_corresp = []
 
     nodes_ref_type = {x for x,y in types.items() if y == ref_type}
