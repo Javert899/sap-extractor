@@ -1,5 +1,7 @@
 from sapextractor.algo.o2c import o2c_common
 from sapextractor.utils.graph_building import build_graph
+from pm4py.algo.filtering.pandas.cases import case_filter
+from sapextractor.utils import constants
 
 
 def apply(con, ref_type="Invoice", keep_first=True):
@@ -16,6 +18,7 @@ def apply(con, ref_type="Invoice", keep_first=True):
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
     dataframe = dataframe.sort_values("time:timestamp")
+    dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
 

@@ -1,5 +1,7 @@
 from sapextractor.algo.ap_ar import ap_ar_common
 from sapextractor.utils.graph_building import build_graph
+from pm4py.algo.filtering.pandas.cases import case_filter
+from sapextractor.utils import constants
 
 
 def apply(con, ref_type="Goods receipt"):
@@ -14,6 +16,7 @@ def apply(con, ref_type="Goods receipt"):
     bkpf = bkpf.rename(columns=ren_cols)
     bkpf = bkpf.dropna(subset=["concept:name", "time:timestamp"], how="any")
     bkpf = bkpf.sort_values("time:timestamp")
+    bkpf = case_filter.filter_on_case_size(bkpf, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return bkpf
 
 
