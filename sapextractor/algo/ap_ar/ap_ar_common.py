@@ -12,7 +12,6 @@ def extract_bkpf(con):
     bkpf = bkpf.dropna(subset=["BELNR", "TCODE", "BLART"], how="any")
     transactions = set(bkpf["TCODE"].unique())
     doc_types = set(bkpf["BLART"].unique())
-    #changes = extract_change.apply_static(con)
     tcodes = extract_tstct.apply_static(con, transactions=transactions)
     blart = extract_blart.apply_static(con, doc_types=doc_types)
     cols = {x: "event_" + x for x in bkpf.columns}
@@ -46,7 +45,6 @@ def extract_bseg(con, doc_first_dates, doc_types):
     bseg["INVOLVED_DOCUMENTS"] = bseg["event_BELNR"].astype(str) + constants.DOC_SEP + bseg["event_AUGBL"].astype(str)
     bseg["INVOLVED_DOCUMENTS"] = bseg["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     bseg["event_timestamp"] = bseg["event_AUGDT"]
-    #bseg["event_timestamp"] = bseg["event_AUGBL"].map(doc_first_dates)
     bseg = bseg.dropna(subset=["event_timestamp"], how="any")
     bseg["event_ONLYACT"] = "Clear Document"
     bseg["event_DOCTYPE"] = bseg["event_BELNR"].map(doc_types)
@@ -55,18 +53,9 @@ def extract_bseg(con, doc_first_dates, doc_types):
 
 
 def extract_changes_bkpf(con, bkpf, doc_types):
-    changes = extract_change.apply_static(con)
-    awkey_belnr = {x["event_AWKEY"]: x["event_BELNR"] for x in bkpf[["event_BELNR", "event_AWKEY"]].dropna(subset=["event_BELNR", "event_AWKEY"], how="any").to_dict("records")}
-    changes = {x: y for x, y in changes.items() if x in awkey_belnr}
-    changes = pd.concat([y for y in changes.values()])
-    changes["event_BELNR"] = changes["event_AWKEY"].map(awkey_belnr)
-    changes = changes.dropna(subset=["event_AWKEY", "event_BELNR"], how="any")
+    changes = extract_change.get_changes_dataframe_two_mapping(con, bkpf, "event_AWKEY", "event_BELNR", resource_column="event_USNAM")
     changes["event_BLART"] = changes["event_BELNR"].map(doc_types)
     changes = changes.dropna(subset=["event_BLART"], how="any")
-    changes = changes.rename(columns={"event_USERNAME": "event_USNAM"})
-    transactions = set(changes["event_TCODE"].unique())
-    tcodes = extract_tstct.apply_static(con, transactions=transactions)
-    changes["event_ONLYACT"] = changes["event_TCODE"].map(tcodes)
     changes["INVOLVED_DOCUMENTS"] = changes["event_BELNR"].astype(str)
     changes["INVOLVED_DOCUMENTS"] = changes["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     return changes
