@@ -17,4 +17,7 @@ def cli(con):
     path = input("Insert the path where the log should be saved (default: o2c.mdl): ")
     if not path:
         path = "o2c.mdl"
-    mdl_exporter.apply(dataframe, path)
+    if path.endswith("mdl"):
+        mdl_exporter.apply(dataframe, path)
+    elif path.endswith("jmd"):
+        jmd_exporter.apply(dataframe, path)

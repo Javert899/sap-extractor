@@ -25,8 +25,8 @@ def get_o2c_classic_dataframe(con, ref_type="Invoice", keep_first=True):
     return algo.o2c.o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first)
 
 
-def get_o2c_mdl_dataframe(con):
-    pass
+def get_o2c_obj_centr_log(con, keep_first=True):
+    return algo.o2c.obj_centr_log.apply(con, keep_first=keep_first)
 
 
 def get_ap_ar_single_doc_transactions_dataframe(con):
@@ -51,6 +51,10 @@ def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt"):
 
 def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt"):
     return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type)
+
+
+def get_ap_ar_obj_centr_log(con):
+    return algo.ap_ar.obj_centr_log.apply(con)
 
 
 def cli():
