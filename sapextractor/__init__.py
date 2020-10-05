@@ -45,9 +45,13 @@ def get_ap_ar_document_flow_log(con, ref_type="Goods receipt"):
     return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type)
 
 
+def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt"):
+    return algo.ap_ar.doc_flow_transactions_dataframe.apply(con, ref_type=ref_type)
+
+
+def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt"):
+    return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type)
+
+
 def cli():
     return main.main()
-
-
-def extraction_with_arguments(db_con_arg, ext_type, ext_arg):
-    pass
