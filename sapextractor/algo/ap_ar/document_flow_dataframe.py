@@ -27,4 +27,4 @@ def cli(con):
     path = input("Insert the path where the dataframe should be saved (default: doc_flow.csv): ")
     if not path:
         path = "doc_flow.csv"
-    dataframe.to_csv(path, index=False)
+    dataframe.to_csv(path, sep=",", quotechar="\"", index=False)

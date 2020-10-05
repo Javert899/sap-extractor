@@ -36,4 +36,4 @@ def cli(con):
     path = input("Insert the path where the dataframe should be saved (default: o2c.csv):")
     if not path:
         path = "o2c.csv"
-    dataframe.to_csv(path, index=False)
+    dataframe.to_csv(path, sep=",", quotechar="\"",  index=False)
