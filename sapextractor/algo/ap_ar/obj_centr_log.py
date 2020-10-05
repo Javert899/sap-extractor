@@ -1,13 +1,10 @@
 from sapextractor.algo.ap_ar import ap_ar_common
-import pandas as pd
 from pm4pymdl.objects.jmd.exporter import exporter as jmd_exporter
 from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 
 def apply(con, **ext_arg):
-    bkpf, doc_first_dates, doc_types = ap_ar_common.extract_bkpf(con)
-    bseg = ap_ar_common.extract_bseg(con, doc_first_dates, doc_types)
-    bkpf = pd.concat([bkpf, bseg])
+    bkpf = ap_ar_common.get_full_dataframe(con, filter_columns=False)
     bkpf["event_activity"] = bkpf["event_ONLYACT"] + " (" + bkpf["event_BLART"] + ")"
     bkpf["event_id"] = bkpf.index.astype(str)
     bkpf = bkpf.sort_values("event_timestamp")

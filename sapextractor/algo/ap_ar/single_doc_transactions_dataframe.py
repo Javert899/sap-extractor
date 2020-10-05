@@ -1,5 +1,4 @@
 from sapextractor.algo.ap_ar import ap_ar_common
-import pandas as pd
 
 
 def apply(con, **ext_arg):
