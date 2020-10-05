@@ -1,6 +1,7 @@
 from sapextractor.algo.ap_ar import ap_ar_common
 import pandas as pd
 from pm4pymdl.objects.jmd.exporter import exporter as jmd_exporter
+from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 
 def apply(con, **ext_arg):
@@ -17,7 +18,7 @@ def apply(con, **ext_arg):
 def cli(con):
     print("\n\nAccounting Object-Centric Log Extractor\n\n")
     dataframe = apply(con)
-    path = input("Insert the path where the log should be saved (default: accounting.jmd): ")
+    path = input("Insert the path where the log should be saved (default: accounting.mdl): ")
     if not path:
-        path = "accounting.jmd"
-    jmd_exporter.apply(dataframe, path)
+        path = "accounting.mdl"
+    mdl_exporter.apply(dataframe, path)

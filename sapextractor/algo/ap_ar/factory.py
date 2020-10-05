@@ -17,5 +17,5 @@ def apply(con, ext_type, ext_arg):
         return doc_flow_transactions_dataframe.apply(con, **ext_arg)
     elif ext_type == "doc_flow_transactions_xes":
         return doc_flow_transactions_log.apply(con, **ext_arg)
-    elif ext_type == "obj_centr_log":
+    elif ext_type == "apar_obj_centr_log":
         return obj_centr_log.apply(con, **ext_arg)
