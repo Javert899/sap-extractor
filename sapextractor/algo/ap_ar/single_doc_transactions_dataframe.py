@@ -3,17 +3,14 @@ import pandas as pd
 
 
 def apply(con, **ext_arg):
-    bkpf, doc_first_dates, doc_types = ap_ar_common.extract_bkpf(con)
-    bkpf = bkpf[[x for x in bkpf.columns if x.startswith("event_")]]
-    bseg = ap_ar_common.extract_bseg(con, doc_first_dates, doc_types)
-    bseg = bseg[[x for x in bseg.columns if x.startswith("event_")]]
-    bkpf = pd.concat([bkpf, bseg])
+    bkpf = ap_ar_common.get_full_dataframe(con, filter_columns=True)
     bkpf["event_activity"] = bkpf["event_ONLYACT"]
     ren_cols = {"event_activity": "concept:name", "event_timestamp": "time:timestamp", "event_USNAM": "org:resource"}
     bkpf = bkpf.rename(columns=ren_cols)
     ren_cols = {x: x.split("event_")[-1] for x in bkpf.columns}
     bkpf = bkpf.rename(columns=ren_cols)
     bkpf["case:concept:name"] = bkpf["BELNR"]
+    bkpf = bkpf.dropna(subset=["concept:name", "time:timestamp"], how="any")
     bkpf = bkpf.sort_values("time:timestamp")
     return bkpf
 
