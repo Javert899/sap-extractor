@@ -17,3 +17,15 @@ def apply(con, ref_type="Goods receipt"):
     bkpf = bkpf.groupby(["case:concept:name", "BELNR"]).first().reset_index()
     bkpf = bkpf.sort_values("time:timestamp")
     return bkpf
+
+
+def cli(con):
+    print("\n\nAccounting Doc Flow dataframe extractor\n\n")
+    ref_type = input("Insert the central document type of the extraction (default: Goods receipt): ")
+    if not ref_type:
+        ref_type = "Goods receipt"
+    dataframe = apply(con, ref_type=ref_type)
+    path = input("Insert the path where the dataframe should be saved (default: doc_flow.csv): ")
+    if not path:
+        path = "doc_flow.csv"
+    dataframe.to_csv(path, index=False)
