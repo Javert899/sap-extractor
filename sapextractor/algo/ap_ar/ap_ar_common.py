@@ -3,6 +3,7 @@ from sapextractor.utils.blart import extract_blart
 from sapextractor.utils.change_tables import extract_change
 import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
+from datetime import datetime
 
 
 def extract_bkpf(con):
@@ -28,10 +29,15 @@ def extract_bkpf(con):
 
 def extract_bseg(con, doc_first_dates, doc_types):
     bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"])
-    bseg = bseg.dropna(subset=["BELNR", "AUGBL"], how="any")
+    bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
+    bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
+    bseg["AUGDT"] = bseg["AUGDT"].apply(lambda x: x.timestamp())
+    bseg["AUGDT"] += 86399
+    bseg["AUGDT"] = bseg["AUGDT"].apply(lambda x: datetime.fromtimestamp(x))
     cols = {x: "event_" + x for x in bseg.columns}
     bseg = bseg.rename(columns=cols)
-    bseg["event_timestamp"] = bseg["event_AUGBL"].map(doc_first_dates)
+    bseg["event_timestamp"] = bseg["event_AUGDT"]
+    #bseg["event_timestamp"] = bseg["event_AUGBL"].map(doc_first_dates)
     bseg = bseg.dropna(subset=["event_timestamp"], how="any")
     bseg["event_ONLYACT"] = "Clear Document"
     bseg["event_DOCTYPE"] = bseg["event_BELNR"].map(doc_types)
