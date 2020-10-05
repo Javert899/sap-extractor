@@ -30,6 +30,9 @@ def extract_bkpf(con):
 def extract_bseg(con, doc_first_dates, doc_types):
     bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"])
     bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
+    bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
+    bseg["AUGBL_TYPE"] = bseg["AUGBL"].map(doc_types)
+    bseg = bseg.dropna(subset=["BELNR_TYPE", "AUGBL_TYPE"])
     bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
     bseg["AUGDT"] = bseg["AUGDT"].apply(lambda x: x.timestamp())
     bseg["AUGDT"] += 86399

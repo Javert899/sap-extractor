@@ -37,6 +37,14 @@ def get_ap_ar_single_doc_transactions_log(con):
     return algo.ap_ar.single_doc_transactions_log.apply(con)
 
 
+def get_ap_ar_document_flow_dataframe(con, ref_type="Goods receipt"):
+    return algo.ap_ar.document_flow_dataframe.apply(con, ref_type=ref_type)
+
+
+def get_ap_ar_document_flow_log(con, ref_type="Goods receipt"):
+    return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type)
+
+
 def cli():
     return main.main()
 
