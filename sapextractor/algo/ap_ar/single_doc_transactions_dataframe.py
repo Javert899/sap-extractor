@@ -1,5 +1,5 @@
 from sapextractor.algo.ap_ar import ap_ar_common
-from pm4py.algo.filtering.pandas.cases import case_filter
+from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 
 

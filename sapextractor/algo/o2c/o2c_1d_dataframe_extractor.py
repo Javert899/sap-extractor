@@ -1,6 +1,6 @@
 from sapextractor.algo.o2c import o2c_common
 from sapextractor.utils.graph_building import build_graph
-from pm4py.algo.filtering.pandas.cases import case_filter
+from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 
 
