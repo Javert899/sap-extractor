@@ -17,7 +17,7 @@ def apply(con, **ext_arg):
 def cli(con):
     print("\n\nAccounting Object-Centric Log Extractor\n\n")
     dataframe = apply(con)
-    path = input("Insert the path where the LOG should be saved (default: accounting.jmd): ")
+    path = input("Insert the path where the log should be saved (default: accounting.jmd): ")
     if not path:
         path = "accounting.jmd"
     jmd_exporter.apply(dataframe, path)
