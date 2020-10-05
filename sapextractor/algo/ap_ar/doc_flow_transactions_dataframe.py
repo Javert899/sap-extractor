@@ -6,6 +6,7 @@ def apply(con, ref_type="Goods receipt"):
     bkpf, doc_first_dates, doc_types = ap_ar_common.extract_bkpf(con)
     bkpf = bkpf[[x for x in bkpf.columns if x.startswith("event_")]]
     bseg = ap_ar_common.extract_bseg(con, doc_first_dates, doc_types)
+    bseg = bseg[[x for x in bseg.columns if x.startswith("event_")]]
     anc_succ = build_graph.get_ancestors_successors(bseg, "event_AUGBL", "event_BELNR", "event_AUGBL_TYPE", "event_BELNR_TYPE", ref_type)
     bkpf = bkpf.merge(anc_succ, left_on="event_BELNR", right_on="node", suffixes=('', '_r'), how="right")
     bkpf = bkpf.reset_index()

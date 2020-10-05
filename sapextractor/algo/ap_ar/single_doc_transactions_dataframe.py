@@ -6,6 +6,7 @@ def apply(con, **ext_arg):
     bkpf, doc_first_dates, doc_types = ap_ar_common.extract_bkpf(con)
     bkpf = bkpf[[x for x in bkpf.columns if x.startswith("event_")]]
     bseg = ap_ar_common.extract_bseg(con, doc_first_dates, doc_types)
+    bseg = bseg[[x for x in bseg.columns if x.startswith("event_")]]
     bkpf = pd.concat([bkpf, bseg])
     bkpf["event_activity"] = bkpf["event_ONLYACT"]
     ren_cols = {"event_activity": "concept:name", "event_timestamp": "time:timestamp", "event_USNAM": "org:resource"}
