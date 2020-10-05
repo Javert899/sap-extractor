@@ -8,8 +8,7 @@ def apply(con):
     ekko["event_timestamp"] = pd.to_datetime(ekko["event_timestamp"])
     ekko["event_activity"] = "Create Purchase Order"
     ekko["event_FROMTABLE"] = "EKKO"
-    ekko["event_node"] = ekko["event_BANFN"]
+    ekko["event_node"] = ekko["event_EBELN"]
     ekko = ekko.dropna(subset=["event_node"], how="any")
     ekko_nodes_types = {x: "EKKO" for x in ekko["event_node"].unique()}
     return ekko, ekko_nodes_types
-
