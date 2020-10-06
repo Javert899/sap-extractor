@@ -29,11 +29,11 @@ def get_o2c_obj_centr_log(con, keep_first=True):
     return algo.o2c.obj_centr_log.apply(con, keep_first=keep_first)
 
 
-def get_p2p_classic_event_log(con, ref_type="MKPF"):
+def get_p2p_classic_event_log(con, ref_type="EKKO"):
     return algo.p2p.p2p_1d_log.apply(con, ref_type=ref_type)
 
 
-def get_p2p_classic_dataframe(con, ref_type="MKPF"):
+def get_p2p_classic_dataframe(con, ref_type="EKKO"):
     return algo.p2p.p2p_1d_dataframe.apply(con, ref_type=ref_type)
 
 
