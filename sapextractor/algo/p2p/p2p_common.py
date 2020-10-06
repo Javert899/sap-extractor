@@ -3,6 +3,18 @@ import networkx as nx
 import pandas as pd
 
 
+def add_edges_to_graph(edges, nodes_connections, G):
+    for edge in edges:
+        if edge[0] in G.nodes and edge[1] in G.nodes:
+            G.add_edge(edge[0], edge[1])
+        if not edge[0] in nodes_connections:
+            nodes_connections[edge[0]] = {edge[0]}
+        if not edge[1] in nodes_connections:
+            nodes_connections[edge[1]] = {edge[1]}
+        nodes_connections[edge[0]].add(edge[1])
+    return nodes_connections, G
+
+
 def extract_tables_and_graph(con):
     G = nx.DiGraph()
     nodes_types = {}
@@ -16,12 +28,7 @@ def extract_tables_and_graph(con):
         G.add_node(n)
     nodes_types.update(ekko_nodes_types)
     eban_ekpo_connection = ekpo_processing.eban_ekko_connection(con)
-    for edge in eban_ekpo_connection:
-        if edge[0] in G.nodes and edge[1] in G.nodes:
-            G.add_edge(edge[0], edge[1])
-        if not edge[0] in nodes_connections:
-            nodes_connections[edge[0]] = {edge[0]}
-        nodes_connections[edge[0]].add(edge[1])
+    nodes_connections, G = add_edges_to_graph(eban_ekpo_connection, nodes_connections, G)
     nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
     dataframe = pd.concat([eban, ekko])
     dataframe = dataframe.sort_values("event_timestamp")
