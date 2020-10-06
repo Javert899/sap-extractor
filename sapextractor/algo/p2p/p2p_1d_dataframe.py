@@ -22,9 +22,9 @@ def apply(con, ref_type="EKKO"):
 
 def cli(con):
     print("\n\nP2P - XES log\n")
-    ref_type = input("Provide the central table for the extraction (default: MKPF):")
+    ref_type = input("Provide the central table for the extraction (default: EKKO):")
     if not ref_type:
-        ref_type = "MKPF"
+        ref_type = "EKKO"
     dataframe = apply(con, ref_type=ref_type)
     path = input("Insert the path where the log should be saved (default: p2p.csv): ")
     if not path:
