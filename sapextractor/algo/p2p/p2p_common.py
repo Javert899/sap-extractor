@@ -1,4 +1,5 @@
 from sapextractor.algo.p2p.tab_processing import eban_processing, ekko_processing, ekpo_processing
+from sapextractor.algo.p2p.tab_processing import mkpf_processing, mseg_processing
 import networkx as nx
 import pandas as pd
 
@@ -27,10 +28,18 @@ def extract_tables_and_graph(con):
     for n in ekko_nodes_types:
         G.add_node(n)
     nodes_types.update(ekko_nodes_types)
-    eban_ekpo_connection = ekpo_processing.eban_ekko_connection(con)
-    nodes_connections, G = add_edges_to_graph(eban_ekpo_connection, nodes_connections, G)
+    eban_ekko_connection = ekpo_processing.eban_ekko_connection(con)
+    nodes_connections, G = add_edges_to_graph(eban_ekko_connection, nodes_connections, G)
+
+    mkpf, mkpf_nodes_types = mkpf_processing.apply(con)
+    for n in mkpf_nodes_types:
+        G.add_node(n)
+    nodes_types.update(mkpf_nodes_types)
+    ekko_mkpf_connection = mseg_processing.ekko_mkpf_connection(con)
+    nodes_connections, G = add_edges_to_graph(ekko_mkpf_connection, nodes_connections, G)
+
     nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
-    dataframe = pd.concat([eban, ekko])
+    dataframe = pd.concat([eban, ekko, mkpf])
     dataframe = dataframe.sort_values("event_timestamp")
     dataframe = dataframe.merge(nodes_connections, left_on="event_node", right_on="node", suffixes=('', '_r'), how="left")
     return dataframe, G, nodes_types
