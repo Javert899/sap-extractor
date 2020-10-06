@@ -4,7 +4,7 @@ from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 
 
-def apply(con, ref_type="EKKO"):
+def apply(con, ref_type="MKPF"):
     dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     anc_succ = build_graph.get_ancestors_successors_from_graph(G, nodes_types, ref_type=ref_type)
@@ -22,9 +22,9 @@ def apply(con, ref_type="EKKO"):
 
 def cli(con):
     print("\n\nP2P - XES log\n")
-    ref_type = input("Provide the central table for the extraction (default: EKKO):")
+    ref_type = input("Provide the central table for the extraction (default: MKPF):")
     if not ref_type:
-        ref_type = "EKKO"
+        ref_type = "MKPF"
     dataframe = apply(con, ref_type=ref_type)
     path = input("Insert the path where the log should be saved (default: p2p.csv): ")
     if not path:
