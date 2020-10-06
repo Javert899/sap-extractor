@@ -30,6 +30,7 @@ class SqliteConnection(DatabaseConnection):
         cursor.execute("SELECT name FROM PRAGMA_TABLE_INFO('%s')" % table_name)
         columns = cursor.fetchall()
         columns = [x[0] for x in columns]
+        columns = sorted(columns)
         return columns
 
     def format_table_name(self, table_name):
