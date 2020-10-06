@@ -1,4 +1,3 @@
-import pandas as pd
 from sapextractor.utils.tstct import extract_tstct
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
