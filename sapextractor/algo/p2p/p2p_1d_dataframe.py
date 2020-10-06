@@ -16,6 +16,7 @@ def apply(con, ref_type="EKKO"):
     cols["event_USERNAME"] = "org:resource"
     dataframe = dataframe.rename(columns=cols)
     dataframe = dataframe.sort_values("time:timestamp")
+    dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
     dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
