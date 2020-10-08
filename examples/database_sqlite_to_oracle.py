@@ -1,4 +1,5 @@
 import sapextractor
+import traceback
 
 
 def execute_script():
@@ -6,10 +7,13 @@ def execute_script():
     c2 = sapextractor.connect_oracle(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle")
     list_tables = c1.get_list_tables()
     for table in list_tables:
-        print()
-        print(table)
-        df = c1.execute_read_sql("SELECT * FROM "+table)
-        c2.write_dataframe(df, table)
+        try:
+            print()
+            print(table)
+            df = c1.execute_read_sql("SELECT * FROM "+table)
+            c2.write_dataframe(df, table)
+        except:
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
