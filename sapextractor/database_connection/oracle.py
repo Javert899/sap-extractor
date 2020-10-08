@@ -24,7 +24,45 @@ class OracleConnection(DatabaseConnection):
         return tables
 
     def write_dataframe(self, dataframe, table_name):
-        raise Exception("not implemented")
+        columns = list(dataframe.columns)
+        stream = dataframe.to_dict("r")
+        stream2 = []
+        while stream:
+            event = stream.pop(0)
+            new_event = []
+            for index, c in enumerate(columns):
+                val = event[c]
+                new_event.append(val)
+            stream2.append(tuple(new_event))
+        cursor = self.con.cursor()
+        try:
+            cursor.execute("DROP TABLE "+table_name)
+        except:
+            pass
+        creation_instructions = ["CREATE TABLE "+table_name+" ("]
+        for index, c in enumerate(columns):
+            creation_instructions.append(c)
+            dtype = str(dataframe[c].dtype)
+            if dtype == "object":
+                creation_instructions.append(" CLOB")
+            elif dtype == "int64":
+                creation_instructions.append(" INTEGER")
+            elif dtype == "float64":
+                creation_instructions.append(" FLOAT")
+            if index < len(columns)-1:
+                creation_instructions.append(", ")
+        creation_instructions.append(")")
+        creation_instructions = "".join(creation_instructions)
+        cursor.execute(creation_instructions)
+        insertmany_instruction = ["INSERT INTO "+table_name+" VALUES ("]
+        for index in range(len(columns)):
+            insertmany_instruction.append(":%d" % (index+1))
+            if index < len(columns)-1:
+                insertmany_instruction.append(", ")
+        insertmany_instruction.append(")")
+        insertmany_instruction = "".join(insertmany_instruction)
+        cursor.executemany(insertmany_instruction, stream2)
+        self.con.commit()
 
     def get_columns(self, table_name):
         cursor = self.con.cursor()
