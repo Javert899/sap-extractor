@@ -17,7 +17,7 @@ def vbfa_closure(vbfa):
 
 
 def apply(con, keep_first=True):
-    vbfa = con.execute_read_sql("SELECT ERDAT, ERZET, VBELN, VBELV, VBTYP_N, VBTYP_V FROM VBFA")
+    vbfa = con.prepare_and_execute_query("VBFA", ["ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V"])
     timestamp_column_from_dt_tm.apply(vbfa, "ERDAT", "ERZET", "event_timestamp")
     doc_types = set(vbfa["VBTYP_N"].unique()).union(set(vbfa["VBTYP_V"].unique()))
     vbtyp = extract_vbtyp.apply_static(con, doc_types=doc_types)

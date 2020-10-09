@@ -47,6 +47,8 @@ def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
 def get_ancestors_successors_from_graph(G, types, ref_type=""):
     list_corresp = []
 
+    #print(types)
+
     nodes_ref_type = {x for x,y in types.items() if y == ref_type}
 
     for index, node in enumerate(nodes_ref_type):

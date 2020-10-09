@@ -44,7 +44,7 @@ class OracleConnection(DatabaseConnection):
             creation_instructions.append(c)
             dtype = str(dataframe[c].dtype)
             if dtype == "object":
-                creation_instructions.append(" CLOB")
+                creation_instructions.append(" VARCHAR2(3000)")
             elif dtype == "int64":
                 creation_instructions.append(" INTEGER")
             elif dtype == "float64":
