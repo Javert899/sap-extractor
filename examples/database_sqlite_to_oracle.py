@@ -1,11 +1,12 @@
 import sapextractor
 import traceback
 from sapextractor.utils import constants
+from examples import example_connection
 
 
 def execute_script():
-    c1 = sapextractor.connect_sqlite("../sap.sqlite")
-    c2 = sapextractor.connect_oracle(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle")
+    c1 = example_connection.get_sqlite_con()
+    c2 = example_connection.get_oracle_con()
     #list_tables = c1.get_list_tables()
     for table in constants.INVOLVED_TABLES:
         try:
