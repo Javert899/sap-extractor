@@ -6,7 +6,7 @@ class Shared:
 
 
 def apply(con, target_language="E"):
-    df = con.prepare_and_execute_query("T003T", ["SPRAS", "BLART", "LTEXT"])
+    df = con.prepare_and_execute_query("T003T", ["SPRAS", "BLART", "LTEXT"], " WHERE SPRAS = '"+target_language+"'")
     df = df[df["SPRAS"] == target_language]
     stream = df.to_dict('records')
     dictio = {}

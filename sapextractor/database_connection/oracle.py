@@ -82,8 +82,8 @@ class OracleConnection(DatabaseConnection):
         columns = find_corr.apply(columns, table_columns)
         return "SELECT "+",".join(columns)+" FROM "+table_name
 
-    def prepare_and_execute_query(self, table_name, columns):
-        query = self.prepare_query(table_name, columns)
+    def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
+        query = self.prepare_query(table_name, columns) + additional_query_part
         dataframe = self.execute_read_sql(query)
         dataframe.columns = columns
         return dataframe

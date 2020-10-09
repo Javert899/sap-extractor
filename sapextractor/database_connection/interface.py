@@ -20,5 +20,5 @@ class DatabaseConnection(object):
     def prepare_query(self, table_name, columns):
         raise Exception("not implemented")
 
-    def prepare_and_execute_query(self, table_name, columns):
+    def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
         raise Exception("not implemented")
