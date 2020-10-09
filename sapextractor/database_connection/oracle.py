@@ -78,7 +78,6 @@ class OracleConnection(DatabaseConnection):
         table_name = self.format_table_name(table_name)
         table_columns = self.get_columns(table_name)
         columns = find_corr.apply(columns, table_columns)
-        columns = sorted(columns)
         return "SELECT "+",".join(columns)+" FROM "+table_name
 
     def prepare_and_execute_query(self, table_name, columns):
