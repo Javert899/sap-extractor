@@ -12,8 +12,10 @@ class OracleConnection(DatabaseConnection):
         DatabaseConnection.__init__(self)
 
     def execute_read_sql(self, sql):
-        df = pd.read_sql(sql, self.con)
-        df.columns = [x.upper() for x in df.columns]
+        cursor = self.con.cursor()
+        cursor.execute(sql)
+        stream = cursor.fetchall()
+        df = pd.DataFrame(stream)
         return df
 
     def get_list_tables(self):
