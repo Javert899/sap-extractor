@@ -29,7 +29,7 @@ setup(
     license='GPL 3.0',
     install_requires=[
         "pm4py>=1.5.2.3",
-        "pm4pymdl>=0.0.26",
+        "pm4pymdl>=0.0.27",
         "stringdist",
         "cx_Oracle"
     ]
