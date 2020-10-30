@@ -1,0 +1,85 @@
+@startuml
+
+entity BKPF {
+    BELNR: Integer <<PK>>
+    CPUDT: Date
+    CPUTM: Date
+    USNAM: String
+    TCODE: String <<FK>>
+    BLART: String <<FK>>
+    AWKEY: String <<FK>>
+}
+
+entity BSEG {
+    BELNR: Integer <<PK>> <<FK>>
+    BUZEI: Integer <<PK>>
+    AUGBL: Integer <<FK>>
+    HKONT: Integer
+    KUNNR: Integer
+    LIFNR: Integer
+}
+
+entity TSTCT {
+    TCODE: Integer <<PK>> <<FK>>
+    SPRSL: Integer <<PK>>
+    TTEXT: String
+}
+
+entity T003T {
+    BLART: String <<PK>> <<FK>>
+    SPRSL: String <<PK>>
+    LTEXT: String
+}
+
+entity LFA1 {
+    LIFNR: String <<PK>>
+    NAME1: String
+    LAND1: String
+    ORT01: String
+}
+
+entity LFB1 {
+    LIFNR: String <<PK>>
+    AKONT: String
+    ZTERM: String
+}
+
+entity KNA1 {
+    KUNNR: String <<PK>>
+    NAME1: String
+    LAND1: String
+    ORT01: String
+}
+
+entity KNB1 {
+    KUNNR: String <<PK>>
+    AKONT: String
+    ZTERM: String
+}
+
+entity CDHDR {
+    CHANGENR: String <<PK>>
+    USERNAME: String
+    UDATE: Date
+    UTIME: Date
+    TCODE: String <<PK>>
+}
+
+entity CDPOS {
+    CHANGENR: String <<PK>> <<FK>>
+    OBJECTID: String
+}
+
+BKPF }|..|| BSEG
+BKPF ||-- TSTCT
+BKPF ||-- T003T
+BSEG |o-- LFA1
+BSEG |o-- LFB1
+BSEG |o-- KNA1
+BSEG |o-- KNB1
+CDHDR }|-- CDPOS
+CDHDR ||-- TSTCT
+BKPF |o-- CDPOS
+
+
+@enduml

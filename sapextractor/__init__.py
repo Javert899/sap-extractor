@@ -1,4 +1,4 @@
-from sapextractor import algo, database_connection, utils, main
+from sapextractor import algo, database_connection, utils, main, diagrams
 
 
 __version__ = '0.0.8'
