@@ -1,0 +1,38 @@
+@startuml
+
+entity BKPF {
+    BELNR: Integer <<PK>>
+    CPUDT: Date
+    CPUTM: Date
+    USNAM: String
+    TCODE: String <<FK>>
+    BLART: String <<FK>>
+    AWKEY: String <<FK>>
+}
+
+entity BSEG {
+    BELNR: Integer <<PK>> <<FK>>
+    BUZEI: Integer <<PK>>
+    AUGBL: Integer <<FK>>
+    HKONT: Integer
+    KUNNR: Integer
+    LIFNR: Integer
+}
+
+entity TSTCT {
+    TCODE: Integer <<PK>> <<FK>>
+    SPRSL: Integer <<PK>>
+    TTEXT: String
+}
+
+entity T003T {
+    BLART: String <<PK>> <<FK>>
+    SPRSL: String <<PK>>
+    LTEXT: String
+}
+
+BKPF }|..|| BSEG
+BKPF ||-- TSTCT
+BKPF ||-- T003T
+
+@enduml
