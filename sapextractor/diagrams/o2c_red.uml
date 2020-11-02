@@ -1,0 +1,16 @@
+@startuml
+
+entity VBFA {
+    VBELN: String <<PK>>
+    VBELV: String <<FK>>
+    VBTYP_N: String
+    VBTYP_V: String
+    ERDAT: Date
+    ERZET: Date
+}
+
+entity DD07T {
+
+}
+
+@enduml

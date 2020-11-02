@@ -32,6 +32,7 @@ entity T003T {
 }
 
 BKPF }|..|| BSEG
+BSEG |o-- BSEG
 BKPF ||-- TSTCT
 BKPF ||-- T003T
 

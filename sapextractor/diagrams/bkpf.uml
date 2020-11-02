@@ -71,6 +71,7 @@ entity CDPOS {
 }
 
 BKPF }|..|| BSEG
+BSEG |o-- BSEG
 BKPF ||-- TSTCT
 BKPF ||-- T003T
 BSEG |o-- LFA1
