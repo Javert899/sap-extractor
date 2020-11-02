@@ -1,0 +1,48 @@
+@startuml
+
+entity EBAN {
+    BANFN: String <<PK>>
+    ERNAM: String
+    ERDAT: Date
+}
+
+entity EKKO {
+    EBELN: String <<PK>>
+    ERNAM: String
+    AEDAT: Date
+    LIFNR: String
+    ZTERM: String
+}
+
+entity EKPO {
+    EBELN: String <<PK>> <<FK>>
+    BANFN: String <<PK>> <<FK>>
+}
+
+entity MKPF {
+    MBLNR: String <<PK>>
+    BLART: String
+    CPUDT: Date
+    CPUTM: Date
+    USNAM: String
+    TCODE: String <<FK>>
+}
+
+entity MSEG {
+    MBLNR: String <<PK>> <<FK>>
+    EBELN: String <<PK>> <<FK>>
+}
+
+entity TSTCT {
+    TCODE: Integer <<PK>>
+    SPRSL: Integer <<PK>>
+    TTEXT: String
+}
+
+EKKO }|..|| EKPO
+EBAN }o-- EKPO
+MKPF }|..|| MSEG
+EKKO }o-- MSEG
+MKPF ||-- TSTCT
+
+@enduml
