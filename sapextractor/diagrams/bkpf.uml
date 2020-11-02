@@ -20,13 +20,13 @@ entity BSEG {
 }
 
 entity TSTCT {
-    TCODE: Integer <<PK>> <<FK>>
+    TCODE: Integer <<PK>>
     SPRSL: Integer <<PK>>
     TTEXT: String
 }
 
 entity T003T {
-    BLART: String <<PK>> <<FK>>
+    BLART: String <<PK>>
     SPRSL: String <<PK>>
     LTEXT: String
 }

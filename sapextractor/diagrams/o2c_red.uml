@@ -3,14 +3,20 @@
 entity VBFA {
     VBELN: String <<PK>>
     VBELV: String <<FK>>
-    VBTYP_N: String
-    VBTYP_V: String
+    VBTYP_N: String <<FK>>
+    VBTYP_V: String <<FK>>
     ERDAT: Date
     ERZET: Date
 }
 
 entity DD07T {
-
+    DOMNAME: String <<PK>>
+    DOMVALUE_L: String <<PK>>
+    DDLANGUAGE: String <<PK>>
+    DDTEXT: String
 }
+
+VBFA }|..|| VBFA
+VBFA ||-- DD07T
 
 @enduml
