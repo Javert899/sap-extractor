@@ -29,7 +29,10 @@ class OracleConnection(DatabaseConnection):
             df.append(this_dataframe)
             stream = None
             stream = []
-        df = pd.concat(df)
+        if df:
+            df = pd.concat(df)
+        else:
+            df = pd.DataFrame({x: [] for x in columns})
         df.columns = [x.upper() for x in df.columns]
         return df
 

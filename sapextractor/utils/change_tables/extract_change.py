@@ -9,8 +9,9 @@ def read_cdhdr(con, objectclas=None):
     df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"],
                                        additional_query_part=additional_query_part)
     df.columns = ["event_" + x for x in df.columns]
-    df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
-    df = df.sort_values("event_timestamp")
+    if len(df) > 0:
+        df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
+        df = df.sort_values("event_timestamp")
     transactions = set(df["event_TCODE"].unique())
     tstct = extract_tstct.apply_static(con, transactions=transactions)
     df["event_ONLYACT"] = df["event_TCODE"].map(tstct)
@@ -39,11 +40,17 @@ def apply(con, objectclas=None, tabname=None):
     for el in cdpos:
         changenr = el["CHANGENR"]
         objectid = el["OBJECTID"]
+        tabname = el["TABNAME"]
+        fname = el["FNAME"]
+        value_new = el["VALUE_NEW"]
         if changenr in change_dictio:
             if objectid not in ret:
                 ret[objectid] = []
             df = change_dictio[changenr].copy()
             df["event_AWKEY"] = objectid
+            df["event_TABNAME"] = tabname
+            df["event_FNAME"] = fname
+            df["event_VALUE_NEW"] = value_new
             ret[objectid].append(df)
     for objectid in ret:
         ret[objectid] = pd.concat(ret[objectid])
@@ -52,13 +59,17 @@ def apply(con, objectclas=None, tabname=None):
 
 def get_changes_dataframe_two_mapping(con, orig_df, change_key, target_key, resource_column=None, objectclas=None,
                                       tabname=None):
-    changes = apply(con, objectclas=None, tabname=tabname)
+    changes = apply(con, objectclas=objectclas, tabname=tabname)
     mapping = {x[change_key]: x[target_key] for x in
                orig_df[[change_key, target_key]].dropna(subset=[change_key, target_key], how="any").to_dict("records")}
     changes = {x: y for x, y in changes.items() if x in mapping}
-    changes = pd.concat([y for y in changes.values()])
-    changes[target_key] = changes[change_key].map(mapping)
-    changes = changes.dropna(subset=[change_key, target_key, "event_ONLYACT"], how="any")
-    if resource_column is not None:
-        changes = changes.rename(columns={"event_USERNAME": resource_column})
+    changes = [y for y in changes.values()]
+    if changes:
+        changes = pd.concat(changes)
+        changes[target_key] = changes[change_key].map(mapping)
+        changes = changes.dropna(subset=[change_key, target_key, "event_ONLYACT"], how="any")
+        if resource_column is not None:
+            changes = changes.rename(columns={"event_USERNAME": resource_column})
+    else:
+        changes = pd.DataFrame()
     return changes

@@ -1,10 +1,12 @@
-from sapextractor.utils.tstct import extract_tstct
+from datetime import datetime
+
+import pandas as pd
+
+from sapextractor.utils import constants
 from sapextractor.utils.blart import extract_blart
 from sapextractor.utils.change_tables import extract_change
-import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
-from datetime import datetime
-from sapextractor.utils import constants
+from sapextractor.utils.tstct import extract_tstct
 
 
 def extract_bkpf(con):
@@ -53,11 +55,14 @@ def extract_bseg(con, doc_first_dates, doc_types):
 
 
 def extract_changes_bkpf(con, bkpf, doc_types):
-    changes = extract_change.get_changes_dataframe_two_mapping(con, bkpf, "event_AWKEY", "event_BELNR", resource_column="event_USNAM")
-    changes["event_BLART"] = changes["event_BELNR"].map(doc_types)
-    changes = changes.dropna(subset=["event_BLART"], how="any")
-    changes["INVOLVED_DOCUMENTS"] = changes["event_BELNR"].astype(str)
-    changes["INVOLVED_DOCUMENTS"] = changes["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
+    changes = extract_change.get_changes_dataframe_two_mapping(con, bkpf, "event_AWKEY", "event_BELNR",
+                                                               resource_column="event_USNAM", objectclas="BELEG",
+                                                               tabname="BKPF")
+    if len(changes) > 0:
+        changes["event_BLART"] = changes["event_BELNR"].map(doc_types)
+        changes = changes.dropna(subset=["event_BLART"], how="any")
+        changes["INVOLVED_DOCUMENTS"] = changes["event_BELNR"].astype(str)
+        changes["INVOLVED_DOCUMENTS"] = changes["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     return changes
 
 
