@@ -1,5 +1,5 @@
 from sapextractor.algo.p2p import p2p_common
-from pm4pymdl.objects.jmd.exporter import exporter as jmd_exporter
+from pm4pymdl.objects.ocel.exporter import exporter as jmd_exporter
 from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 

@@ -1,5 +1,5 @@
 from sapextractor.algo.ap_ar import ap_ar_common
-from pm4pymdl.objects.jmd.exporter import exporter as jmd_exporter
+from pm4pymdl.objects.ocel.exporter import exporter as jmd_exporter
 from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 

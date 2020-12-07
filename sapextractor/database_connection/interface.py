@@ -2,7 +2,7 @@ class DatabaseConnection(object):
     def __init__(self):
         pass
 
-    def execute_read_sql(self, sql):
+    def execute_read_sql(self, sql, columns):
         raise Exception("not implemented")
 
     def get_list_tables(self):
