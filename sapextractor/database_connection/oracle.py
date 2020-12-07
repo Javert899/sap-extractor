@@ -11,11 +11,26 @@ class OracleConnection(DatabaseConnection):
                                      events=True)
         DatabaseConnection.__init__(self)
 
-    def execute_read_sql(self, sql):
+    def execute_read_sql(self, sql, columns):
         cursor = self.con.cursor()
         cursor.execute(sql)
-        stream = cursor.fetchall()
-        df = pd.DataFrame(stream)
+        stream = []
+        df = []
+        while True:
+            res = cursor.fetchmany(10000)
+            if len(res) == 0:
+                break
+            for row in res:
+                el = {}
+                for idx, col in enumerate(columns):
+                    el[col] = row[idx]
+                stream.append(el)
+            this_dataframe = pd.DataFrame(stream)
+            df.append(this_dataframe)
+            stream = None
+            stream = []
+        df = pd.concat(df)
+        df.columns = [x.upper() for x in df.columns]
         return df
 
     def get_list_tables(self):
@@ -84,7 +99,7 @@ class OracleConnection(DatabaseConnection):
 
     def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
         query = self.prepare_query(table_name, columns) + additional_query_part
-        dataframe = self.execute_read_sql(query)
+        dataframe = self.execute_read_sql(query, columns)
         dataframe.columns = columns
         return dataframe
 

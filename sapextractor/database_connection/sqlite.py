@@ -11,7 +11,6 @@ class SqliteConnection(DatabaseConnection):
         DatabaseConnection.__init__(self)
 
     def execute_read_sql(self, sql, columns):
-        #df = pd.read_sql(sql, self.con)
         cursor = self.con.cursor()
         cursor.execute(sql)
         stream = []
