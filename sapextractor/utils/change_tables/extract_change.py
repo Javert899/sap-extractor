@@ -1,14 +1,14 @@
 import pandas as pd
-from sapextractor.utils.tstct import extract_tstct
+
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
-
-class Shared:
-    change_dictio = {}
+from sapextractor.utils.tstct import extract_tstct
 
 
-def read_cdhdr(con):
-    df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"])
-    df.columns = ["event_"+x for x in df.columns]
+def read_cdhdr(con, objectclas=None):
+    additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
+    df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"],
+                                       additional_query_part=additional_query_part)
+    df.columns = ["event_" + x for x in df.columns]
     df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
     df = df.sort_values("event_timestamp")
     transactions = set(df["event_TCODE"].unique())
@@ -17,14 +17,17 @@ def read_cdhdr(con):
     return df
 
 
-def read_cdpos(con):
-    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID"])
+def read_cdpos(con, objectclas=None, tabname=None):
+    additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
+    if tabname is not None and additional_query_part:
+        additional_query_part += " AND TABNAME = '"+tabname+"'"
+    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID"], additional_query_part=additional_query_part)
     return df
 
 
-def apply(con):
-    cdhdr = read_cdhdr(con)
-    cdpos = read_cdpos(con)
+def apply(con, objectclas=None, tabname=None):
+    cdhdr = read_cdhdr(con, objectclas=objectclas)
+    cdpos = read_cdpos(con, objectclas=objectclas, tabname=tabname)
     grouped_cdhdr = cdhdr.groupby("event_CHANGENR")
     change_dictio = {}
     for name, group in grouped_cdhdr:
@@ -46,15 +49,11 @@ def apply(con):
     return ret
 
 
-def apply_static(con):
-    if not Shared.change_dictio:
-        Shared.change_dictio = apply(con)
-    return Shared.change_dictio
-
-
-def get_changes_dataframe_two_mapping(con, orig_df, change_key, target_key, resource_column=None):
-    changes = apply(con)
-    mapping = {x[change_key]: x[target_key] for x in orig_df[[change_key, target_key]].dropna(subset=[change_key, target_key], how="any").to_dict("records")}
+def get_changes_dataframe_two_mapping(con, orig_df, change_key, target_key, resource_column=None, objectclas=None,
+                                      tabname=None):
+    changes = apply(con, objectclas=None, tabname=tabname)
+    mapping = {x[change_key]: x[target_key] for x in
+               orig_df[[change_key, target_key]].dropna(subset=[change_key, target_key], how="any").to_dict("records")}
     changes = {x: y for x, y in changes.items() if x in mapping}
     changes = pd.concat([y for y in changes.values()])
     changes[target_key] = changes[change_key].map(mapping)
