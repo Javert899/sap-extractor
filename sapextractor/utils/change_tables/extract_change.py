@@ -20,8 +20,9 @@ def read_cdhdr(con, objectclas=None):
 def read_cdpos(con, objectclas=None, tabname=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
     if tabname is not None and additional_query_part:
-        additional_query_part += " AND TABNAME = '"+tabname+"'"
-    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID"], additional_query_part=additional_query_part)
+        additional_query_part += " AND TABNAME = '" + tabname + "'"
+    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW"],
+                                       additional_query_part=additional_query_part)
     return df
 
 
