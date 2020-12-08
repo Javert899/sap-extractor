@@ -41,6 +41,7 @@ def extract_changes_vbfa(con, dataframe):
                 z["case:concept:name"] = cc
                 ret.append(z)
     ret = pd.concat(ret)
+
     return ret
 
 
@@ -102,6 +103,9 @@ def extract_bkpf_bsak(con, dataframe):
                         ret.append({"case:concept:name": cas, "concept:name": "Clearance ("+blart_vals[clearingdoc[2]]+")", "AUGBL": clearingdoc[0], "time:timestamp": clearingdoc[1]})
     ret = pd.DataFrame(ret)
     ret["time:timestamp"] = ret["time:timestamp"] + pd.Timedelta(np.timedelta64(86399, 's'))
+
+    ret = ret.groupby(["case:concept:name", "AUGBL"]).first().reset_index()
+
     return ret
 
 
