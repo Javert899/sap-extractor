@@ -1,0 +1,100 @@
+@startuml
+
+entity CDHDR {
+    CHANGENR: String <<PK>>
+    USERNAME: String
+    UDATE: Date
+    UTIME: Date
+    TCODE: String <<PK>>
+}
+
+entity CDPOS {
+    CHANGENR: String <<PK>> <<FK>>
+    OBJECTID: String
+}
+
+entity BKPF {
+    BELNR: String <<PK>>
+    GJAHR: String <<PK>>
+    CPUDT: Date
+    CPUTM: Date
+    USNAM: String
+    TCODE: String <<FK>>
+    BLART: String <<FK>>
+    AWKEY: String <<FK>>
+}
+
+entity BSEG {
+    BELNR: String <<PK>> <<FK>>
+    GJAHR: String <<PK>> <<FK>>
+    BUZEI: String <<PK>>
+    AUGBL: String <<FK>>
+    HKONT: String
+    KUNNR: String
+    LIFNR: String
+}
+
+entity TSTCT {
+    TCODE: String <<PK>>
+    SPRSL: String <<PK>>
+    TTEXT: String
+}
+
+entity EKKO {
+    EBELN: String <<PK>>
+    ERNAM: String
+    AEDAT: Date
+    LIFNR: String
+    ZTERM: String
+}
+
+entity EKPO {
+    EBELN: String <<PK>> <<FK>>
+    EBELP: String <<PK>>
+    BANFN: String <<FK>>
+}
+
+entity EKBE {
+    EBELN: String <<PK>> <<FK>>
+    EBELP: String <<PK>>
+    BELNR: String <<PK>> <<FK>>
+    BUZEI: String <<PK>> <<FK>>
+    VGABE: String
+}
+
+entity RBKP {
+    BELNR: String <<PK>>
+    TCODE: String <<FK>>
+    BLART: String <<FK>>
+    GJAHR: String <<PK>>
+}
+
+entity RSEG {
+    BELNR: String <<PK>>
+    BUZEI: String <<PK>>
+    GJAHR: String <<PK>>
+}
+
+entity T003T {
+    BLART: String <<PK>>
+    SPRSL: String <<PK>>
+    LTEXT: String
+}
+
+BKPF }|..|| BSEG
+BSEG |o-- BSEG
+BKPF ||-- TSTCT
+BKPF ||-- T003T
+CDHDR }|-- CDPOS
+CDHDR ||-- TSTCT
+BKPF |o-- CDPOS
+EKKO }|..|| EKPO
+EKKO }|..|| EKBE
+RBKP ||-- TSTCT
+RBKP ||-- T003T
+RBKP }|..|| RSEG
+RSEG }|-- EKBE
+RBKP }o-- BKPF
+RBKP |o-- CDPOS
+
+@enduml
