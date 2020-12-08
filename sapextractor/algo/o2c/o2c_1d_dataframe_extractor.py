@@ -3,6 +3,7 @@ from sapextractor.utils.graph_building import build_graph
 from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 from sapextractor.utils.change_tables import extract_change
+from sapextractor.utils.fields_corresp import extract_dd03t
 import pandas as pd
 
 
@@ -16,6 +17,7 @@ def extract_changes_vbfa(con, dataframe):
             case_vbeln_dict[vbeln] = set()
         case_vbeln_dict[vbeln].add(caseid)
     ret = []
+    dict_corr = extract_dd03t.apply(con)
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
                 ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
         changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
@@ -25,8 +27,13 @@ def extract_changes_vbfa(con, dataframe):
             cols = {x: x.split("event_")[-1] for x in y.columns}
             cols["event_timestamp"] = "time:timestamp"
             y = y.rename(columns=cols)
+            fnames = set(y["FNAME"].unique())
+            for fname in fnames:
+                if fname not in dict_corr:
+                    dict_corr[fname] = fname
             y["VBELN"] = y["AWKEY"]
-            y["concept:name"] = "Change "+y["FNAME"]
+            y["FNAME_CORR"] = y["FNAME"].map(dict_corr)
+            y["concept:name"] = "Change "+y["FNAME_CORR"]
             for cc in case_vbeln_dict[x]:
                 z = y.copy()
                 z["case:concept:name"] = cc

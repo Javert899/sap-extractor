@@ -58,7 +58,6 @@ class SqliteConnection(DatabaseConnection):
     def prepare_query(self, table_name, columns):
         table_name = self.format_table_name(table_name)
         table_columns = self.get_columns(table_name)
-        print(columns, table_columns)
         columns = find_corr.apply(columns, table_columns)
         return "SELECT "+",".join(columns)+" FROM "+table_name
 
