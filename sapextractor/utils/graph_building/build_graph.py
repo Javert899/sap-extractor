@@ -28,14 +28,20 @@ def apply(df, prev, curr, prev_type, curr_type):
     return G, types
 
 
-def get_conn_comp(df, prev, curr, prev_type, curr_type):
+def get_conn_comp(df, prev, curr, prev_type, curr_type, ref_type=""):
     G, types = apply(df, prev, curr, prev_type, curr_type)
+
     conn_comp = nx.connected_components(nx.Graph(G))
-    ret = {}
+
+    list_corresp = []
     for index, cc in enumerate(conn_comp):
-        for node in cc:
-            ret[node] = str(index)
-    return ret
+        for n2 in cc:
+            this_type = types[n2] if n2 in types else ""
+            list_corresp.append({"node": n2, "type": this_type, "case:concept:name": str(index)})
+
+    dataframe = pd.DataFrame(list_corresp).sort_values("node")
+
+    return dataframe
 
 
 def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):

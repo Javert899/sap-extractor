@@ -11,8 +11,8 @@ def apply(con, ref_type="Invoice", keep_first=True):
     cols["event_activity"] = "concept:name"
     cols["event_timestamp"] = "time:timestamp"
     dataframe = dataframe.rename(columns=cols)
-    ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
-                                                       ref_type=ref_type)
+    ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
+    # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
     if keep_first:
