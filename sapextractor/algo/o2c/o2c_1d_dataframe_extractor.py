@@ -42,7 +42,7 @@ def extract_changes_vbfa(con, dataframe):
     return ret
 
 
-def apply(con, ref_type="Invoice", keep_first=True):
+def apply(con, ref_type="Order", keep_first=True):
     dataframe = o2c_common.apply(con, keep_first=keep_first)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
