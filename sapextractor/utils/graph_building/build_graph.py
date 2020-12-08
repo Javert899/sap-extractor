@@ -53,16 +53,15 @@ def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
 def get_ancestors_successors_from_graph(G, types, ref_type=""):
     list_corresp = []
 
-    #print(types)
-
     nodes_ref_type = {x for x,y in types.items() if y == ref_type}
 
     for index, node in enumerate(nodes_ref_type):
         all_ancestors = set(nx.ancestors(G, node))
-        all_descendants = set(nx.ancestors(G, node))
+        all_descendants = set(nx.descendants(G, node))
         all_nodes = all_ancestors.union(all_descendants).union({node})
         for n2 in all_nodes:
-            list_corresp.append({"node": n2, "type": types[n2], "case:concept:name": str(index)})
+            new_el = {"node": n2, "type": types[n2], "case:concept:name": str(index)}
+            list_corresp.append(new_el)
 
     dataframe = pd.DataFrame(list_corresp).sort_values("node")
 
