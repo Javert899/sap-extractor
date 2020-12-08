@@ -2,6 +2,37 @@ from sapextractor.algo.o2c import o2c_common
 from sapextractor.utils.graph_building import build_graph
 from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
+from sapextractor.utils.change_tables import extract_change
+import pandas as pd
+
+
+def extract_changes_vbfa(con, dataframe):
+    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("r")
+    case_vbeln_dict = {}
+    for x in case_vbeln:
+        caseid = x["case:concept:name"]
+        vbeln = x["VBELN"]
+        if vbeln not in case_vbeln_dict:
+            case_vbeln_dict[vbeln] = set()
+        case_vbeln_dict[vbeln].add(caseid)
+    ret = []
+    for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
+                ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
+        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
+        changes = {x: y for x, y in changes.items() if x in case_vbeln_dict}
+        for x, y in changes.items():
+            y = y[[xx for xx in y.columns if xx.startswith("event_")]]
+            cols = {x: x.split("event_")[-1] for x in y.columns}
+            cols["event_timestamp"] = "time:timestamp"
+            y = y.rename(columns=cols)
+            y["VBELN"] = y["AWKEY"]
+            y["concept:name"] = "Change "+y["FNAME"]
+            for cc in case_vbeln_dict[x]:
+                z = y.copy()
+                z["case:concept:name"] = cc
+                ret.append(z)
+    ret = pd.concat(ret)
+    return ret
 
 
 def apply(con, ref_type="Invoice", keep_first=True):
@@ -15,8 +46,10 @@ def apply(con, ref_type="Invoice", keep_first=True):
     # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
+    changes = extract_changes_vbfa(con, dataframe)
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
+    dataframe = pd.concat([dataframe, changes])
     dataframe = dataframe.sort_values("time:timestamp")
     dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe

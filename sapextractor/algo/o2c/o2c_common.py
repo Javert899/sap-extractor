@@ -1,8 +1,10 @@
-import pandas as pd
 from datetime import datetime
-from sapextractor.utils.vbtyp import extract_vbtyp
-from sapextractor.utils.dates import timestamp_column_from_dt_tm
+
+import pandas as pd
+
 from sapextractor.utils import constants
+from sapextractor.utils.dates import timestamp_column_from_dt_tm
+from sapextractor.utils.vbtyp import extract_vbtyp
 
 
 def vbfa_closure(vbfa):
@@ -39,4 +41,3 @@ def apply(con, keep_first=True):
     vbfa["INVOLVED_DOCUMENTS"] = vbfa["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
     vbfa = vbfa.reset_index()
     return vbfa
-
