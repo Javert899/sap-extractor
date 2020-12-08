@@ -43,7 +43,10 @@ def extract_changes_vbfa(con, dataframe):
                     z["case:concept:name"] = cc
                     ret.append(z)
 
-    ret = pd.concat(ret)
+    if ret:
+        ret = pd.concat(ret)
+    else:
+        ret = pd.DataFrame()
 
     return ret
 
@@ -69,7 +72,10 @@ def extract_bkpf_bsak(con, dataframe):
     except:
         bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
     bseg = bseg.dropna(subset=["AUGBL"])
-    bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format="%d.%m.%Y")
+    try:
+        bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format="%d.%m.%Y")
+    except:
+        bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
     bseg = bseg.to_dict("r")
     dict_awkey = {}
     clearance_docs_dates = {}
@@ -90,10 +96,11 @@ def extract_bkpf_bsak(con, dataframe):
         belnr = el["BELNR"]
         augbl = el["AUGBL"]
         augdt = el["AUGDT"]
-        blart = blart_dict[augbl]
-        if not belnr in clearance_docs_dates:
-            clearance_docs_dates[belnr] = set()
-        clearance_docs_dates[belnr].add((augbl, augdt, blart))
+        if augbl in blart_dict:
+            blart = blart_dict[augbl]
+            if not belnr in clearance_docs_dates:
+                clearance_docs_dates[belnr] = set()
+            clearance_docs_dates[belnr].add((augbl, augdt, blart))
 
     intersect = set(case_vbeln_dict.keys()).intersection(dict_awkey.keys())
 
@@ -105,9 +112,12 @@ def extract_bkpf_bsak(con, dataframe):
                     for cas in case_vbeln_dict[k]:
                         ret.append({"case:concept:name": cas, "concept:name": "Clearance ("+blart_vals[clearingdoc[2]]+")", "AUGBL": clearingdoc[0], "time:timestamp": clearingdoc[1]})
     ret = pd.DataFrame(ret)
-    ret["time:timestamp"] = ret["time:timestamp"] + pd.Timedelta(np.timedelta64(86399, 's'))
 
-    ret = ret.groupby(["case:concept:name", "AUGBL"]).first().reset_index()
+    if len(ret) > 0:
+        if "time:timestamp" in ret.columns:
+            ret["time:timestamp"] = ret["time:timestamp"] + pd.Timedelta(np.timedelta64(86399, 's'))
+
+            ret = ret.groupby(["case:concept:name", "AUGBL"]).first().reset_index()
 
     return ret
 
