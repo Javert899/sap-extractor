@@ -4,7 +4,9 @@ from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 from sapextractor.utils.change_tables import extract_change
 from sapextractor.utils.fields_corresp import extract_dd03t
+from sapextractor.utils.blart import extract_blart
 import pandas as pd
+import numpy as np
 
 
 def extract_changes_vbfa(con, dataframe):
@@ -42,6 +44,68 @@ def extract_changes_vbfa(con, dataframe):
     return ret
 
 
+def extract_bkpf_bsak(con, dataframe):
+
+    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("r")
+    case_vbeln_dict = {}
+    for x in case_vbeln:
+        caseid = x["case:concept:name"]
+        vbeln = x["VBELN"]
+        if vbeln not in case_vbeln_dict:
+            case_vbeln_dict[vbeln] = set()
+        case_vbeln_dict[vbeln].add(caseid)
+
+    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "AWKEY", "BLART"])
+    blart_vals = set(bkpf["BLART"].unique())
+    blart_vals = {x: x for x in blart_vals}
+    blart_vals = extract_blart.apply_static(con, doc_types=blart_vals)
+    bkpf = bkpf.to_dict("r")
+    try:
+        bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
+    except:
+        bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
+    bseg = bseg.dropna(subset=["AUGBL"])
+    bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format="%d.%m.%Y")
+    bseg = bseg.to_dict("r")
+    dict_awkey = {}
+    clearance_docs_dates = {}
+    blart_dict = {}
+    for el in bkpf:
+        awkey = el["AWKEY"]
+        belnr = el["BELNR"]
+        blart = el["BLART"]
+        if awkey is not None:
+            if len(awkey) == 18:
+                awkey = awkey[4:-4]
+                if awkey not in dict_awkey:
+                    dict_awkey[awkey] = []
+                dict_awkey[awkey].append(belnr)
+        if not belnr in blart_dict:
+            blart_dict[belnr] = blart
+    for el in bseg:
+        belnr = el["BELNR"]
+        augbl = el["AUGBL"]
+        augdt = el["AUGDT"]
+        blart = blart_dict[belnr]
+        if not belnr in clearance_docs_dates:
+            clearance_docs_dates[belnr] = set()
+        clearance_docs_dates[belnr].add((augbl, augdt, blart))
+
+    intersect = set(case_vbeln_dict.keys()).intersection(dict_awkey.keys())
+
+    ret = []
+    for k in intersect:
+        for belnr in dict_awkey[k]:
+            if belnr in clearance_docs_dates:
+                for clearingdoc in clearance_docs_dates[belnr]:
+                    for cas in case_vbeln_dict[k]:
+                        ret.append({"case:concept:name": cas, "concept:name": "Clearance ("+blart_vals[clearingdoc[2]]+")", "AUGBL": clearingdoc[0], "time:timestamp": clearingdoc[1]})
+    ret = pd.DataFrame(ret)
+    ret["time:timestamp"] = ret["time:timestamp"] + pd.Timedelta(np.timedelta64(86399, 's'))
+    return ret
+
+
+
 def apply(con, ref_type="Order", keep_first=True):
     dataframe = o2c_common.apply(con, keep_first=keep_first)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
@@ -54,9 +118,10 @@ def apply(con, ref_type="Order", keep_first=True):
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
     changes = extract_changes_vbfa(con, dataframe)
+    payments = extract_bkpf_bsak(con, dataframe)
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
-    dataframe = pd.concat([dataframe, changes])
+    dataframe = pd.concat([dataframe, changes, payments])
     dataframe = dataframe.sort_values("time:timestamp")
     dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
