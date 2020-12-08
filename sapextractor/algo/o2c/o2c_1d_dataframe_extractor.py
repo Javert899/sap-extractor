@@ -31,7 +31,7 @@ def extract_changes_vbfa(con, dataframe):
             y = y.rename(columns=cols)
             fnames = set(y["FNAME"].unique())
             for fname in fnames:
-                if fname not in dict_corr:
+                if fname not in dict_corr or dict_corr[fname] is None:
                     dict_corr[fname] = fname
             y["VBELN"] = y["AWKEY"]
             y["FNAME_CORR"] = y["FNAME"].map(dict_corr)
