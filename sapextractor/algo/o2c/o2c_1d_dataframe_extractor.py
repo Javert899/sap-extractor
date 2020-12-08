@@ -35,11 +35,14 @@ def extract_changes_vbfa(con, dataframe):
                     dict_corr[fname] = fname
             y["VBELN"] = y["AWKEY"]
             y["FNAME_CORR"] = y["FNAME"].map(dict_corr)
-            y["concept:name"] = "Change "+y["FNAME_CORR"]
-            for cc in case_vbeln_dict[x]:
-                z = y.copy()
-                z["case:concept:name"] = cc
-                ret.append(z)
+            y = y.dropna(subset=["FNAME_CORR"])
+            if len(y) > 0:
+                y["concept:name"] = "Change " + y["FNAME_CORR"]
+                for cc in case_vbeln_dict[x]:
+                    z = y.copy()
+                    z["case:concept:name"] = cc
+                    ret.append(z)
+
     ret = pd.concat(ret)
 
     return ret
