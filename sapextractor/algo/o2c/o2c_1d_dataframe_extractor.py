@@ -87,7 +87,7 @@ def extract_bkpf_bsak(con, dataframe):
         belnr = el["BELNR"]
         augbl = el["AUGBL"]
         augdt = el["AUGDT"]
-        blart = blart_dict[belnr]
+        blart = blart_dict[augbl]
         if not belnr in clearance_docs_dates:
             clearance_docs_dates[belnr] = set()
         clearance_docs_dates[belnr].add((augbl, augdt, blart))
