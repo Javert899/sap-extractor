@@ -3,6 +3,7 @@ import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.tstct import extract_tstct
 from sapextractor.utils.fields_corresp import extract_dd03t
+from dateutil import parser
 
 def read_cdhdr(con, objectclas=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
@@ -22,7 +23,7 @@ def read_cdpos(con, objectclas=None, tabname=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
     if tabname is not None and additional_query_part:
         additional_query_part += " AND TABNAME = '" + tabname + "'"
-    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW"],
+    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW", "VALUE_OLD"],
                                        additional_query_part=additional_query_part)
     return df
 
@@ -32,6 +33,7 @@ def give_field_desc(con, cdpos_dict):
     for c in cdpos_dict:
         fname = c["FNAME"]
         value_new = c["VALUE_NEW"]
+        value_old = c["VALUE_OLD"]
         if fname not in fnames or fnames[fname] is None:
             fnames[fname] = fname
         if fname == "KOSTK" and value_new == "B":
@@ -78,6 +80,43 @@ def give_field_desc(con, cdpos_dict):
             c["CHANGEDESC"] = "Distribution Status: Delivery split was performed locally"
         elif fname == "SPE_REV_VLSTK" and value_new == "F":
             c["CHANGEDESC"] = "Distribution Status: Change Management Switched Off"
+        elif fname == "VLSTK" and value_new == "A":
+            c["CHANGEDESC"] = "Distribution Status: Relevant"
+        elif fname == "VLSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Distribution Status: Distributed"
+        elif fname == "VLSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Distribution Status: Confirmed"
+        elif fname == "VLSTK" and value_new == "D":
+            c["CHANGEDESC"] = "Distribution Status: Planned for Distribution"
+        elif fname == "VLSTK" and value_new == "E":
+            c["CHANGEDESC"] = "Distribution Status: Delivery split was performed locally"
+        elif fname == "VLSTK" and value_new == "F":
+            c["CHANGEDESC"] = "Distribution Status: Change Management Switched Off"
+        elif fname == "SPE_GEN_ELIKZ" and value_new == "X":
+            c["CHANGEDESC"] = "Delivery Completed"
+        elif fname == "IMWRK" and value_new == "X":
+            c["CHANGEDESC"] = "Delivery in Plant"
+        elif fname == "UVVLS" and value_new == "A":
+            c["CHANGEDESC"] = "Delivery Uncompletion: Not yet processed"
+        elif fname == "UVVLS" and value_new == "B":
+            c["CHANGEDESC"] = "Delivery Uncompletion: Partially processed"
+        elif fname == "UVVLS" and value_new == "C":
+            c["CHANGEDESC"] = "Delivery Uncompletion: Completely processed"
+        elif fname == "FKDAT":
+            try:
+                value_new = parser.parse(value_new)
+                value_old = parser.parse(value_old)
+                if value_new <= value_old:
+                    c["CHANGEDESC"] = "Anticipate Billing Date"
+                else:
+                    c["CHANGEDESC"] = "Postpone Billing Date"
+            except:
+                c["CHANGEDESC"] = "Change " + fnames[fname]
+        elif fname == "FAKSK":
+            if value_new is None:
+                c["CHANGEDESC"] = "Remove Billing Block"
+            else:
+                c["CHANGEDESC"] = "Set Billing Block"
         else:
             c["CHANGEDESC"] = "Change "+fnames[fname]
     return cdpos_dict
