@@ -4,6 +4,7 @@ from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.tstct import extract_tstct
 from sapextractor.utils.fields_corresp import extract_dd03t
 from dateutil import parser
+import time, datetime
 
 def read_cdhdr(con, objectclas=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
@@ -104,21 +105,63 @@ def give_field_desc(con, cdpos_dict):
             c["CHANGEDESC"] = "Delivery Uncompletion: Completely processed"
         elif fname == "FKDAT":
             try:
-                value_new = parser.parse(value_new)
-                value_old = parser.parse(value_old)
-                if value_new <= value_old:
-                    c["CHANGEDESC"] = "Anticipate Billing Date"
-                else:
-                    c["CHANGEDESC"] = "Postpone Billing Date"
+                value_new = parser.parse(value_new).timestamp()
             except:
-                c["CHANGEDESC"] = "Change " + fnames[fname]
+                value_new = 0
+            try:
+                value_old = parser.parse(value_old).timestamp()
+            except:
+                value_old = 0
+            if value_old == 0:
+                c["CHANGEDESC"] = "Set Billing Date"
+            elif value_new == 0:
+                c["CHANGEDESC"] = "Remove Billing Date"
+            elif value_new <= value_old:
+                c["CHANGEDESC"] = "Anticipate Billing Date"
+            else:
+                c["CHANGEDESC"] = "Postpone Billing Date"
         elif fname == "FAKSK":
             if value_new is None:
                 c["CHANGEDESC"] = "Remove Billing Block"
             else:
                 c["CHANGEDESC"] = "Set Billing Block"
+        elif fname == "SKFBP":
+            value_new = float(value_new)
+            value_old = float(value_old)
+            if value_new <= value_old:
+                c["CHANGEDESC"] = "Decrease Cash Discount"
+            else:
+                c["CHANGEDESC"] = "Increase Cash Discount"
+        elif fname == "UVALL" and value_new == "A":
+            c["CHANGEDESC"] = "Order Uncompletion: Not yet processed"
+        elif fname == "UVALL" and value_new == "B":
+            c["CHANGEDESC"] = "Order Uncompletion: Partially processed"
+        elif fname == "UVALL" and value_new == "C":
+            c["CHANGEDESC"] = "Order Uncompletion: Completely processed"
+        elif fname == "LISPL" and value_new == "A":
+            c["CHANGEDESC"] = "Delivery is for single warehouse"
+        elif fname == "LISPL" and value_new == "B":
+            c["CHANGEDESC"] = "Delivery is not for single warehouse"
+        elif fname == "WADAT_IST":
+            try:
+                value_new = parser.parse(value_new).timestamp()
+            except:
+                value_new = 0
+            try:
+                value_old = parser.parse(value_old).timestamp()
+            except:
+                value_old = 0
+            if value_old == 0:
+                c["CHANGEDESC"] = "Set Actual Goods Movement Date"
+            elif value_new == 0:
+                c["CHANGEDESC"] = "Remove Actual Goods Movement Date"
+            elif value_new <= value_old:
+                c["CHANGEDESC"] = "Anticipate Actual Goods Movement Date"
+            else:
+                c["CHANGEDESC"] = "Postpone Actual Goods Movement Date"
         else:
             c["CHANGEDESC"] = "Change "+fnames[fname]
+
     return cdpos_dict
 
 
