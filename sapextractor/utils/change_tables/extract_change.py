@@ -24,7 +24,7 @@ def read_cdpos(con, objectclas=None, tabname=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
     if tabname is not None and additional_query_part:
         additional_query_part += " AND TABNAME = '" + tabname + "'"
-    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW", "VALUE_OLD"],
+    df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW", "VALUE_OLD", "CHNGIND"],
                                        additional_query_part=additional_query_part)
     return df
 
@@ -33,8 +33,10 @@ def give_field_desc(con, cdpos_dict):
     fnames = extract_dd03t.apply(con)
     for c in cdpos_dict:
         fname = c["FNAME"]
+        tabname = c["TABNAME"]
         value_new = c["VALUE_NEW"]
         value_old = c["VALUE_OLD"]
+        chngind = c["CHNGIND"]
         if fname not in fnames or fnames[fname] is None:
             fnames[fname] = fname
         if fname == "KOSTK" and value_new == "B":
@@ -159,6 +161,24 @@ def give_field_desc(con, cdpos_dict):
                 c["CHANGEDESC"] = "Anticipate Actual Goods Movement Date"
             else:
                 c["CHANGEDESC"] = "Postpone Actual Goods Movement Date"
+        elif fname == "KEY" and tabname == "FPLT" and chngind == "I":
+            c["CHANGEDESC"] = "Insert Billing Plan"
+        elif fname == "KEY" and tabname == "FPLT" and chngind == "D":
+            c["CHANGEDESC"] = "Remove Billing Plan"
+        elif fname == "KEY" and tabname == "VBEP" and chngind == "D":
+            c["CHANGEDESC"] = "Remove Schedule Line"
+        elif fname == "KEY" and tabname == "VBEP" and chngind == "I":
+            c["CHANGEDESC"] = "Insert Schedule Line"
+        elif fname == "KEY" and tabname == "VBAK" and chngind == "D":
+            c["CHANGEDESC"] = "Cancel Order"
+        elif fname == "KEY" and tabname == "VBAP" and chngind == "D":
+            c["CHANGEDESC"] = "Remove Order Item"
+        elif fname == "KEY" and tabname == "VBAP" and chngind == "I":
+            c["CHANGEDESC"] = "Insert Order Item"
+        elif fname == "KEY" and tabname == "LIPS" and chngind == "D":
+            c["CHANGEDESC"] = "Remove Delivery Item"
+        elif fname == "KEY" and tabname == "LIPS" and chngind == "I":
+            c["CHANGEDESC"] = "Insert Delivery Item"
         else:
             c["CHANGEDESC"] = "Change "+fnames[fname]
 
@@ -183,6 +203,7 @@ def apply(con, objectclas=None, tabname=None):
         fname = el["FNAME"]
         value_new = el["VALUE_NEW"]
         changedesc = el["CHANGEDESC"]
+        chngind = el["CHNGIND"]
         if changenr in change_dictio:
             if objectid not in ret:
                 ret[objectid] = []
@@ -192,6 +213,7 @@ def apply(con, objectclas=None, tabname=None):
             df["event_FNAME"] = fname
             df["event_VALUE_NEW"] = value_new
             df["event_CHANGEDESC"] = changedesc
+            df["event_CHNGIND"] = chngind
             ret[objectid].append(df)
     for objectid in ret:
         ret[objectid] = pd.concat(ret[objectid])
