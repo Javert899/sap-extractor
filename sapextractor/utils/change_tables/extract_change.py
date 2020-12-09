@@ -34,8 +34,50 @@ def give_field_desc(con, cdpos_dict):
         value_new = c["VALUE_NEW"]
         if fname not in fnames or fnames[fname] is None:
             fnames[fname] = fname
-        if fname == "KOSTK" and value_new == "C":
-            c["CHANGEDESC"] = "Picking Completely Processed"
+        if fname == "KOSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Picking: Partially Processed"
+        elif fname == "KOSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Picking: Completely Processed"
+        elif fname == "GBSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Set Order Status: Partially Processed"
+        elif fname == "GBSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Set Order Status: Completely Processed"
+        elif fname == "KOQUK" and value_new == "B":
+            c["CHANGEDESC"] = "Pick Confirmation: Partially Processed"
+        elif fname == "KOQUK" and value_new == "C":
+            c["CHANGEDESC"] = "Pick Confirmation: Completely Processed"
+        elif fname == "LVSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Warehouse Management: Partially Processed"
+        elif fname == "LVSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Warehouse Management: Completely Processed"
+        elif fname == "WBSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Total Goods Movement: Partially processed"
+        elif fname == "WBSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Total Goods Movement: Completely processed"
+        elif fname == "TRSTA" and value_new == "B":
+            c["CHANGEDESC"] = "Transportation Status: Partially processed"
+        elif fname == "TRSTA" and value_new == "C":
+            c["CHANGEDESC"] = "Transportation Status: Completely processed"
+        elif fname == "SPE_IMWRK" and value_new == "X":
+            c["CHANGEDESC"] = "Item in Plant"
+        elif fname == "MPROK" and value_new == "A":
+            c["CHANGEDESC"] = "Manual price change carried out"
+        elif fname == "MPROK" and value_new == "B":
+            c["CHANGEDESC"] = "Condition manually deleted"
+        elif fname == "MPROK" and value_new == "C":
+            c["CHANGEDESC"] = "Manual price change released"
+        elif fname == "SPE_REV_VLSTK" and value_new == "A":
+            c["CHANGEDESC"] = "Distribution Status: Relevant"
+        elif fname == "SPE_REV_VLSTK" and value_new == "B":
+            c["CHANGEDESC"] = "Distribution Status: Distributed"
+        elif fname == "SPE_REV_VLSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Distribution Status: Confirmed"
+        elif fname == "SPE_REV_VLSTK" and value_new == "D":
+            c["CHANGEDESC"] = "Distribution Status: Planned for Distribution"
+        elif fname == "SPE_REV_VLSTK" and value_new == "E":
+            c["CHANGEDESC"] = "Distribution Status: Delivery split was performed locally"
+        elif fname == "SPE_REV_VLSTK" and value_new == "F":
+            c["CHANGEDESC"] = "Distribution Status: Change Management Switched Off"
         else:
             c["CHANGEDESC"] = "Change "+fnames[fname]
     return cdpos_dict
