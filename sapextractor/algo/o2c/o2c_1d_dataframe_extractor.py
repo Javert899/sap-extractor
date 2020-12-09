@@ -10,7 +10,7 @@ import numpy as np
 
 
 def extract_changes_vbfa(con, dataframe):
-    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("r")
+    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
     case_vbeln_dict = {}
     for x in case_vbeln:
         caseid = x["case:concept:name"]
@@ -34,14 +34,11 @@ def extract_changes_vbfa(con, dataframe):
                 if fname not in dict_corr or dict_corr[fname] is None:
                     dict_corr[fname] = fname
             y["VBELN"] = y["AWKEY"]
-            y["FNAME_CORR"] = y["FNAME"].map(dict_corr)
-            y = y.dropna(subset=["FNAME_CORR"])
-            if len(y) > 0:
-                y["concept:name"] = "Change " + y["FNAME_CORR"]
-                for cc in case_vbeln_dict[x]:
-                    z = y.copy()
-                    z["case:concept:name"] = cc
-                    ret.append(z)
+            y["concept:name"] = y["CHANGEDESC"]
+            for cc in case_vbeln_dict[x]:
+                z = y.copy()
+                z["case:concept:name"] = cc
+                ret.append(z)
 
     if ret:
         ret = pd.concat(ret)
@@ -53,7 +50,7 @@ def extract_changes_vbfa(con, dataframe):
 
 def extract_bkpf_bsak(con, dataframe):
 
-    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("r")
+    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
     case_vbeln_dict = {}
     for x in case_vbeln:
         caseid = x["case:concept:name"]
@@ -66,7 +63,7 @@ def extract_bkpf_bsak(con, dataframe):
     blart_vals = set(bkpf["BLART"].unique())
     blart_vals = {x: x for x in blart_vals}
     blart_vals = extract_blart.apply_static(con, doc_types=blart_vals)
-    bkpf = bkpf.to_dict("r")
+    bkpf = bkpf.to_dict("records")
     try:
         bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
     except:
@@ -76,7 +73,7 @@ def extract_bkpf_bsak(con, dataframe):
         bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format="%d.%m.%Y")
     except:
         bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
-    bseg = bseg.to_dict("r")
+    bseg = bseg.to_dict("records")
     dict_awkey = {}
     clearance_docs_dates = {}
     blart_dict = {}

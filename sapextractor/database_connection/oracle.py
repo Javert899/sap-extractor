@@ -45,7 +45,7 @@ class OracleConnection(DatabaseConnection):
 
     def write_dataframe(self, dataframe, table_name):
         columns = list(dataframe.columns)
-        stream = dataframe.to_dict("r")
+        stream = dataframe.to_dict("records")
         stream2 = []
         while stream:
             event = stream.pop(0)

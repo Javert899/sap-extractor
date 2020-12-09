@@ -2,7 +2,7 @@ import pandas as pd
 
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.tstct import extract_tstct
-
+from sapextractor.utils.fields_corresp import extract_dd03t
 
 def read_cdhdr(con, objectclas=None):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "'" if objectclas is not None else ""
@@ -27,6 +27,20 @@ def read_cdpos(con, objectclas=None, tabname=None):
     return df
 
 
+def give_field_desc(con, cdpos_dict):
+    fnames = extract_dd03t.apply(con)
+    for c in cdpos_dict:
+        fname = c["FNAME"]
+        value_new = c["VALUE_NEW"]
+        if fname not in fnames or fnames[fname] is None:
+            fnames[fname] = fname
+        if fname == "KOSTK" and value_new == "C":
+            c["CHANGEDESC"] = "Picking Completely Processed"
+        else:
+            c["CHANGEDESC"] = "Change "+fnames[fname]
+    return cdpos_dict
+
+
 def apply(con, objectclas=None, tabname=None):
     cdhdr = read_cdhdr(con, objectclas=objectclas)
     cdpos = read_cdpos(con, objectclas=objectclas, tabname=tabname)
@@ -36,6 +50,7 @@ def apply(con, objectclas=None, tabname=None):
         change_dictio[name] = group
     del grouped_cdhdr
     cdpos = cdpos.to_dict('records')
+    cdpos = give_field_desc(con, cdpos)
     ret = {}
     for el in cdpos:
         changenr = el["CHANGENR"]
@@ -43,6 +58,7 @@ def apply(con, objectclas=None, tabname=None):
         tabname = el["TABNAME"]
         fname = el["FNAME"]
         value_new = el["VALUE_NEW"]
+        changedesc = el["CHANGEDESC"]
         if changenr in change_dictio:
             if objectid not in ret:
                 ret[objectid] = []
@@ -51,6 +67,7 @@ def apply(con, objectclas=None, tabname=None):
             df["event_TABNAME"] = tabname
             df["event_FNAME"] = fname
             df["event_VALUE_NEW"] = value_new
+            df["event_CHANGEDESC"] = changedesc
             ret[objectid].append(df)
     for objectid in ret:
         ret[objectid] = pd.concat(ret[objectid])
