@@ -9,7 +9,7 @@
     <body style="background-color: lightblue">
         <div class="center">
 			<div>
-				<b>Connection to the database:</b>
+				Connection to the database:
 				<select id="connection_types" name="connection_types" onchange="changeConnectionType()">
 					<option value="SQLite" selected="selected">SQLite Connection</option>
 					<option value="Oracle">Oracle Connection</option>
@@ -28,9 +28,9 @@
 					Oracle Password:&nbsp;&nbsp;<input type="text" id="oracle_password" value="oracle"></input><br />
 				</div>
 			</div>
-			<br /><br />
+			<br />
 			<div>
-				<b>Process to extract:</b>
+				Process to extract:
 				<select id="available_processes" name="available_processes" onchange="changeProcess()">
 					<option value="o2c" selected="selected">Order-to-Cash</option>
 					<option value="ap_ar">Accounts Payable/Receivable</option>
@@ -39,25 +39,102 @@
 				<br />
 				<div id="o2c" style="display:">
 					<p><b>Order-to-Cash</b></p>
-					<b>Extraction Type:</b>
-					<select id="o2c_ext_type" name="o2c_ext_type" onchange="o2cExtChange()">
-						<option value="o2c_1d_log_extractor">XES</option>
-						<option value="o2c_1d_dataframe_extractor">CSV</option>
-						<option value="o2c_obj_centric_log">Object-Centric Log</option>
-					</select>
-					<div id="o2c_log" style="display:">
-						<p>Insert the parameters for the log extraction:</p>
-					</div>
-					<div id="o2c_dataframe" style="display: none">
-						<p>Insert the parameters for the CSV extraction:</p>
-					</div>
-					<div id="o2c_obj" style="display: none">
-						<p>Insert the parameters for the object-centric log extraction:
-					</div>
+					<table border="0" style="width: 100%">
+						<tr>
+							<td style="width: 40%">
+								<img src="static/o2c_red.png">
+								</img>
+							</td>
+							<td style="width: 60%">
+								Extraction Type:
+								<select id="o2c_ext_type" name="o2c_ext_type" onchange="o2cExtChange()">
+									<option value="o2c_1d_log_extractor" selected="selected">XES</option>
+									<option value="o2c_1d_dataframe_extractor">CSV</option>
+									<option value="o2c_obj_centric_log">Object-Centric Log</option>
+								</select>
+								<br />
+								<div id="o2c_log" style="display:">
+									<p>Insert the parameters for the log extraction:</p>
+								</div>
+								<div id="o2c_dataframe" style="display: none">
+									<p>Insert the parameters for the CSV extraction:</p>
+								</div>
+								<div id="o2c_obj" style="display: none">
+									<p>Insert the parameters for the object-centric log extraction:
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
-				<div id="ap_ar" style="display:">
+				<div id="ap_ar" style="display: none">
+					<p><b>Accounts Payable / Accounts Receivable</b></p>
+					<table border="0" style="width: 100%">
+						<tr>
+							<td style="width: 40%">
+								<img src="static/bkpf_red.png" style="width: 90%">
+								</img>
+							</td>
+							<td style="width: 60%">
+								Extraction Type:
+								<select id="apar_ext_type" name="apar_ext_type" onchange="apArExtChange()">
+									<option value="single_doc_transactions_dataframe">Single transactions (CSV)</option>
+									<option value="single_doc_transactions_log">Single transactions (XES)</option>
+									<option value="document_flow_dataframe">Document flow (CSV)</option>
+									<option value="document_flow_log" selected="selected">Document flow (XES)</option>
+									<option value="doc_flow_transactions_dataframe">Document flow transactions (CSV)</option>
+									<option value="doc_flow_transactions_xes">Document flow transactions (XES)</option>
+									<option value="apar_obj_centr_log">Object-Centric Log</option>
+								</select>
+								<br />
+								<div id="single_doc_transactions_dataframe" style="display: none">
+									<p>Insert the parameters for the CSV extraction (single transactions):</p>
+								</div>
+								<div id="single_doc_transactions_log" style="display: none">
+									<p>Insert the parameters for the XES extraction (single transactions):</p>
+								</div>
+								<div id="document_flow_dataframe" style="display: none">
+									<p>Insert the parameters for the CSV extraction (document flow):</p>
+								</div>
+								<div id="document_flow_log" style="display: ">
+									<p>Insert the parameters for the XES extraction (document flow):</p>
+								</div>
+								<div id="doc_flow_transactions_dataframe" style="display: none">
+									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
+								</div>
+								<div id="doc_flow_transactions_xes" style="display: none">
+									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
+								</div>
+								<div id="apar_obj_centr_log" style="display: none">
+									<p>Insert the parameters for the object-centric log extraction:</p>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
-				<div id="p2p" style="display:">
+				<div id="p2p" style="display: none">
+					<p><b>Procure-to-Pay</b></p>
+					<table border="0" style="width: 100%">
+						<tr>
+							<td style="width: 40%">
+								<img src="static/p2p_red.png">
+								</img>
+							</td>
+							<td style="width: 60%">
+								Extraction Type:
+								<select id="p2p_ext_type" name="p2p_ext_type" onchange="p2pExtChange()">
+									<option value="p2p_1d_dataframe">CSV log</option>
+									<option value="p2p_1d_log" selected="selected">XES log</option>
+								</select>
+								<br />
+								<div id="p2p_1d_dataframe" style="display: none">
+									<p>Insert the parameters for the CSV extraction:</p>
+								</div>
+								<div id="p2p_1d_log" style="display: ">
+									<p>Insert the parameters for the XES extraction:</p>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
 			</div>
         </div>
@@ -76,6 +153,22 @@
 		}
 		
 		function changeProcess() {
+			let proc = document.getElementById("available_processes").value;
+			if (proc == "o2c") {
+				document.getElementById("o2c").style.display = "";
+				document.getElementById("p2p").style.display = "none";
+				document.getElementById("ap_ar").style.display = "none";
+			}
+			else if (proc == "ap_ar") {
+				document.getElementById("o2c").style.display = "none";
+				document.getElementById("p2p").style.display = "none";
+				document.getElementById("ap_ar").style.display = "";
+			}
+			else if (proc == "p2p") {
+				document.getElementById("o2c").style.display = "none";
+				document.getElementById("p2p").style.display = "";
+				document.getElementById("ap_ar").style.display = "none";
+			}
 		}
 		
 		function o2cExtChange() {
@@ -94,6 +187,54 @@
 				document.getElementById("o2c_log").style.display = "none";
 				document.getElementById("o2c_dataframe").style.display = "none";
 				document.getElementById("o2c_obj").style.display = "";
+			}
+		}
+		
+		function apArExtChange() {
+			let ext = document.getElementById("apar_ext_type").value;
+			
+			document.getElementById("single_doc_transactions_dataframe").style.display = "none";
+			document.getElementById("single_doc_transactions_log").style.display = "none";
+			document.getElementById("document_flow_dataframe").style.display = "none";
+			document.getElementById("document_flow_log").style.display = "none";
+			document.getElementById("doc_flow_transactions_dataframe").style.display = "none";
+			document.getElementById("doc_flow_transactions_xes").style.display = "none";
+			document.getElementById("apar_obj_centr_log").style.display = "none";
+			
+			if (ext == "single_doc_transactions_dataframe") {
+				document.getElementById("single_doc_transactions_dataframe").style.display = "";
+			}
+			else if (ext == "single_doc_transactions_log") {
+				document.getElementById("single_doc_transactions_log").style.display = "";
+			}
+			else if (ext == "document_flow_dataframe") {
+				document.getElementById("document_flow_dataframe").style.display = "";
+			}
+			else if (ext == "document_flow_log") {
+				document.getElementById("document_flow_log").style.display = "";
+			}
+			else if (ext == "doc_flow_transactions_dataframe") {
+				document.getElementById("doc_flow_transactions_dataframe").style.display = "";
+			}
+			else if (ext == "doc_flow_transactions_xes") {
+				document.getElementById("doc_flow_transactions_xes").style.display = "";
+			}
+			else if (ext == "apar_obj_centr_log") {
+				document.getElementById("apar_obj_centr_log").style.display = "";
+			}
+		}
+		
+		function p2pExtChange() {
+			let ext = document.getElementById("p2p_ext_type").value;
+			
+			document.getElementById("p2p_1d_dataframe").style.display = "none";
+			document.getElementById("p2p_1d_log").style.display = "none";
+			
+			if (ext == "p2p_1d_dataframe") {
+				document.getElementById("p2p_1d_dataframe").style.display = "";
+			}
+			else if (ext == "p2p_1d_log") {
+				document.getElementById("p2p_1d_log").style.display = "";
 			}
 		}
 	</script>
