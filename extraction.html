@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <script src="static/jquery.min.js" type="text/javascript"></script>
+        <script src="static/bootstrap.min.js" type="text/javascript"></script>
+        <script src="static/FileSaver.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="static/style.css">
+
+    </head>
+    <body style="background-color: lightblue">
+        <div class="center">
+			<div>
+				<b>Connection to the database:</b>
+				<select id="connection_types" name="connection_types" onchange="changeConnectionType()">
+					<option value="SQLite" selected="selected">SQLite Connection</option>
+					<option value="Oracle">Oracle Connection</option>
+				</select>
+				<br />
+				<div id="sqlite_conn_parameters" style="display:">
+					<p><b>Parameters of connection to the SQLite database:</b></p>
+					SQLite Database Path:&nbsp;&nbsp;<input type="text" id="sqlite_db_path" value="sap.sqlite"></input><br />
+				</div>
+				<div id="oracle_conn_parameters" style="display:none">
+					<p><b>Parameters of connection to the Oracle database:</b></p>
+					Oracle Hostname:&nbsp;&nbsp;<input type="text" id="oracle_hostname" value="127.0.0.1"></input><br />
+					Oracle Port:&nbsp;&nbsp;<input type="text" id="oracle_port" value="1521"></input><br />
+					Oracle SID:&nbsp;&nbsp;<input type="text" id="oracle_sid" value="XE"></input><br />
+					Oracle Username:&nbsp;&nbsp;<input type="text" id="oracle_username" value="system"></input><br />
+					Oracle Password:&nbsp;&nbsp;<input type="text" id="oracle_password" value="oracle"></input><br />
+				</div>
+			</div>
+			<br /><br />
+			<div>
+				<b>Process to extract:</b>
+				<select id="available_processes" name="available_processes" onchange="changeProcess()">
+					<option value="o2c" selected="selected">Order-to-Cash</option>
+					<option value="ap_ar">Accounts Payable/Receivable</option>
+					<option value="p2p">Procure-to-Pay</option>
+				</select>
+				<br />
+				<div id="o2c" style="display:">
+					<p><b>Order-to-Cash</b></p>
+					<b>Extraction Type:</b>
+					<select id="o2c_ext_type" name="o2c_ext_type" onchange="o2cExtChange()">
+						<option value="o2c_1d_log_extractor">XES</option>
+						<option value="o2c_1d_dataframe_extractor">CSV</option>
+						<option value="o2c_obj_centric_log">Object-Centric Log</option>
+					</select>
+					<div id="o2c_log" style="display:">
+						<p>Insert the parameters for the log extraction:</p>
+					</div>
+					<div id="o2c_dataframe" style="display: none">
+						<p>Insert the parameters for the CSV extraction:</p>
+					</div>
+					<div id="o2c_obj" style="display: none">
+						<p>Insert the parameters for the object-centric log extraction:
+					</div>
+				</div>
+				<div id="ap_ar" style="display:">
+				</div>
+				<div id="p2p" style="display:">
+				</div>
+			</div>
+        </div>
+    </body>
+	<script type="text/javascript">
+		function changeConnectionType() {
+			let connection_type = document.getElementById("connection_types").value;
+			if (connection_type == "SQLite") {
+				document.getElementById("sqlite_conn_parameters").style.display = "";
+				document.getElementById("oracle_conn_parameters").style.display = "none";
+			}
+			else if (connection_type == "Oracle") {
+				document.getElementById("sqlite_conn_parameters").style.display = "none";
+				document.getElementById("oracle_conn_parameters").style.display = "";
+			}
+		}
+		
+		function changeProcess() {
+		}
+		
+		function o2cExtChange() {
+			let ext = document.getElementById("o2c_ext_type").value;
+			if (ext == "o2c_1d_log_extractor") {
+				document.getElementById("o2c_log").style.display = "";
+				document.getElementById("o2c_dataframe").style.display = "none";
+				document.getElementById("o2c_obj").style.display = "none";
+			}
+			else if (ext == "o2c_1d_dataframe_extractor") {
+				document.getElementById("o2c_log").style.display = "none";
+				document.getElementById("o2c_dataframe").style.display = "";
+				document.getElementById("o2c_obj").style.display = "none";
+			}
+			else if (ext == "o2c_obj_centric_log") {
+				document.getElementById("o2c_log").style.display = "none";
+				document.getElementById("o2c_dataframe").style.display = "none";
+				document.getElementById("o2c_obj").style.display = "";
+			}
+		}
+	</script>
+</html>
