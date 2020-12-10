@@ -44,7 +44,7 @@ def download_event_log():
     log = factory.apply(db_type, db_con_args, process, ext_type, ext_arg)
 
     if "obj_centr" in ext_type:
-        extension = ".ocel"
+        extension = ".ocelxml"
         temp_file = tempfile.NamedTemporaryFile(suffix=extension)
         temp_file.close()
         from pm4pymdl.objects.ocel.exporter import exporter as ocel_exporter

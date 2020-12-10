@@ -11,8 +11,8 @@
 			<div>
 				Connection to the database:
 				<select id="connection_types" name="connection_types" onchange="changeConnectionType()">
-					<option value="SQLite" selected="selected">SQLite Connection</option>
-					<option value="Oracle">Oracle Connection</option>
+					<option value="sqlite" selected="selected">SQLite Connection</option>
+					<option value="oracle">Oracle Connection</option>
 				</select>
 				<br />
 				<div id="sqlite_conn_parameters" style="display:">
@@ -55,9 +55,11 @@
 								<br />
 								<div id="o2c_log" style="display:">
 									<p>Insert the parameters for the log extraction:</p>
+									Reference document type: <input type="text" id="o2c_log_reference_type" value="Order"></input>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
+									Reference document type: <input type="text" id="o2c_df_reference_type" value="Order"></input>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:
@@ -137,16 +139,18 @@
 					</table>
 				</div>
 			</div>
+			<br />
+			<button onclick="javascript:extract()">Extract the Event Log</button>
         </div>
     </body>
 	<script type="text/javascript">
 		function changeConnectionType() {
 			let connection_type = document.getElementById("connection_types").value;
-			if (connection_type == "SQLite") {
+			if (connection_type == "sqlite") {
 				document.getElementById("sqlite_conn_parameters").style.display = "";
 				document.getElementById("oracle_conn_parameters").style.display = "none";
 			}
-			else if (connection_type == "Oracle") {
+			else if (connection_type == "oracle") {
 				document.getElementById("sqlite_conn_parameters").style.display = "none";
 				document.getElementById("oracle_conn_parameters").style.display = "";
 			}
@@ -236,6 +240,162 @@
 			else if (ext == "p2p_1d_log") {
 				document.getElementById("p2p_1d_log").style.display = "";
 			}
+		}
+		
+		function extract() {
+			let db_type = document.getElementById("connection_types").value;
+			let db_con_args = {};
+			if (db_type == "sqlite") {
+				db_con_args = getSqliteDbConArgs();
+			}
+			else if (db_type == "oracle") {
+				db_con_args = getOracleDbConArgs();
+			}
+			let process = document.getElementById("available_processes").value;
+			let ext_type = "";
+			let ext_args = {};
+			if (process == "o2c") {
+				ext_type = document.getElementById("o2c_ext_type").value;
+				ext_args = getO2Cparameters(ext_type);
+			}
+			else if (process == "ap_ar") {
+				ext_type = document.getElementById("apar_ext_type").value;
+				ext_args = getAPARparameters(ext_type);
+			}
+			else if (process == "p2p") {
+				ext_type = document.getElementById("p2p_ext_type").value;
+				ext_args = getP2Pparameters(ext_type);
+			}
+			var obj = {};
+			obj["db_type"] = db_type;
+			obj["db_con_args"] = db_con_args;
+			obj["process"] = process;
+			obj["ext_type"] = ext_type;
+			obj["ext_args"] = ext_args;
+			obj = JSON.stringify(obj);
+			obj = btoa(obj);
+			window.open("http://localhost:5000/downloadLog?parameters="+obj);
+		}
+		
+		function getSqliteDbConArgs() {
+			let db_con_args = {};
+			db_con_args["path"] = document.getElementById("sqlite_db_path").value;
+			return db_con_args;
+		}
+		
+		function getOracleDbConArgs() {
+			let db_con_args = {};
+			db_con_args["hostname"] = document.getElementById("oracle_hostname").value;
+			db_con_args["port"] = document.getElementById("oracle_port").value;
+			db_con_args["sid"] = document.getElementById("oracle_sid").value;
+			db_con_args["username"] = document.getElementById("oracle_username").value;
+			db_con_args["password"] = document.getElementById("oracle_password").value;
+			return db_con_args;
+		}
+		
+		function getO2Cparameters(ext_type) {
+			if (ext_type == "o2c_1d_log_extractor") {
+				return getO2CparametersXES(ext_type);
+			}
+			else if (ext_type == "o2c_1d_dataframe_extractor") {
+				return getO2CparametersCSV(ext_type);
+			}
+			else if (ext_type == "o2c_obj_centric_log") {
+				return getO2CparametersOL(ext_type);
+			}
+		}
+		
+		function getO2CparametersXES(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getO2CparametersCSV(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getO2CparametersOL(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparameters(ext_type) {
+			if (ext_type == "single_doc_transactions_dataframe") {
+				return getAPARparametersSTCSV(ext_type);
+			}
+			else if (ext_type == "single_doc_transactions_log") {
+				return getAPARparametersSTXES(ext_type);
+			}
+			else if (ext_type == "document_flow_dataframe") {
+				return getAPARparametersDFCSV(ext_type);
+			}
+			else if (ext_type == "document_flow_log") {
+				return getAPARparametersDFXES(ext_type);
+			}
+			else if (ext_type == "doc_flow_transactions_dataframe") {
+				return getAPARparametersDFTCSV(ext_type);
+			}
+			else if (ext_type == "doc_flow_transactions_xes") {
+				return getAPARparametersDFTXES(ext_type);
+			}
+			else if (ext_type == "apar_obj_centr_log") {
+				return getAPARparametersOL(ext_type);
+			}
+		}
+		
+		function getAPARparametersSTCSV(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersSTXES(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersDFCSV(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersDFXES(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersDFTCSV(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersDFTXES(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getAPARparametersOL(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getP2Pparameters(ext_type) {
+			if (ext_type == "p2p_1d_dataframe") {
+				return getP2PparametersCSV(ext_type);
+			}
+			else if (ext_type == "p2p_1d_log") {
+				return getP2PparametersXES(ext_type);
+			}
+		}
+		
+		function getP2PparametersCSV(ext_type) {
+			let ext_args = {};
+			return ext_args;
+		}
+		
+		function getP2PparametersXES(ext_type) {
+			let ext_args = {};
+			return ext_args;
 		}
 	</script>
 </html>
