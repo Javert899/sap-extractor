@@ -33,13 +33,15 @@ def download_event_log():
     try:
         parameters = json.loads(base64.b64decode(parameters))
     except:
+        import traceback
+        traceback.print_exc()
         parameters = {}
 
     db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
     db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
     process = parameters["process"] if "process" in parameters else "ap_ar"
     ext_type = parameters["ext_type"] if "ext_type" in parameters else "document_flow_log"
-    ext_arg = parameters["ext_arg"] if "ext_arg" in parameters else {}
+    ext_arg = parameters["ext_args"] if "ext_args" in parameters else {}
 
     log = factory.apply(db_type, db_con_args, process, ext_type, ext_arg)
 

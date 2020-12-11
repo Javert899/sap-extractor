@@ -96,15 +96,19 @@
 								</div>
 								<div id="document_flow_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow):</p>
+									Reference document type: <input type="text" id="apar_df_csv_reference_type" value="Goods receipt"></input>
 								</div>
 								<div id="document_flow_log" style="display: ">
 									<p>Insert the parameters for the XES extraction (document flow):</p>
+									Reference document type: <input type="text" id="apar_df_xes_reference_type" value="Goods receipt"></input>
 								</div>
 								<div id="doc_flow_transactions_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
+									Reference document type: <input type="text" id="apar_dft_csv_reference_type" value="Goods receipt"></input>
 								</div>
 								<div id="doc_flow_transactions_xes" style="display: none">
 									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
+									Reference document type: <input type="text" id="apar_dft_xes_reference_type" value="Goods receipt"></input>
 								</div>
 								<div id="apar_obj_centr_log" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
@@ -130,9 +134,11 @@
 								<br />
 								<div id="p2p_1d_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
+									Central table for the extraction: <input type="text" id="p2p_csv_central_table" value="EKKO"></input>
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
+									Central table for the extraction: <input type="text" id="p2p_xes_central_table" value="EKKO"></input>
 								</div>
 							</td>
 						</tr>
@@ -272,6 +278,7 @@
 			obj["process"] = process;
 			obj["ext_type"] = ext_type;
 			obj["ext_args"] = ext_args;
+			console.log(obj);
 			obj = JSON.stringify(obj);
 			obj = btoa(obj);
 			window.open("http://localhost:5000/downloadLog?parameters="+obj);
@@ -307,11 +314,13 @@
 		
 		function getO2CparametersXES(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("o2c_log_reference_type").value;
 			return ext_args;
 		}
 		
 		function getO2CparametersCSV(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("o2c_df_reference_type").value;
 			return ext_args;
 		}
 		
@@ -356,21 +365,25 @@
 		
 		function getAPARparametersDFCSV(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("apar_df_csv_reference_type").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFXES(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("apar_df_xes_reference_type").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFTCSV(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("apar_dft_csv_reference_type").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFTXES(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("apar_dft_xes_reference_type").value;
 			return ext_args;
 		}
 		
@@ -390,11 +403,13 @@
 		
 		function getP2PparametersCSV(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("p2p_csv_central_table").value;
 			return ext_args;
 		}
 		
 		function getP2PparametersXES(ext_type) {
 			let ext_args = {};
+			ext_args["ref_type"] = document.getElementById("p2p_xes_central_table").value;
 			return ext_args;
 		}
 	</script>
