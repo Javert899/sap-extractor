@@ -23,13 +23,13 @@ setup(
               'sapextractor.algo.p2p.tab_processing', 'sapextractor.algo.ap_ar', 'sapextractor.utils',
               'sapextractor.utils.blart', 'sapextractor.utils.dates', 'sapextractor.utils.tstct',
               'sapextractor.utils.vbtyp', 'sapextractor.utils.filters', 'sapextractor.utils.change_tables',
-              'sapextractor.utils.graph_building', 'sapextractor.utils.string_matching',
-              'sapextractor.database_connection'],
+              'sapextractor.utils.fields_corresp', 'sapextractor.utils.graph_building',
+              'sapextractor.utils.string_matching', 'sapextractor.diagrams', 'sapextractor.database_connection'],
     url='http://www.pm4py.org',
     license='GPL 3.0',
     install_requires=[
-        "pm4py>=2.0.0",
-        "pm4pymdl>=0.0.30",
+        "pm4py>=2.1.1",
+        "pm4pymdl>=0.0.35",
         "stringdist",
         "cx_Oracle",
         "plantuml"

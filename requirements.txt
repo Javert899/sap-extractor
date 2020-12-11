@@ -1,5 +1,5 @@
-pm4py>=2.0.0
-pm4pymdl>=0.0.30
+pm4py>=2.1.1
+pm4pymdl>=0.0.35
 stringdist
 cx_Oracle
 plantuml

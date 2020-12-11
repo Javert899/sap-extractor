@@ -1,7 +1,7 @@
 from sapextractor import algo, database_connection, utils, main, diagrams
 
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
 __doc__ = "SAP Extractor"
 __author__ = 'PADS'
 __author_email__ = 'alessandro.berti89@gmail.com'
