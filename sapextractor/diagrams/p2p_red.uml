@@ -34,8 +34,8 @@ entity MSEG {
 }
 
 entity TSTCT {
-    TCODE: Integer <<PK>>
-    SPRSL: Integer <<PK>>
+    TCODE: String <<PK>>
+    SPRSL: String <<PK>>
     TTEXT: String
 }
 

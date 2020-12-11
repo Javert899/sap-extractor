@@ -1,7 +1,7 @@
 @startuml
 
 entity BKPF {
-    BELNR: Integer <<PK>>
+    BELNR: String <<PK>>
     CPUDT: Date
     CPUTM: Date
     USNAM: String
@@ -11,17 +11,17 @@ entity BKPF {
 }
 
 entity BSEG {
-    BELNR: Integer <<PK>> <<FK>>
-    BUZEI: Integer <<PK>>
-    AUGBL: Integer <<FK>>
-    HKONT: Integer
-    KUNNR: Integer
-    LIFNR: Integer
+    BELNR: String <<PK>> <<FK>>
+    BUZEI: String <<PK>>
+    AUGBL: String <<FK>>
+    HKONT: String
+    KUNNR: String
+    LIFNR: String
 }
 
 entity TSTCT {
-    TCODE: Integer <<PK>>
-    SPRSL: Integer <<PK>>
+    TCODE: String <<PK>>
+    SPRSL: String <<PK>>
     TTEXT: String
 }
 
@@ -63,6 +63,7 @@ entity CDHDR {
     UDATE: Date
     UTIME: Date
     TCODE: String <<PK>>
+    AWKEY: String <<FK>>
 }
 
 entity CDPOS {

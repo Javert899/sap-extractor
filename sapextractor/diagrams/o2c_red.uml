@@ -16,7 +16,54 @@ entity DD07T {
     DDTEXT: String
 }
 
+entity BKPF {
+    BELNR: String <<PK>>
+    CPUDT: Date
+    CPUTM: Date
+    USNAM: String
+    TCODE: String <<FK>>
+    BLART: String <<FK>>
+    AWKEY: String <<FK>>
+}
+
+entity BSEG {
+    BELNR: String <<PK>> <<FK>>
+    BUZEI: String <<PK>>
+    AUGBL: String <<FK>>
+    HKONT: String
+    KUNNR: String
+    LIFNR: String
+}
+
+entity T003T {
+    BLART: String <<PK>>
+    SPRSL: String <<PK>>
+    LTEXT: String
+}
+
+entity CDHDR {
+    CHANGENR: String <<PK>>
+    USERNAME: String
+    UDATE: Date
+    UTIME: Date
+    TCODE: String <<PK>>
+    AWKEY: String <<FK>>
+}
+
+entity CDPOS {
+    CHANGENR: String <<PK>> <<FK>>
+    OBJECTID: String
+}
+
+
+
 VBFA }|..|| VBFA
 VBFA ||-- DD07T
+CDHDR }|-- CDPOS
+BKPF ||-- T003T
+BKPF }|..|| BSEG
+BSEG |o-- BSEG
+VBFA }o-- BKPF
+VBFA |o-- CDPOS
 
 @enduml
