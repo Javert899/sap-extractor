@@ -26,8 +26,8 @@ def get_o2c_classic_dataframe(con, ref_type="Invoice", keep_first=True, min_extr
                                                      min_extr_date=min_extr_date, gjahr=gjahr)
 
 
-def get_o2c_obj_centr_log(con, keep_first=True):
-    return algo.o2c.obj_centr_log.apply(con, keep_first=keep_first)
+def get_o2c_obj_centr_log(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
+    return algo.o2c.obj_centr_log.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
 
 
 def get_p2p_classic_event_log(con, ref_type="EKKO"):

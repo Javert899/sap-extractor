@@ -5,7 +5,7 @@ from examples import example_connection
 
 def execute_script():
     con = example_connection.get_con()
-    ol = sapextractor.get_o2c_obj_centr_log(con, keep_first=True)
+    ol = sapextractor.get_o2c_obj_centr_log(con, keep_first=True, min_extr_date="1990-01-01 00:00:00")
     mdl_exporter.apply(ol, "o2c.mdl")
 
 
