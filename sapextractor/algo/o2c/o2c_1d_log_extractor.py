@@ -1,11 +1,13 @@
-from sapextractor.algo.o2c import o2c_1d_dataframe_extractor
 from pm4py.objects.conversion.log import converter as log_converter
-from pm4py.objects.log.util import sorting
 from pm4py.objects.log.exporter.xes import exporter as xes_exporter
+from pm4py.objects.log.util import sorting
+
+from sapextractor.algo.o2c import o2c_1d_dataframe_extractor
 
 
-def apply(con, ref_type="Invoice", keep_first=True):
-    dataframe = o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first)
+def apply(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020"):
+    dataframe = o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first,
+                                                 min_extr_date=min_extr_date, gjahr=gjahr)
     log = log_converter.apply(dataframe, parameters={"stream_postprocessing": True})
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log

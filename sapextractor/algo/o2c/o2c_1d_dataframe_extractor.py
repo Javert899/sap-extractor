@@ -1,12 +1,13 @@
+import numpy as np
+import pandas as pd
+
 from sapextractor.algo.o2c import o2c_common
-from sapextractor.utils.graph_building import build_graph
-from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
+from sapextractor.utils.blart import extract_blart
 from sapextractor.utils.change_tables import extract_change
 from sapextractor.utils.fields_corresp import extract_dd03t
-from sapextractor.utils.blart import extract_blart
-import pandas as pd
-import numpy as np
+from sapextractor.utils.filters import case_filter
+from sapextractor.utils.graph_building import build_graph
 
 
 def extract_changes_vbfa(con, dataframe):
@@ -48,8 +49,7 @@ def extract_changes_vbfa(con, dataframe):
     return ret
 
 
-def extract_bkpf_bsak(con, dataframe):
-
+def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
     case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
     case_vbeln_dict = {}
     for x in case_vbeln:
@@ -59,7 +59,7 @@ def extract_bkpf_bsak(con, dataframe):
             case_vbeln_dict[vbeln] = set()
         case_vbeln_dict[vbeln].add(caseid)
 
-    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "AWKEY", "BLART"])
+    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "AWKEY", "BLART"], additional_query_part=" WHERE GJAHR = '"+gjahr+"'")
     blart_vals = set(bkpf["BLART"].unique())
     blart_vals = {x: x for x in blart_vals}
     blart_vals = extract_blart.apply_static(con, doc_types=blart_vals)
@@ -107,7 +107,9 @@ def extract_bkpf_bsak(con, dataframe):
             if belnr in clearance_docs_dates:
                 for clearingdoc in clearance_docs_dates[belnr]:
                     for cas in case_vbeln_dict[k]:
-                        ret.append({"case:concept:name": cas, "concept:name": "Clearance ("+blart_vals[clearingdoc[2]]+")", "AUGBL": clearingdoc[0], "time:timestamp": clearingdoc[1]})
+                        ret.append(
+                            {"case:concept:name": cas, "concept:name": "Clearance (" + blart_vals[clearingdoc[2]] + ")",
+                             "AUGBL": clearingdoc[0], "time:timestamp": clearingdoc[1]})
     ret = pd.DataFrame(ret)
 
     if len(ret) > 0:
@@ -119,25 +121,26 @@ def extract_bkpf_bsak(con, dataframe):
     return ret
 
 
-
-def apply(con, ref_type="Order", keep_first=True):
-    dataframe = o2c_common.apply(con, keep_first=keep_first)
+def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020"):
+    dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
     cols["event_activity"] = "concept:name"
     cols["event_timestamp"] = "time:timestamp"
     dataframe = dataframe.rename(columns=cols)
-    ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
+    ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
+                                                       ref_type=ref_type)
     # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
     changes = extract_changes_vbfa(con, dataframe)
-    payments = extract_bkpf_bsak(con, dataframe)
+    payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr)
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
     dataframe = pd.concat([dataframe, changes, payments])
     dataframe = dataframe.sort_values("time:timestamp")
-    dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
+    dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1,
+                                                max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
 
@@ -158,4 +161,4 @@ def cli(con):
     path = input("Insert the path where the dataframe should be saved (default: o2c.csv):")
     if not path:
         path = "o2c.csv"
-    dataframe.to_csv(path, sep=",", quotechar="\"",  index=False)
+    dataframe.to_csv(path, sep=",", quotechar="\"", index=False)
