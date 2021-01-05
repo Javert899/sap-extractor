@@ -1,6 +1,7 @@
 DOC_SEP = "@#@#@#"
 MAX_CASE_SIZE = 130
 
+ORACLE_OWNER = "SAPSR3"
 
 def set_documents(content):
     ret = []

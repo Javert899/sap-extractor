@@ -3,15 +3,16 @@ from sapextractor.utils.string_matching import distances
 
 def find_least_dist(col, col_set):
     col_set_keys = list(col_set.keys())
-    ret = col_set[col_set_keys[0]]
+    ret = col_set_keys[0]
     curr_dist = distances.apply(col, ret)
     i = 1
     while i < len(col_set_keys):
         new_dist = distances.apply(col, col_set_keys[i])
         if new_dist < curr_dist:
-            ret = col_set[col_set_keys[i]]
+            ret = col_set_keys[i]
             curr_dist = new_dist
         i = i + 1
+    ret = col_set[ret]
     return ret
 
 
