@@ -15,6 +15,8 @@ class OracleConnection(DatabaseConnection):
 
     def execute_read_sql(self, sql, columns):
         cursor = self.con.cursor()
+        cursor.prefetchrows = constants.ORACLE_ARRAYSIZE
+        cursor.arraysize = constants.ORACLE_ARRAYSIZE
         print(time.time(), "executing: "+sql)
         cursor.execute(sql)
         stream = []

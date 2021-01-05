@@ -1,10 +1,12 @@
 import pandas as pd
 from datetime import datetime
+from sapextractor.utils import constants
+
 
 def apply(dataframe, dt_column, tm_column, target_column):
     try:
         dataframe[target_column] = dataframe[dt_column] + " " + dataframe[tm_column]
-        dataframe[target_column] = pd.to_datetime(dataframe[target_column], format="%d.%m.%Y %H:%M:%S")
+        dataframe[target_column] = pd.to_datetime(dataframe[target_column], format=constants.TIMESTAMP_FORMAT)
         dataframe = dataframe.sort_values("event_timestamp")
         dataframe = dataframe.dropna(subset=["event_timestamp"], how="any")
     except:
