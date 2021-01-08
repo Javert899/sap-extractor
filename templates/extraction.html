@@ -55,11 +55,15 @@
 								<br />
 								<div id="o2c_log" style="display:">
 									<p>Insert the parameters for the log extraction:</p>
-									Reference document type: <input type="text" id="o2c_log_reference_type" value="Order"></input>
+									Reference document type: <input type="text" id="o2c_log_reference_type" value="Order" /> <br />
+									Minimum extraction date: <input type="text" id="o2c_log_min_ext_date" value="2020-12-21 00:00:00" /> <br />
+									Fiscal year: <input type="text" id="o2c_log_fiscal_year" value="2020" /> <br />
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
-									Reference document type: <input type="text" id="o2c_df_reference_type" value="Order"></input>
+									Reference document type: <input type="text" id="o2c_df_reference_type" value="Order" /> <br />
+									Minimum extraction date: <input type="text" id="o2c_df_min_ext_date" value="2020-12-21 00:00:00" /> <br />
+									Fiscal year: <input type="text" id="o2c_df_fiscal_year" value="2020" /> <br />
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:
@@ -315,12 +319,16 @@
 		function getO2CparametersXES(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("o2c_log_reference_type").value;
+			ext_args["min_extr_date"] = document.getElementById("o2c_log_min_ext_date").value;
+			ext_args["gjahr"] = document.getElementById("o2c_log_fiscal_year").value;
 			return ext_args;
 		}
 		
 		function getO2CparametersCSV(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("o2c_df_reference_type").value;
+			ext_args["min_extr_date"] = document.getElementById("o2c_df_min_ext_date").value;
+			ext_args["gjahr"] = document.getElementById("o2c_df_fiscal_year").value;
 			return ext_args;
 		}
 		
