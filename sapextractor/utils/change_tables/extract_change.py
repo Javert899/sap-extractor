@@ -30,7 +30,8 @@ def read_cdpos(con, objectclas=None, tabname=None):
 
 
 def give_field_desc(con, cdpos_dict):
-    fnames = extract_dd03t.apply(con)
+    #fnames = extract_dd03t.apply(con)
+    fnames = {}
     for c in cdpos_dict:
         fname = c["FNAME"]
         tabname = c["TABNAME"]

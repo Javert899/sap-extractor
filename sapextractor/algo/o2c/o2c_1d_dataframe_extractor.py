@@ -20,7 +20,6 @@ def extract_changes_vbfa(con, dataframe):
             case_vbeln_dict[vbeln] = set()
         case_vbeln_dict[vbeln].add(caseid)
     ret = []
-    dict_corr = extract_dd03t.apply(con)
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
                 ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
         changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
@@ -30,10 +29,6 @@ def extract_changes_vbfa(con, dataframe):
             cols = {x: x.split("event_")[-1] for x in y.columns}
             cols["event_timestamp"] = "time:timestamp"
             y = y.rename(columns=cols)
-            fnames = set(y["FNAME"].unique())
-            for fname in fnames:
-                if fname not in dict_corr or dict_corr[fname] is None:
-                    dict_corr[fname] = fname
             y["VBELN"] = y["AWKEY"]
             y["concept:name"] = y["CHANGEDESC"]
             for cc in case_vbeln_dict[x]:
