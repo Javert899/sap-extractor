@@ -8,13 +8,27 @@ from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.vbtyp import extract_vbtyp
 
 
-def vbfa_closure(vbfa):
+def extract_vbak(con, min_extr_date="2020-01-01 00:00:00"):
+    vbak = {}
+    try:
+        vbak = con.prepare_and_execute_query("VBAK", ["VBELN", "ERDAT", "ERZET"])
+        timestamp_column_from_dt_tm.apply(vbak, "ERDAT", "ERZET", "event_timestamp")
+        vbak = vbak[vbak["event_timestamp"] > min_extr_date]
+        vbak = vbak[["VBELN", "event_timestamp"]].to_dict("r")
+        vbak = {x["VBELN"]: x["event_timestamp"] for x in vbak}
+    except:
+        pass
+    return vbak
+
+
+def vbfa_closure(con, vbfa, min_extr_date):
+    vbak = extract_vbak(con, min_extr_date=min_extr_date)
     vbeln_unique = set(vbfa["VBELN"].unique())
     vbfa_vbelv_types = list((x["VBELV"], x["VBTYP_V"]) for x in vbfa[["VBELV", "VBTYP_V"]].to_dict("records") if
                             x["VBELV"] not in vbeln_unique)
     # default the timestamp
     closure_events = {"VBELN": [x[0] for x in vbfa_vbelv_types], "VBTYP_N": [x[1] for x in vbfa_vbelv_types],
-                      "event_timestamp": datetime.fromtimestamp(10000000)}
+                      "event_timestamp": [vbak[x[0]] if x[0] in vbak else datetime.fromtimestamp(10000000) for x in vbfa_vbelv_types]}
     closure_df = pd.DataFrame(closure_events)
     return pd.concat([vbfa, closure_df]).sort_values("event_timestamp")
 
@@ -28,7 +42,7 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbtyp = extract_vbtyp.apply_static(con, doc_types=doc_types)
     vbfa["VBTYP_N"] = vbfa["VBTYP_N"].map(vbtyp)
     vbfa["VBTYP_V"] = vbfa["VBTYP_V"].map(vbtyp)
-    vbfa = vbfa_closure(vbfa)
+    vbfa = vbfa_closure(con, vbfa, min_extr_date)
     vbfa["event_id"] = vbfa.index.astype(str)
     cols = {}
     for x in vbfa.columns:

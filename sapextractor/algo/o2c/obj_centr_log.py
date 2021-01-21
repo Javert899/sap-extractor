@@ -3,7 +3,7 @@ from pm4pymdl.objects.ocel.exporter import exporter as jmd_exporter
 from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 
-def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
+def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020"):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe["event_id"] = dataframe.index.astype(str)
     dataframe = dataframe.sort_values("event_timestamp")
