@@ -77,7 +77,7 @@ def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
     return ret
 
 
-def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020"):
+def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
@@ -89,8 +89,14 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
     # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
-    changes = extract_changes_vbfa(con, dataframe)
-    payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr)
+    if enable_changes:
+        changes = extract_changes_vbfa(con, dataframe)
+    else:
+        changes = pd.DataFrame()
+    if enable_payments:
+        payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr)
+    else:
+        payments = pd.DataFrame()
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
     dataframe = pd.concat([dataframe, changes, payments])
@@ -113,7 +119,13 @@ def cli(con):
         keep_first = True
     elif ext_type == "items":
         keep_first = False
-    dataframe = apply(con, ref_type=ref_type, keep_first=keep_first)
+    min_extr_date = input("Insert the minimum extraction date (default: 2020-01-01 00:00:00): ")
+    if not min_extr_date:
+        min_extr_date = "2020-01-01 00:00:00"
+    gjahr = input("Insert the fiscal year (default: 2020):")
+    if not gjahr:
+        gjahr = "2020"
+    dataframe = apply(con, ref_type=ref_type, keep_first=keep_first, min_extr_date=min_extr_date, gjahr=gjahr)
     path = input("Insert the path where the dataframe should be saved (default: o2c.csv):")
     if not path:
         path = "o2c.csv"

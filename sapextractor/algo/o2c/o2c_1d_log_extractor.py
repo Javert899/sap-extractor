@@ -5,9 +5,9 @@ from pm4py.objects.log.util import sorting
 from sapextractor.algo.o2c import o2c_1d_dataframe_extractor
 
 
-def apply(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020"):
+def apply(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True):
     dataframe = o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first,
-                                                 min_extr_date=min_extr_date, gjahr=gjahr)
+                                                 min_extr_date=min_extr_date, gjahr=gjahr, enable_changes=enable_changes, enable_payments=enable_payments)
     log = log_converter.apply(dataframe, parameters={"stream_postprocessing": True})
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log
@@ -25,7 +25,13 @@ def cli(con):
         keep_first = True
     else:
         keep_first = False
-    log = apply(con, ref_type=ref_type, keep_first=keep_first)
+    min_extr_date = input("Insert the minimum extraction date (default: 2020-01-01 00:00:00): ")
+    if not min_extr_date:
+        min_extr_date = "2020-01-01 00:00:00"
+    gjahr = input("Insert the fiscal year (default: 2020):")
+    if not gjahr:
+        gjahr = "2020"
+    log = apply(con, ref_type=ref_type, keep_first=keep_first, min_extr_date=min_extr_date, gjahr=gjahr)
     path = input("Insert the path where the log should be saved (default: o2c.xes):")
     if not path:
         path = "o2c.xes"

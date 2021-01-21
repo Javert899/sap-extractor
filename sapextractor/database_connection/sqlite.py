@@ -2,12 +2,14 @@ from sapextractor.database_connection.interface import DatabaseConnection
 from sapextractor.utils.string_matching import find_corr
 import sqlite3
 import pandas as pd
+from sapextractor.utils import constants
 
 
 class SqliteConnection(DatabaseConnection):
     def __init__(self, path):
         self.path = path
         self.con = sqlite3.connect(self.path)
+        constants.TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
         DatabaseConnection.__init__(self)
 
     def execute_read_sql(self, sql, columns):

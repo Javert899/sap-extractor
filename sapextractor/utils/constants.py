@@ -4,7 +4,7 @@ MAX_CASE_SIZE = 130
 ORACLE_OWNER = "SAPSR3"
 ORACLE_ARRAYSIZE = 10000
 
-TIMESTAMP_FORMAT = "%Y.%m.%d %H:%M:%S"
+TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
 
 
 def set_documents(content):
