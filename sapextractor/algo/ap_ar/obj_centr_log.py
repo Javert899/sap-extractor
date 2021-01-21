@@ -17,9 +17,9 @@ def cli(con):
     dataframe = apply(con)
     path = input("Insert the path where the log should be saved (default: accounting.mdl): ")
     if not path:
-        path = "accounting.mdl"
+        path = "accounting.xmlocel"
     if path.endswith("mdl"):
         mdl_exporter.apply(dataframe, path)
-    elif path.endswith("jmd"):
+    elif path.endswith("jsonocel") or path.endswith("xmlocel"):
         jmd_exporter.apply(dataframe, path)
 

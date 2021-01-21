@@ -16,8 +16,8 @@ def cli(con):
     dataframe = apply(con)
     path = input("Insert the path where the log should be saved (default: p2p.mdl): ")
     if not path:
-        path = "p2p.mdl"
+        path = "p2p.xmlocel"
     if path.endswith("mdl"):
         mdl_exporter.apply(dataframe, path)
-    elif path.endswith("jmd"):
+    elif path.endswith("jsonocel") or path.endswith("xmlocel"):
         jmd_exporter.apply(dataframe, path)
