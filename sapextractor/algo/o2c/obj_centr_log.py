@@ -37,7 +37,8 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020
         changes = get_changes(con, dataframe)
     else:
         changes = pd.DataFrame()
-    changes = changes.sort_values("event_timestamp")
+    if len(changes) > 0:
+        changes = changes.sort_values("event_timestamp")
     dataframe = pd.concat([dataframe, changes])
     dataframe["event_id"] = dataframe.index.astype(str)
     dataframe = dataframe.sort_values("event_timestamp")
