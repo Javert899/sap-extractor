@@ -10,9 +10,13 @@ from sapextractor.utils.tstct import extract_tstct
 
 
 def extract_bkpf(con, gjahr="1997", bukrs=None):
-    additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
-    if bukrs is not None:
-        additional_query_part = additional_query_part + " AND BUKRS = '"+bukrs+"'"
+    additional_query_part = ""
+    if gjahr is not None and bukrs is not None:
+        additional_query_part = " WHERE GJAHR = '"+gjahr+"' AND BUKRS = '"+bukrs+"'"
+    elif gjahr is not None:
+        additional_query_part = " WHERE GJAHR = '" + gjahr + "'"
+    elif bukrs is not None:
+        additional_query_part = " WHERE BUKRS = '" + bukrs + "'"
     bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "BLART", "CPUDT", "CPUTM", "USNAM", "TCODE", "AWKEY"], additional_query_part=additional_query_part)
     bkpf = bkpf.dropna(subset=["BELNR", "TCODE", "BLART"], how="any")
     transactions = set(bkpf["TCODE"].unique())
@@ -36,9 +40,13 @@ def extract_bkpf(con, gjahr="1997", bukrs=None):
 
 
 def extract_bseg(con, doc_first_dates, doc_types, gjahr="1997", bukrs=None):
-    additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
-    if bukrs is not None:
-        additional_query_part = additional_query_part + " AND BUKRS = '"+bukrs+"'"
+    additional_query_part = ""
+    if gjahr is not None and bukrs is not None:
+        additional_query_part = " WHERE GJAHR = '"+gjahr+"' AND BUKRS = '"+bukrs+"'"
+    elif gjahr is not None:
+        additional_query_part = " WHERE GJAHR = '" + gjahr + "'"
+    elif bukrs is not None:
+        additional_query_part = " WHERE BUKRS = '" + bukrs + "'"
     bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=additional_query_part)
     bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
     bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
@@ -74,7 +82,11 @@ def extract_changes_bkpf(con, bkpf, doc_types, gjahr="1997", bukrs=None):
 
 def get_single_dataframes(con, gjahr="1997", bukrs=None, filter_columns=False):
     bkpf, doc_first_dates, doc_types = extract_bkpf(con, gjahr=gjahr, bukrs=bukrs)
+    #bkpf["@@DOCTYPE"] = bkpf["event_BELNR"].map(doc_types)
+    #bkpf.to_csv("bkpf.csv", index=False)
     bseg = extract_bseg(con, doc_first_dates, doc_types, gjahr=gjahr, bukrs=bukrs)
+    #bseg["@@DOCTYPE"] = bseg["event_BELNR"].map(doc_types)
+    #bseg.to_csv("bseg.csv", index=False)
     #changes = extract_changes_bkpf(con, bkpf, doc_types, gjahr=gjahr, bukrs=bukrs)
     if filter_columns:
         bkpf = bkpf[[x for x in bkpf.columns if x.startswith("event_")]]
