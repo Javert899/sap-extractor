@@ -9,8 +9,11 @@ from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.tstct import extract_tstct
 
 
-def extract_bkpf(con):
-    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "BLART", "CPUDT", "CPUTM", "USNAM", "TCODE", "AWKEY"])
+def extract_bkpf(con, gjahr="1997", bukrs=None):
+    additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
+    if bukrs is not None:
+        additional_query_part = additional_query_part + " AND BUKRS = '"+bukrs+"'"
+    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "BLART", "CPUDT", "CPUTM", "USNAM", "TCODE", "AWKEY"], additional_query_part=additional_query_part)
     bkpf = bkpf.dropna(subset=["BELNR", "TCODE", "BLART"], how="any")
     transactions = set(bkpf["TCODE"].unique())
     doc_types = set(bkpf["BLART"].unique())
@@ -32,8 +35,11 @@ def extract_bkpf(con):
     return bkpf, doc_first_dates, doc_types
 
 
-def extract_bseg(con, doc_first_dates, doc_types):
-    bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"])
+def extract_bseg(con, doc_first_dates, doc_types, gjahr="1997", bukrs=None):
+    additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
+    if bukrs is not None:
+        additional_query_part = additional_query_part + " AND BUKRS = '"+bukrs+"'"
+    bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=additional_query_part)
     bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
     bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
     bseg["AUGBL_TYPE"] = bseg["AUGBL"].map(doc_types)
@@ -54,7 +60,7 @@ def extract_bseg(con, doc_first_dates, doc_types):
     return bseg
 
 
-def extract_changes_bkpf(con, bkpf, doc_types):
+def extract_changes_bkpf(con, bkpf, doc_types, gjahr="1997", bukrs=None):
     changes = extract_change.get_changes_dataframe_two_mapping(con, bkpf, "event_AWKEY", "event_BELNR",
                                                                resource_column="event_USNAM", objectclas="BELEG",
                                                                tabname="BKPF")
@@ -66,17 +72,17 @@ def extract_changes_bkpf(con, bkpf, doc_types):
     return changes
 
 
-def get_single_dataframes(con, filter_columns=False):
-    bkpf, doc_first_dates, doc_types = extract_bkpf(con)
-    bseg = extract_bseg(con, doc_first_dates, doc_types)
-    changes = extract_changes_bkpf(con, bkpf, doc_types)
+def get_single_dataframes(con, gjahr="1997", bukrs=None, filter_columns=False):
+    bkpf, doc_first_dates, doc_types = extract_bkpf(con, gjahr=gjahr, bukrs=bukrs)
+    bseg = extract_bseg(con, doc_first_dates, doc_types, gjahr=gjahr, bukrs=bukrs)
+    #changes = extract_changes_bkpf(con, bkpf, doc_types, gjahr=gjahr, bukrs=bukrs)
     if filter_columns:
         bkpf = bkpf[[x for x in bkpf.columns if x.startswith("event_")]]
         bseg = bseg[[x for x in bseg.columns if x.startswith("event_")]]
-    bkpf = pd.concat([bkpf, changes])
+    #bkpf = pd.concat([bkpf, changes])
     return bkpf, bseg
 
 
-def get_full_dataframe(con, filter_columns=False):
-    bkpf, bseg = get_single_dataframes(con, filter_columns=filter_columns)
+def get_full_dataframe(con, gjahr="1997", bukrs=None, filter_columns=False):
+    bkpf, bseg = get_single_dataframes(con, gjahr=gjahr, bukrs=bukrs, filter_columns=filter_columns)
     return pd.concat([bkpf, bseg])

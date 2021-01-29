@@ -4,8 +4,8 @@ from pm4py.objects.log.util import sorting
 from pm4py.objects.log.exporter.xes import exporter as xes_exporter
 
 
-def apply(con, ref_type="Goods receipt"):
-    dataframe = document_flow_dataframe.apply(con, ref_type=ref_type)
+def apply(con, gjahr="1997", bukrs=None, ref_type="Goods receipt", **ext_args):
+    dataframe = document_flow_dataframe.apply(con, gjahr=gjahr, bukrs=bukrs, ref_type=ref_type)
     log = log_converter.apply(dataframe, parameters={"stream_postprocessing": True})
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log

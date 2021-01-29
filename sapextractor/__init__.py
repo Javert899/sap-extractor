@@ -42,32 +42,32 @@ def get_p2p_obj_centr_log(con):
     return algo.p2p.obj_centr_log.apply(con)
 
 
-def get_ap_ar_single_doc_transactions_dataframe(con):
-    return algo.ap_ar.single_doc_transactions_dataframe.apply(con)
+def get_ap_ar_single_doc_transactions_dataframe(con, gjahr="1997", bukrs=None):
+    return algo.ap_ar.single_doc_transactions_dataframe.apply(con, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_single_doc_transactions_log(con):
-    return algo.ap_ar.single_doc_transactions_log.apply(con)
+def get_ap_ar_single_doc_transactions_log(con, gjahr="1997", bukrs=None):
+    return algo.ap_ar.single_doc_transactions_log.apply(con, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_document_flow_dataframe(con, ref_type="Goods receipt"):
-    return algo.ap_ar.document_flow_dataframe.apply(con, ref_type=ref_type)
+def get_ap_ar_document_flow_dataframe(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
+    return algo.ap_ar.document_flow_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_document_flow_log(con, ref_type="Goods receipt"):
-    return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type)
+def get_ap_ar_document_flow_log(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
+    return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt"):
-    return algo.ap_ar.doc_flow_transactions_dataframe.apply(con, ref_type=ref_type)
+def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
+    return algo.ap_ar.doc_flow_transactions_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt"):
-    return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type)
+def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
+    return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
 
 
-def get_ap_ar_obj_centr_log(con):
-    return algo.ap_ar.obj_centr_log.apply(con)
+def get_ap_ar_obj_centr_log(con, gjahr="1997", bukrs=None):
+    return algo.ap_ar.obj_centr_log.apply(con, gjahr=gjahr, bukrs=bukrs)
 
 
 def cli():
