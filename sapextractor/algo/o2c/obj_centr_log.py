@@ -30,7 +30,7 @@ def get_changes(con, dataframe):
 
 
 def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True,
-          enable_payments=True):
+          enable_payments=True, allowed_activities=None):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe = dataframe.sort_values("event_timestamp")
     if enable_changes:
@@ -41,6 +41,9 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020
         changes = changes.sort_values("event_timestamp")
     dataframe = pd.concat([dataframe, changes])
     dataframe["event_id"] = dataframe.index.astype(str)
+    if allowed_activities is not None:
+        allowed_activities = set(allowed_activities)
+        dataframe["event_activity"] = dataframe["event_activity"].isin(allowed_activities)
     dataframe = dataframe.sort_values("event_timestamp")
     dataframe.type = "succint"
     return dataframe

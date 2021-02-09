@@ -77,7 +77,7 @@ def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
     return ret
 
 
-def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True):
+def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_activities=None):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
@@ -100,6 +100,9 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
     dataframe = pd.concat([dataframe, changes, payments])
+    if allowed_activities is not None:
+        allowed_activities = set(allowed_activities)
+        dataframe["concept:name"] = dataframe["concept:name"].isin(allowed_activities)
     dataframe = dataframe.sort_values("time:timestamp")
     dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1,
                                                 max_case_size=constants.MAX_CASE_SIZE)

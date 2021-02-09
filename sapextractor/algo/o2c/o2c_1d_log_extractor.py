@@ -5,9 +5,9 @@ from pm4py.objects.log.util import sorting
 from sapextractor.algo.o2c import o2c_1d_dataframe_extractor
 
 
-def apply(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True):
+def apply(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_activities=None):
     dataframe = o2c_1d_dataframe_extractor.apply(con, ref_type=ref_type, keep_first=keep_first,
-                                                 min_extr_date=min_extr_date, gjahr=gjahr, enable_changes=enable_changes, enable_payments=enable_payments)
+                                                 min_extr_date=min_extr_date, gjahr=gjahr, enable_changes=enable_changes, enable_payments=enable_payments, allowed_activities=allowed_activities)
     log = log_converter.apply(dataframe, parameters={"stream_postprocessing": True})
     log = sorting.sort_timestamp(log, "time:timestamp")
     return log
