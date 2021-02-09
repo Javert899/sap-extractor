@@ -21,7 +21,7 @@ def extract(con):
         counter[el["CHANGEDESC"]] += int(el["COUNT"])
         i = i + 1
 
-    counter = [(x, y) for x, y in counter.items()]
+    counter = [[x, y] for x, y in counter.items()]
     counter = sorted(counter, key=lambda x: x[1], reverse=True)
 
     return counter
