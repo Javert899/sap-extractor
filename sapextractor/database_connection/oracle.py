@@ -10,6 +10,7 @@ class OracleConnection(DatabaseConnection):
     def __init__(self, hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
         import cx_Oracle
         constants.TIMESTAMP_FORMAT = "%Y%m%d %H%M%S"
+        self.table_prefix = "SAPSR3."
         self.con = cx_Oracle.connect(username, password, hostname + ":" + str(port) + "/" + str(sid), encoding="UTF-8",
                                      events=True)
         DatabaseConnection.__init__(self)

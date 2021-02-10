@@ -4,7 +4,7 @@ import json
 from sapextractor import factory
 import tempfile
 from flask_cors import CORS
-from sapextractor.database_connection import factory
+from sapextractor.database_connection import factory as database_factory
 import pm4py
 
 
@@ -42,12 +42,13 @@ def vbfaGetDfg():
     db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
     db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
 
-    c = factory.apply(db_type, db_con_args)
+    c = database_factory.apply(db_type, db_con_args)
     from sapextractor.algo.o2c import graph_retrieval_util
     dfg, act_count = graph_retrieval_util.extract_dfg(c)
     gviz = pm4py.visualization.dfg.visualizer.apply(dfg, activities_count=act_count, parameters={"format": "svg"})
     ser = pm4py.visualization.dfg.visualizer.serialize(gviz).decode("utf-8")
-    dfg = [[x[0], x[1], y] for x, y in dfg.items()]
+    dfg = sorted([[x[0], x[1], y] for x, y in dfg.items()], key=lambda x: x[1], reverse=True)
+    act_count = sorted([(x, y) for x, y in act_count.items()], key=lambda x: x[1], reverse=True)
 
     return jsonify({"dfg": dfg, "act_count": act_count, "ser": ser})
 
@@ -66,7 +67,7 @@ def vbfaChangeActivityUtil():
     db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
     db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
 
-    c = factory.apply(db_type, db_con_args)
+    c = database_factory.apply(db_type, db_con_args)
     from sapextractor.algo.o2c import change_activities_util
     changes_count = change_activities_util.extract(c)
 
