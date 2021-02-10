@@ -77,7 +77,7 @@ def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
     return ret
 
 
-def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_activities=None):
+def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
@@ -89,6 +89,9 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
     # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
+    if allowed_act_doc_types is not None:
+        allowed_act_doc_types = set(allowed_act_doc_types)
+        dataframe = dataframe[dataframe["concept:name"].isin(allowed_act_doc_types)]
     if enable_changes:
         changes = extract_changes_vbfa(con, dataframe)
     else:
@@ -99,10 +102,10 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
         payments = pd.DataFrame()
     if keep_first:
         dataframe = dataframe.groupby("VBELN").first()
+    if allowed_act_changes is not None:
+        allowed_act_changes = set(allowed_act_changes)
+        changes = changes[changes["concept:name"].isin(allowed_act_changes)]
     dataframe = pd.concat([dataframe, changes, payments])
-    if allowed_activities is not None:
-        allowed_activities = set(allowed_activities)
-        dataframe["concept:name"] = dataframe["concept:name"].isin(allowed_activities)
     dataframe = dataframe.sort_values("time:timestamp")
     dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1,
                                                 max_case_size=constants.MAX_CASE_SIZE)

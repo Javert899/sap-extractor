@@ -30,8 +30,11 @@ def get_changes(con, dataframe):
 
 
 def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True,
-          enable_payments=True, allowed_activities=None):
+          enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
+    if allowed_act_doc_types is not None:
+        allowed_act_doc_types = set(allowed_act_doc_types)
+        dataframe = dataframe[dataframe["event_activity"].isin(allowed_act_doc_types)]
     dataframe = dataframe.sort_values("event_timestamp")
     if enable_changes:
         changes = get_changes(con, dataframe)
@@ -39,11 +42,11 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020
         changes = pd.DataFrame()
     if len(changes) > 0:
         changes = changes.sort_values("event_timestamp")
+    if allowed_act_changes is not None:
+        allowed_act_changes = set(allowed_act_changes)
+        changes = changes[changes["event_activity"].isin(allowed_act_changes)]
     dataframe = pd.concat([dataframe, changes])
     dataframe["event_id"] = dataframe.index.astype(str)
-    if allowed_activities is not None:
-        allowed_activities = set(allowed_activities)
-        dataframe["event_activity"] = dataframe["event_activity"].isin(allowed_activities)
     dataframe = dataframe.sort_values("event_timestamp")
     dataframe.type = "succint"
     return dataframe
