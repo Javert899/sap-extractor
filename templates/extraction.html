@@ -60,6 +60,8 @@
 									Fiscal year: <input type="text" id="o2c_log_fiscal_year" value="2020" /> <br />
 									<input type="checkbox" id="o2c_log_include_changes" name="o2c_log_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_log_include_payments" name="o2c_log_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
@@ -68,6 +70,8 @@
 									Fiscal year: <input type="text" id="o2c_df_fiscal_year" value="2020" /> <br />
 									<input type="checkbox" id="o2c_df_include_changes" name="o2c_df_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_df_include_payments" name="o2c_df_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:<br />
@@ -75,6 +79,8 @@
 									Fiscal year: <input type="text" id="o2c_obcen_fiscal_year" value="2020" /> <br />
 									<input type="checkbox" id="o2c_obcen_include_changes" name="o2c_obcen_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_obcen_include_payments" name="o2c_obcen_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
 								</div>
 							</td>
 						</tr>
@@ -160,8 +166,146 @@
 			<br />
 			<button onclick="javascript:extract()">Extract the Event Log</button>
         </div>
+		<div class="center" id="o2cDfgDiv" style="display: none">
+			<p>This graph shows the document types of the SAP instance related to the Order-to-Cash process.</p>
+			<div id="o2cDfgVis">
+			</div>
+			<button onclick="javascript:updateDocTypesSelection()">Update Selection</button>
+			<p>Select the ones that you want to consider in your event log, and click 'Update Selection':</p>
+		</div>
+		<div class="center" id="o2cChangesListDiv" style="display: none">
+			<p>This section shows the change activities of the SAP instance related to the Order-to-Cash process.</p>
+			<button onclick="javascript:updateChangeActivitiesList()">Update Change Activities</button>
+			<p>Select the ones that you want to consider in your event log, and click 'Update Change Activities'</p>
+		</div>
     </body>
 	<script type="text/javascript">
+		var o2cDfgInitialized = false;
+		var o2cDfg = null;
+		var o2cActivities = null;
+		var o2cDfgSVG = null;
+		var o2cChangeInitialized = false;
+		var o2cAllChangeActivities = null;
+		var o2cSelectedActivities = null;
+		var o2cSelectedChangeActivities = null;
+		
+		function updateDocTypesSelection() {
+			o2cSelectedActivities = null;
+			o2cSelectedActivities = [];
+			var options = document.getElementsByClassName("o2cCreationActivities");
+			var i = 0;
+			while (i < options.length) {
+				if (options[i].selected) {
+					o2cSelectedActivities.push(options[i].value);
+				}
+				i++;
+			}
+		}
+		
+		function updateChangeActivitiesList() {
+			o2cSelectedChangeActivities = null;
+			o2cSelectedChangeActivities = [];
+			var options = document.getElementsByClassName("o2cChangeActivitiesItem");
+			var i = 0;
+			while (i < options.length) {
+				if (options[i].selected) {
+					o2cSelectedChangeActivities.push(options[i].value);
+				}
+				i++;
+			}
+		}
+		
+		function o2cGraph() {
+			if (!o2cDfgInitialized) {
+				let db_type = document.getElementById("connection_types").value;
+				let db_con_args = {};
+				if (db_type == "sqlite") {
+					db_con_args = getSqliteDbConArgs();
+				}
+				else if (db_type == "oracle") {
+					db_con_args = getOracleDbConArgs();
+				}
+				var obj = {};
+				obj["db_type"] = db_type;
+				obj["db_con_args"] = db_con_args;
+				obj = JSON.stringify(obj);
+				obj = btoa(obj);
+				$.get("http://localhost:5000/vbfaGetDfg?parameters="+obj, function(data) {
+					o2cDfg = data["dfg"];
+					o2cActivities = data["act_count"];
+					o2cDfgSVG = data["ser"];
+					
+					o2cAllChangeActivities = [...o2cActivities];
+					
+					document.getElementById("o2cDfgVis").innerHTML = o2cDfgSVG;
+					
+					var selectt = document.createElement("select");
+					selectt.setAttribute("multiple", "");
+					selectt.setAttribute("id", "o2cDocTypesSelect");
+					
+					var i = 0;
+					while (i < o2cActivities.length) {
+						var option = document.createElement("option");
+						option.setAttribute("class", "o2cCreationActivities");
+						option.setAttribute("value", "Create "+o2cActivities[i][0]);
+						option.setAttribute("selected", "");
+						option.text = o2cActivities[i][0] + "(" + o2cActivities[i][1] + ")";
+						selectt.appendChild(option);
+						i++;
+					}
+					
+					document.getElementById("o2cDfgDiv").appendChild(selectt);
+					
+					document.getElementById("o2cDfgDiv").style.display = "";
+					o2cDfgInitialized = true;
+				});
+			}
+		}
+		
+		function o2cChangeList() {
+			if (!o2cChangeInitialized) {
+				let db_type = document.getElementById("connection_types").value;
+				let db_con_args = {};
+				if (db_type == "sqlite") {
+					db_con_args = getSqliteDbConArgs();
+				}
+				else if (db_type == "oracle") {
+					db_con_args = getOracleDbConArgs();
+				}
+				var obj = {};
+				obj["db_type"] = db_type;
+				obj["db_con_args"] = db_con_args;
+				obj = JSON.stringify(obj);
+				obj = btoa(obj);
+				
+				
+				$.get("http://localhost:5000/vbfaChangeActivityUtil?parameters="+obj, function(data) {
+					o2cAllChangeActivities = data["changes_count"];
+					
+					var selectt = document.createElement("select");
+					selectt.setAttribute("multiple", "");
+					selectt.setAttribute("id", "o2cChangeActivitiesListSelect");
+					
+					
+					var i = 0;
+					while (i < o2cAllChangeActivities.length) {
+						var option = document.createElement("option");
+						option.setAttribute("class", "o2cChangeActivitiesItem");
+						option.setAttribute("value", o2cAllChangeActivities[i][0]);
+						option.setAttribute("selected", "");
+						option.text = o2cAllChangeActivities[i][0] + " ("+o2cAllChangeActivities[i][1]+")";
+						selectt.appendChild(option);
+						i++;
+					}
+					
+					document.getElementById("o2cChangesListDiv").appendChild(selectt);
+					
+					document.getElementById("o2cChangesListDiv").style.display = "";
+					o2cChangeInitialized = true;
+				});
+			}
+		}
+		
 		function changeConnectionType() {
 			let connection_type = document.getElementById("connection_types").value;
 			if (connection_type == "sqlite") {
@@ -313,15 +457,24 @@
 		}
 		
 		function getO2Cparameters(ext_type) {
+			var ret = null;
 			if (ext_type == "o2c_1d_log_extractor") {
-				return getO2CparametersXES(ext_type);
+				ret = getO2CparametersXES(ext_type);
 			}
 			else if (ext_type == "o2c_1d_dataframe_extractor") {
-				return getO2CparametersCSV(ext_type);
+				ret = getO2CparametersCSV(ext_type);
 			}
 			else if (ext_type == "o2c_obj_centric_log") {
-				return getO2CparametersOL(ext_type);
+				ret = getO2CparametersOL(ext_type);
 			}
+			if (o2cSelectedActivities != null) {
+				ret["allowed_act_doc_types"] = o2cSelectedActivities;
+			}
+			if (o2cSelectedChangeActivities != null) {
+				ret["allowed_act_changes"] = o2cSelectedChangeActivities;
+			}
+			console.log(ret);
+			return ret;
 		}
 		
 		function getO2CparametersXES(ext_type) {
