@@ -10,7 +10,7 @@ class SqliteConnection(DatabaseConnection):
         self.path = path
         self.con = sqlite3.connect(self.path)
         constants.TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
-        self.table_prefix = "SAPSR3."
+        self.table_prefix = ""
         DatabaseConnection.__init__(self)
 
     def execute_read_sql(self, sql, columns):

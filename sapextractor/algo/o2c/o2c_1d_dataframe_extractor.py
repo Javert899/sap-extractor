@@ -89,6 +89,8 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
     # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
     dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
     dataframe = dataframe.reset_index()
+    if keep_first:
+        dataframe = dataframe.groupby(["case:concept:name", "VBELN"]).first().reset_index()
     if allowed_act_doc_types is not None:
         allowed_act_doc_types = set(allowed_act_doc_types)
         dataframe = dataframe[dataframe["concept:name"].isin(allowed_act_doc_types)]
@@ -100,8 +102,6 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
         payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr)
     else:
         payments = pd.DataFrame()
-    if keep_first:
-        dataframe = dataframe.groupby("VBELN").first()
     if allowed_act_changes is not None:
         allowed_act_changes = set(allowed_act_changes)
         changes = changes[changes["concept:name"].isin(allowed_act_changes)]

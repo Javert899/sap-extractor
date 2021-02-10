@@ -32,6 +32,8 @@ def get_changes(con, dataframe):
 def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True,
           enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
+    if keep_first:
+        dataframe = dataframe.groupby("event_VBELN").first().reset_index()
     if allowed_act_doc_types is not None:
         allowed_act_doc_types = set(allowed_act_doc_types)
         dataframe = dataframe[dataframe["event_activity"].isin(allowed_act_doc_types)]

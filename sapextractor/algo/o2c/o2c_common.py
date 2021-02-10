@@ -6,7 +6,7 @@ from dateutil import parser
 from sapextractor.utils import constants
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.vbtyp import extract_vbtyp
-
+from pm4pymdl.algo.mvp.utils import exploded_mdl_to_succint_mdl
 
 def extract_vbak(con, min_extr_date="2020-01-01 00:00:00"):
     vbak = {}
@@ -54,7 +54,19 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbfa["event_activity"] = "Create " + vbfa["event_VBTYP_N"]
     if not keep_first:
         vbfa["event_activity"] = vbfa["event_activity"] + " Item"
-    vbfa["INVOLVED_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + constants.DOC_SEP + vbfa["event_VBELN"].astype(str)
-    vbfa["INVOLVED_DOCUMENTS"] = vbfa["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
+    doctypes_n = vbfa["event_VBTYP_N"].unique()
+    doctypes_v = vbfa["event_VBTYP_V"].unique()
+    list_dfs = []
+    for value in doctypes_n:
+        df = vbfa[vbfa["event_VBTYP_N"] == value]
+        df["DOCTYPE_"+str(value)] = df["event_VBELN"]
+        list_dfs.append(df)
+    for value in doctypes_v:
+        df = vbfa[vbfa["event_VBTYP_V"] == value]
+        df["DOCTYPE_"+str(value)] = df["event_VBELV"]
+        list_dfs.append(df)
+    vbfa = pd.concat(list_dfs)
+    vbfa.type = "succint"
+    vbfa = exploded_mdl_to_succint_mdl.apply(vbfa)
     vbfa = vbfa.reset_index()
     return vbfa
