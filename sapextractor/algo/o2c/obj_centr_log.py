@@ -8,18 +8,25 @@ from sapextractor.utils.change_tables import extract_change
 
 
 def get_changes(con, dataframe):
-    vbeln_values = dataframe["event_VBELN"].unique()
+    vbeln_values = dataframe[["event_VBELN", "event_VBTYP_N"]].to_dict("r")
+    vbeln_values = {x["event_VBELN"]: x["event_VBTYP_N"] for x in vbeln_values}
     ret = []
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
                 ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
         changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
         changes = {x: y for x, y in changes.items() if x in vbeln_values}
         for x, y in changes.items():
-            y["event_VBELN"] = y["event_AWKEY"]
-            y["event_activity"] = y["event_CHANGEDESC"]
-            y["INVOLVED_DOCUMENTS"] = y["event_AWKEY"]
-            y["INVOLVED_DOCUMENTS"] = y["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
-            ret.append(y)
+            awkey = list(y["event_AWKEY"])[0]
+            if awkey in vbeln_values:
+                y["event_VBELN"] = y["event_AWKEY"]
+                y["event_activity"] = y["event_CHANGEDESC"]
+                k = "DOCTYPE_" + vbeln_values[awkey]
+                y[k] = y["event_AWKEY"]
+                y[k] = y[k].apply(constants.set_documents)
+
+                #y["INVOLVED_DOCUMENTS"] = y["event_AWKEY"]
+                #y["INVOLVED_DOCUMENTS"] = y["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
+                ret.append(y)
 
     if ret:
         ret = pd.concat(ret)
