@@ -3,7 +3,7 @@ from sapextractor.utils.change_tables import mapping
 
 def extract(con):
     df = con.execute_read_sql(
-                              "SELECT TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND, Count(*) AS COUNT FROM (SELECT TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND FROM "+con.table_prefix+"CDPOS WHERE OBJECTCLAS = 'VERKBELEG' OR OBJECTCLAS = 'LIEFERUNG') GROUP BY TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND", ["TABNAME", "FNAME", "VALUE_OLD", "VALUE_NEW", "CHNGIND", "COUNT"])
+                              "SELECT OBJECTCLAS, TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND, Count(*) AS COUNT FROM (SELECT OBJECTCLAS, TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND FROM "+con.table_prefix+"CDPOS WHERE OBJECTCLAS = 'VERKBELEG' OR OBJECTCLAS = 'LIEFERUNG') GROUP BY OBJECTCLAS, TABNAME, FNAME, VALUE_OLD, VALUE_NEW, CHNGIND", ["OBJECTCLAS", "TABNAME", "FNAME", "VALUE_OLD", "VALUE_NEW", "CHNGIND", "COUNT"])
     stream = df.to_dict("r")
     fnames = {}
     counter = {}
@@ -11,8 +11,9 @@ def extract(con):
     while i < len(stream):
         el = stream[i]
 
-        el["CHANGEDESC"] = mapping.perform_mapping(el["TABNAME"], el["FNAME"], el["VALUE_OLD"], el["VALUE_NEW"], el["CHNGIND"], fnames, return_however=False)
-        if el["CHANGEDESC"] is None:
+        change, typ = mapping.perform_mapping(el["TABNAME"], el["FNAME"], el["VALUE_OLD"], el["VALUE_NEW"], el["CHNGIND"], fnames, return_however=False)
+        el["CHANGEDESC"] = (change, typ, el["OBJECTCLAS"])
+        if el["CHANGEDESC"][0] is None:
             del stream[i]
             continue
         if not el["CHANGEDESC"] in counter:

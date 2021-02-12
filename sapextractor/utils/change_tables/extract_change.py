@@ -39,7 +39,8 @@ def give_field_desc(con, cdpos_dict):
         value_old = c["VALUE_OLD"]
         chngind = c["CHNGIND"]
 
-        c["CHANGEDESC"] = mapping.perform_mapping(tabname, fname, value_old, value_new, chngind, fnames)
+        change, typ = mapping.perform_mapping(tabname, fname, value_old, value_new, chngind, fnames)
+        c["CHANGEDESC"] = change
 
 
     return cdpos_dict
