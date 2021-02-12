@@ -62,6 +62,7 @@
   									<input type="checkbox" id="o2c_log_include_payments" name="o2c_log_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
+									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
@@ -72,6 +73,7 @@
   									<input type="checkbox" id="o2c_df_include_payments" name="o2c_df_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
+									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:<br />
@@ -81,6 +83,7 @@
   									<input type="checkbox" id="o2c_obcen_include_payments" name="o2c_obcen_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
+									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
 								</div>
 							</td>
 						</tr>
@@ -166,6 +169,15 @@
 			<br />
 			<button onclick="javascript:extract()">Extract the Event Log</button>
         </div>
+		<div class="center" id="o2cErExplanation" style="display: none">
+			<p>In this part, we provide an explanation of the tables as shown in the ER diagram.</p>
+			<p>The creation activities for the documents of each document type (e.g. Order, Delivery, Invoice), and the connections between them, are extracted from
+			the table <b>VBFA</b>.</p>
+			<p>The changes that happen to these documents (for example, the insertion of a new item in an existing order) are reported inside the tables <b>CDHDR</b> and <b>CDPOS</b>.</p>
+			<p>The information about the payments is extracted from the <b>BKPF</b> and <b>BSEG</b> tables. These contain all the billing documents, and therefore
+			invoices, payments, accounting documents are reported in these tables. These tables are linked to <b>VBFA</b> (sales order documents) and <b>CDHDR/CDPOS</b> (change tables).</p>
+			<p><b>DD07T</b> and <b>T003T</b> are technical tables reporting the human-understandable names for each document type.</p>
+		</div>
 		<div class="center" id="o2cDfgDiv" style="display: none">
 			<p>This graph shows the document types of the SAP instance related to the Order-to-Cash process.</p>
 			<div id="o2cDfgVis">
@@ -188,6 +200,10 @@
 		var o2cAllChangeActivities = null;
 		var o2cSelectedActivities = null;
 		var o2cSelectedChangeActivities = null;
+		
+		function showO2cErExplanation() {
+			document.getElementById("o2cErExplanation").style.display = "";
+		}
 		
 		function updateDocTypesSelection() {
 			o2cSelectedActivities = null;
@@ -282,24 +298,111 @@
 				$.get("http://localhost:5000/vbfaChangeActivityUtil?parameters="+obj, function(data) {
 					o2cAllChangeActivities = data["changes_count"];
 					
+					var s = document.createElement("span");
+					s.innerHTML = "<p><b>Changes related to the Orders:</b></p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+					
+					s = document.createElement("span");
+					s.innerHTML = "<p>Status Changes:</p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+
+					
 					var selectt = document.createElement("select");
 					selectt.setAttribute("multiple", "");
-					selectt.setAttribute("id", "o2cChangeActivitiesListSelect");
+					selectt.setAttribute("id", "o2cChangeActivitiesListSelectOrderStatusChange");
 					
 					
 					var i = 0;
 					while (i < o2cAllChangeActivities.length) {
-						var option = document.createElement("option");
-						option.setAttribute("class", "o2cChangeActivitiesItem");
-						option.setAttribute("value", o2cAllChangeActivities[i][0]);
-						option.setAttribute("selected", "");
-						option.text = o2cAllChangeActivities[i][0] + " ("+o2cAllChangeActivities[i][1]+")";
-						selectt.appendChild(option);
+						if (o2cAllChangeActivities[i][0][2] == "VERKBELEG" && o2cAllChangeActivities[i][0][1] == 1) {
+							var option = document.createElement("option");
+							option.setAttribute("class", "o2cChangeActivitiesItem");
+							option.setAttribute("value", o2cAllChangeActivities[i][0][0]);
+							option.setAttribute("selected", "");
+							option.text = o2cAllChangeActivities[i][0][0] + " ("+o2cAllChangeActivities[i][1]+")";
+							selectt.appendChild(option);
+						}
 						i++;
 					}
 					
 					document.getElementById("o2cChangesListDiv").appendChild(selectt);
 					
+					s = document.createElement("span");
+					s.innerHTML = "<p>Database Changes:</p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+					
+					selectt = document.createElement("select");
+					selectt.setAttribute("multiple", "");
+					selectt.setAttribute("id", "o2cChangeActivitiesListSelectOrderDatabaseChange");
+					
+					
+					var i = 0;
+					while (i < o2cAllChangeActivities.length) {
+						if (o2cAllChangeActivities[i][0][2] == "VERKBELEG" && o2cAllChangeActivities[i][0][1] == 2) {
+							var option = document.createElement("option");
+							option.setAttribute("class", "o2cChangeActivitiesItem");
+							option.setAttribute("value", o2cAllChangeActivities[i][0][0]);
+							option.setAttribute("selected", "");
+							option.text = o2cAllChangeActivities[i][0][0] + " ("+o2cAllChangeActivities[i][1]+")";
+							selectt.appendChild(option);
+						}
+						i++;
+					}
+					
+					document.getElementById("o2cChangesListDiv").appendChild(selectt);
+					
+					s = document.createElement("span");
+					s.innerHTML = "<p><b>Changes related to the Deliveries:</b></p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+					
+					s = document.createElement("span");
+					s.innerHTML = "<p>Status Changes:</p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+					
+					selectt = document.createElement("select");
+					selectt.setAttribute("multiple", "");
+					selectt.setAttribute("id", "o2cChangeActivitiesListSelectDeliveryStatusChange");
+					
+					
+					var i = 0;
+					while (i < o2cAllChangeActivities.length) {
+						if (o2cAllChangeActivities[i][0][2] == "LIEFERUNG" && o2cAllChangeActivities[i][0][1] == 1) {
+							var option = document.createElement("option");
+							option.setAttribute("class", "o2cChangeActivitiesItem");
+							option.setAttribute("value", o2cAllChangeActivities[i][0][0]);
+							option.setAttribute("selected", "");
+							option.text = o2cAllChangeActivities[i][0][0] + " ("+o2cAllChangeActivities[i][1]+")";
+							selectt.appendChild(option);
+						}
+						i++;
+					}
+					
+					document.getElementById("o2cChangesListDiv").appendChild(selectt);
+					
+					s = document.createElement("span");
+					s.innerHTML = "<p>Database Changes:</p>";
+					document.getElementById("o2cChangesListDiv").appendChild(s);
+					
+					selectt = document.createElement("select");
+					selectt.setAttribute("multiple", "");
+					selectt.setAttribute("id", "o2cChangeActivitiesListSelectDeliveryDatabaseChange");
+					
+					
+					var i = 0;
+					while (i < o2cAllChangeActivities.length) {
+						if (o2cAllChangeActivities[i][0][2] == "LIEFERUNG" && o2cAllChangeActivities[i][0][1] == 2) {
+							var option = document.createElement("option");
+							option.setAttribute("class", "o2cChangeActivitiesItem");
+							option.setAttribute("value", o2cAllChangeActivities[i][0][0]);
+							option.setAttribute("selected", "");
+							option.text = o2cAllChangeActivities[i][0][0] + " ("+o2cAllChangeActivities[i][1]+")";
+							selectt.appendChild(option);
+						}
+						i++;
+					}
+					
+					document.getElementById("o2cChangesListDiv").appendChild(selectt);
+
 					document.getElementById("o2cChangesListDiv").style.display = "";
 					o2cChangeInitialized = true;
 				});
