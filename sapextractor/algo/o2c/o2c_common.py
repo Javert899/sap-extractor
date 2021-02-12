@@ -43,6 +43,8 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbfa["VBTYP_N"] = vbfa["VBTYP_N"].map(vbtyp)
     vbfa["VBTYP_V"] = vbfa["VBTYP_V"].map(vbtyp)
     vbfa = vbfa_closure(con, vbfa, min_extr_date)
+    vbfa = vbfa[vbfa["event_timestamp"] > min_extr_date]
+    vbfa = vbfa.reset_index()
     vbfa["event_id"] = vbfa.index.astype(str)
     cols = {}
     for x in vbfa.columns:
@@ -54,6 +56,15 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbfa["event_activity"] = "Create " + vbfa["event_VBTYP_N"]
     if not keep_first:
         vbfa["event_activity"] = vbfa["event_activity"] + " Item"
+
+    vbfa["event_id"] = vbfa["event_id"].astype(int)
+    vbfa = vbfa.sort_values("event_id")
+
+    #vbfa["INVOLVED_DOCUMENTS"] = vbfa["event_VBELV"].astype(str) + constants.DOC_SEP + vbfa["event_VBELN"].astype(str)
+    #vbfa["INVOLVED_DOCUMENTS"] = vbfa["INVOLVED_DOCUMENTS"].apply(constants.set_documents)
+    #vbfa.to_csv("prova1.csv", index=False)
+    #del vbfa["INVOLVED_DOCUMENTS"]
+
     doctypes_n = vbfa["event_VBTYP_N"].unique()
     doctypes_v = vbfa["event_VBTYP_V"].unique()
     list_dfs = []
@@ -69,4 +80,9 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbfa.type = "succint"
     vbfa = exploded_mdl_to_succint_mdl.apply(vbfa)
     vbfa = vbfa.reset_index()
+    vbfa = vbfa.sort_values("event_id")
+
+    vbfa["event_id"] = vbfa["event_id"].astype(str)
+
+    #vbfa.to_csv("prova2.csv", index=False)
     return vbfa
