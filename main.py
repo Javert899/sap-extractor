@@ -6,7 +6,7 @@ import tempfile
 from flask_cors import CORS
 from sapextractor.database_connection import factory as database_factory
 import pm4py
-
+from pm4py.objects.dfg.filtering import dfg_filtering
 
 app = Flask(__name__)
 CORS(app, expose_headers=["x-suggested-filename"])
@@ -44,7 +44,8 @@ def vbfaGetDfg():
 
     c = database_factory.apply(db_type, db_con_args)
     from sapextractor.algo.o2c import graph_retrieval_util
-    dfg, act_count = graph_retrieval_util.extract_dfg(c)
+    dfg, act_count, sa, ea = graph_retrieval_util.extract_dfg(c)
+    dfg, sa, ea, act_count = dfg_filtering.filter_dfg_on_paths_percentage(dfg, sa, ea, act_count, 0.2, keep_all_activities=False)
     gviz = pm4py.visualization.dfg.visualizer.apply(dfg, activities_count=act_count, parameters={"format": "svg"})
     ser = pm4py.visualization.dfg.visualizer.serialize(gviz).decode("utf-8")
     dfg = sorted([[x[0], x[1], y] for x, y in dfg.items()], key=lambda x: x[1], reverse=True)

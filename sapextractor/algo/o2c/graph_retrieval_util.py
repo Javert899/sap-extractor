@@ -10,6 +10,14 @@ def extract_dfg(con):
     vbfa = vbfa.dropna(subset=["VBTYP_V", "VBTYP_N"], how="any")
     vbfa = vbfa.to_dict("r")
     dfg = {(x["VBTYP_V"], x["VBTYP_N"]): int(x["COUNT"]) for x in vbfa}
+    start_activities = con.execute_read_sql("SELECT VBTYP_V, Count(*) FROM (SELECT VBELV, VBTYP_V FROM "+con.table_prefix+"VBFA WHERE VBELV NOT IN (SELECT VBELN FROM "+con.table_prefix+"VBFA)) GROUP BY VBTYP_V", ["ACT", "COUNT"])
+    end_activities = con.execute_read_sql("SELECT VBTYP_N, Count(*) FROM (SELECT VBELN, VBTYP_N FROM "+con.table_prefix+"VBFA WHERE VBELN NOT IN (SELECT VBELV FROM "+con.table_prefix+"VBFA)) GROUP BY VBTYP_N", ["ACT", "COUNT"])
+    start_activities["ACT"] = start_activities["ACT"].map(vbtyp)
+    end_activities["ACT"] = end_activities["ACT"].map(vbtyp)
+    start_activities = start_activities.to_dict("r")
+    end_activities = end_activities.to_dict("r")
+    start_activities = {x["ACT"]: x["COUNT"] for x in start_activities}
+    end_activities = {x["ACT"]: x["COUNT"] for x in end_activities}
     act_count_exit = {}
     for el in dfg:
         if not el[0] in act_count_exit:
@@ -29,4 +37,4 @@ def extract_dfg(con):
             act_count[act] = act_count_entry[act]
         elif act in act_count_exit:
             act_count[act] = act_count_exit[act]
-    return dfg, act_count
+    return dfg, act_count, start_activities, end_activities
