@@ -46,7 +46,7 @@ def vbfaGetDfg():
     from sapextractor.algo.o2c import graph_retrieval_util
     dfg, act_count, sa, ea = graph_retrieval_util.extract_dfg(c)
     dfg, sa, ea, act_count = dfg_filtering.filter_dfg_on_paths_percentage(dfg, sa, ea, act_count, 0.2, keep_all_activities=False)
-    gviz = pm4py.visualization.dfg.visualizer.apply(dfg, activities_count=act_count, parameters={"format": "svg"})
+    gviz = pm4py.visualization.dfg.visualizer.apply(dfg, activities_count=act_count, parameters={"format": "svg", "start_activities": sa, "end_activities": ea})
     ser = pm4py.visualization.dfg.visualizer.serialize(gviz).decode("utf-8")
     dfg = sorted([[x[0], x[1], y] for x, y in dfg.items()], key=lambda x: x[1], reverse=True)
     act_count = sorted([(x, y) for x, y in act_count.items()], key=lambda x: x[1], reverse=True)
