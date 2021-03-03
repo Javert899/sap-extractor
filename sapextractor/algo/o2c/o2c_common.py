@@ -37,7 +37,7 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     # RFMNG, MEINS, RFWRT, WAERS, MATNR, BWART
     try:
         vbfa = con.prepare_and_execute_query("VBFA", ["ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V", "RFMNG",
-                                                      "MEINS", "RFWRT", "WAERS", "MATNR", "BWART"])
+                                                      "MEINS", "RFWRT", "WAERS", "MATNR", "BWART", "VRKME", "FKTYP"])
         print("siii")
     except:
         vbfa = con.prepare_and_execute_query("VBFA", ["ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V"])
