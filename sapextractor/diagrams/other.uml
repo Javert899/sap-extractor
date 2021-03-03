@@ -54,6 +54,11 @@ entity EKPO {
     BANFN: String <<FK>>
 }
 
+entity EBAN {
+    BANFN: String <<PK>>
+    MATNR: String
+}
+
 entity EKBE {
     EBELN: String <<PK>> <<FK>>
     EBELP: String <<PK>>
@@ -89,6 +94,7 @@ CDHDR }|-- CDPOS
 CDHDR ||-- TSTCT
 BKPF |o-- CDPOS
 EKKO }|..|| EKPO
+EKPO |o-- EBAN
 EKKO }|..|| EKBE
 RBKP ||-- TSTCT
 RBKP ||-- T003T
