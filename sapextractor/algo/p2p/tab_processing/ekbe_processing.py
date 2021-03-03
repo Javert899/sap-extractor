@@ -29,3 +29,15 @@ def invoice_receipt(con, gjahr=None):
     ekbe["event_timestamp"] = ekbe["event_timestamp"] + pd.Timedelta("2 seconds")
     ekbe_nodes_types = {x: "EKBEIR" for x in ekbe["event_node"].unique()}
     return ekbe, ekbe_nodes_types
+
+
+def goods_receipt_ekko_connection(gr):
+    gr = gr[["EBELN", "BELNR", "GJAHR"]].to_dict("r")
+    cons = list(set(("EKKO_"+x["EBELN"], "EKBEGR_"+x["BELNR"]+x["GJAHR"]) for x in gr))
+    return cons
+
+
+def invoice_receipt_ekko_connection(ir):
+    ir = ir[["EBELN", "BELNR", "GJAHR"]].to_dict("r")
+    cons = list(set(("EKKO_"+x["EBELN"], "EKBEIR_"+x["BELNR"]+x["GJAHR"]) for x in ir))
+    return cons

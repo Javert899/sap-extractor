@@ -1,4 +1,4 @@
-from sapextractor.algo.p2p.tab_processing import eban_processing, ekko_processing, ekpo_processing, rbkp_processing, rseg_processing
+from sapextractor.algo.p2p.tab_processing import eban_processing, ekko_processing, ekpo_processing, rbkp_processing, rseg_processing, ekbe_processing
 import networkx as nx
 import pandas as pd
 
@@ -37,8 +37,22 @@ def extract_tables_and_graph(con):
     ekko_rbkp_connections = rseg_processing.apply(con)
     nodes_connections, G = add_edges_to_graph(ekko_rbkp_connections, nodes_connections, G)
 
+    gr, gr_nodes_types = ekbe_processing.goods_receipt(con)
+    for n in gr_nodes_types:
+        G.add_node(n)
+    nodes_types.update(gr_nodes_types)
+    gr_ekko_connections = ekbe_processing.goods_receipt_ekko_connection(gr)
+    nodes_connections, G = add_edges_to_graph(gr_ekko_connections, nodes_connections, G)
+
+    ir, ir_nodes_types = ekbe_processing.invoice_receipt(con)
+    for n in ir_nodes_types:
+        G.add_node(n)
+    nodes_types.update(ir_nodes_types)
+    ir_ekko_connections = ekbe_processing.invoice_receipt_ekko_connection(ir)
+    nodes_connections, G = add_edges_to_graph(ir_ekko_connections, nodes_connections, G)
+
     nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
-    dataframe = pd.concat([eban, ekko, rbkp])
+    dataframe = pd.concat([eban, ekko, rbkp, gr, ir])
     dataframe = dataframe.sort_values("event_timestamp")
     dataframe = dataframe.merge(nodes_connections, left_on="event_node", right_on="node", suffixes=('', '_r'), how="left")
     return dataframe, G, nodes_types
