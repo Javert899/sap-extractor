@@ -28,8 +28,8 @@ setup(
     url='http://www.pm4py.org',
     license='GPL 3.0',
     install_requires=[
-        "pm4py>=2.2.0",
-        "pm4pymdl>=0.0.44",
+        "pm4py>=2.2.2",
+        "pm4pymdl>=0.0.45",
         "stringdist",
         "cx_Oracle",
         "plantuml",
