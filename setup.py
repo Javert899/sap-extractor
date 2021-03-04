@@ -32,6 +32,7 @@ setup(
         "pm4pymdl>=0.0.44",
         "stringdist",
         "cx_Oracle",
-        "plantuml"
+        "plantuml",
+        "frozendict"
     ]
 )
