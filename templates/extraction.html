@@ -151,15 +151,25 @@
 								<select id="p2p_ext_type" name="p2p_ext_type" onchange="p2pExtChange()">
 									<option value="p2p_1d_dataframe">CSV log</option>
 									<option value="p2p_1d_log" selected="selected">XES log</option>
+									<option value="p2p_ocel">Object-Centric Log</option>
 								</select>
 								<br />
 								<div id="p2p_1d_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
-									Central table for the extraction: <input type="text" id="p2p_csv_central_table" value="EKKO"></input>
+									Central table for the extraction: <input type="text" id="p2p_csv_central_table" value="EKKO"></input> <br />
+									Minimum extraction date: <input type="text" id="p2p_csv_min_ext_date" value="2014-01-01 00:00:00" /> <br />
+									Fiscal year: <input type="text" id="p2p_csv_fiscal_year" value="2014" /> <br />
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
-									Central table for the extraction: <input type="text" id="p2p_xes_central_table" value="EKKO"></input>
+									Central table for the extraction: <input type="text" id="p2p_xes_central_table" value="EKKO"></input> <br />
+									Minimum extraction date: <input type="text" id="p2p_xes_min_ext_date" value="2014-01-01 00:00:00" /> <br />
+									Fiscal year: <input type="text" id="p2p_xes_fiscal_year" value="2014" /> <br />
+								</div>
+								<div id="p2p_ocel" style="display: none">
+									<p>Insert the parameters for the object-centric log extraction:</p>
+									Minimum extraction date: <input type="text" id="p2p_ocel_min_ext_date" value="2014-01-01 00:00:00" /> <br />
+									Fiscal year: <input type="text" id="p2p_ocel_fiscal_year" value="2014" /> <br />
 								</div>
 							</td>
 						</tr>
@@ -498,12 +508,16 @@
 			
 			document.getElementById("p2p_1d_dataframe").style.display = "none";
 			document.getElementById("p2p_1d_log").style.display = "none";
+			document.getElementById("p2p_ocel").style.display = "none";
 			
 			if (ext == "p2p_1d_dataframe") {
 				document.getElementById("p2p_1d_dataframe").style.display = "";
 			}
 			else if (ext == "p2p_1d_log") {
 				document.getElementById("p2p_1d_log").style.display = "";
+			}
+			else if (ext == "p2p_ocel") {
+				document.getElementById("p2p_ocel").style.display = "";
 			}
 		}
 		
@@ -679,17 +693,31 @@
 			else if (ext_type == "p2p_1d_log") {
 				return getP2PparametersXES(ext_type);
 			}
+			else if (ext_type == "p2p_ocel") {
+				return getP2PparametersOCEL(ext_type);
+			}
 		}
 		
 		function getP2PparametersCSV(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("p2p_csv_central_table").value;
+			ext_args["min_extr_date"] = document.getElementById("p2p_csv_min_ext_date").value;
+			ext_args["gjahr"] = document.getElementById("p2p_csv_fiscal_year").value;
 			return ext_args;
 		}
 		
 		function getP2PparametersXES(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("p2p_xes_central_table").value;
+			ext_args["min_extr_date"] = document.getElementById("p2p_xes_min_ext_date").value;
+			ext_args["gjahr"] = document.getElementById("p2p_xes_fiscal_year").value;
+			return ext_args;
+		}
+		
+		function getP2PparametersOCEL(ext_type) {
+			let ext_args = {};
+			ext_args["min_extr_date"] = document.getElementById("p2p_ocel_min_ext_date").value;
+			ext_args["gjahr"] = document.getElementById("p2p_ocel_fiscal_year").value;
 			return ext_args;
 		}
 	</script>

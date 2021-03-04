@@ -94,7 +94,7 @@ def download_event_log():
 
     log = factory.apply(db_type, db_con_args, process, ext_type, ext_arg)
 
-    if "obj_centr" in ext_type:
+    if "obj_centr" in ext_type or "ocel" in ext_type:
         extension = ".ocelxml"
         temp_file = tempfile.NamedTemporaryFile(suffix=extension)
         temp_file.close()
