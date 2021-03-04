@@ -50,7 +50,7 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00"):
     vbfa["VBTYP_N"] = vbfa["VBTYP_N"].map(vbtyp)
     vbfa["VBTYP_V"] = vbfa["VBTYP_V"].map(vbtyp)
     vbfa = vbfa_closure(con, vbfa, min_extr_date)
-    vbfa = vbfa[vbfa["event_timestamp"] > min_extr_date]
+    vbfa = vbfa[vbfa["event_timestamp"] >= min_extr_date]
     vbfa = vbfa.reset_index()
     vbfa["event_id"] = vbfa.index.astype(str)
     cols = {}

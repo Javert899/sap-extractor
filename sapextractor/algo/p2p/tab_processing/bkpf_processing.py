@@ -3,7 +3,7 @@ from frozendict import frozendict
 from sapextractor.algo.p2p.tab_processing import bsak_processing
 
 
-def apply(con, gjahr="2014"):
+def apply(con, gjahr=None):
     awkey_docs, doc_dates, doc_types = extract_docs_from_bkpf(con, gjahr=gjahr)
     clearances = bsak_processing.apply(con, gjahr=gjahr)
     events, doc_types, connections = mix_bkpf_bseg(awkey_docs, doc_dates, doc_types, clearances)
