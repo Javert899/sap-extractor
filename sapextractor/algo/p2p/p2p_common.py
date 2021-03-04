@@ -15,7 +15,7 @@ def add_edges_to_graph(edges, nodes_connections, G):
     return nodes_connections, G
 
 
-def extract_tables_and_graph(con):
+def extract_tables_and_graph(con, gjahr=None):
     G = nx.DiGraph()
     nodes_types = {}
     nodes_connections = {}
@@ -30,26 +30,28 @@ def extract_tables_and_graph(con):
     eban_ekko_connection = ekpo_processing.eban_ekko_connection(con)
     nodes_connections, G = add_edges_to_graph(eban_ekko_connection, nodes_connections, G)
 
-    rbkp, rbkp_nodes_types = rbkp_processing.apply(con)
+    rbkp, rbkp_nodes_types = rbkp_processing.apply(con, gjahr=gjahr)
     for n in rbkp_nodes_types:
         G.add_node(n)
     nodes_types.update(rbkp_nodes_types)
-    ekko_rbkp_connections = rseg_processing.apply(con)
+    ekko_rbkp_connections = rseg_processing.apply(con, gjahr=gjahr)
     nodes_connections, G = add_edges_to_graph(ekko_rbkp_connections, nodes_connections, G)
 
-    gr, gr_nodes_types = ekbe_processing.goods_receipt(con)
+    gr, gr_nodes_types = ekbe_processing.goods_receipt(con, gjahr=gjahr)
     for n in gr_nodes_types:
         G.add_node(n)
     nodes_types.update(gr_nodes_types)
     gr_ekko_connections = ekbe_processing.goods_receipt_ekko_connection(gr)
     nodes_connections, G = add_edges_to_graph(gr_ekko_connections, nodes_connections, G)
 
-    ir, ir_nodes_types = ekbe_processing.invoice_receipt(con)
+    ir, ir_nodes_types = ekbe_processing.invoice_receipt(con, gjahr=gjahr)
     for n in ir_nodes_types:
         G.add_node(n)
     nodes_types.update(ir_nodes_types)
     ir_ekko_connections = ekbe_processing.invoice_receipt_ekko_connection(ir)
     nodes_connections, G = add_edges_to_graph(ir_ekko_connections, nodes_connections, G)
+
+    
 
     nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
     dataframe = pd.concat([eban, ekko, rbkp, gr, ir])

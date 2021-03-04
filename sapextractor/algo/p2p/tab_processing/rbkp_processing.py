@@ -20,5 +20,4 @@ def apply(con, gjahr=None):
     rbkp2["event_timestamp"] = rbkp2["event_timestamp"] + pd.Timedelta("3 seconds")
     rbkp = pd.concat([rbkp1, rbkp2])
     rbkp_nodes_types = {x: "RBKP" for x in rbkp["event_node"].unique()}
-    rbkp.to_csv("rbkp.csv", index=False)
     return rbkp, rbkp_nodes_types
