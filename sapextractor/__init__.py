@@ -42,28 +42,28 @@ def get_p2p_obj_centr_log(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00"
     return algo.p2p.obj_centr_log.apply(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
 
 
-def get_ap_ar_single_doc_transactions_dataframe(con, gjahr="1997", bukrs=None):
-    return algo.ap_ar.single_doc_transactions_dataframe.apply(con, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_single_doc_transactions_dataframe(con, gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.single_doc_transactions_dataframe.apply(con, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
-def get_ap_ar_single_doc_transactions_log(con, gjahr="1997", bukrs=None):
-    return algo.ap_ar.single_doc_transactions_log.apply(con, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_single_doc_transactions_log(con, gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.single_doc_transactions_log.apply(con, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
-def get_ap_ar_document_flow_dataframe(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
-    return algo.ap_ar.document_flow_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_document_flow_dataframe(con, ref_type="Goods receipt", gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.document_flow_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
-def get_ap_ar_document_flow_log(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
-    return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_document_flow_log(con, ref_type="Goods receipt", gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.document_flow_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
-def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
-    return algo.ap_ar.doc_flow_transactions_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_doc_flow_transactions_dataframe(con, ref_type="Goods receipt", gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.doc_flow_transactions_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
-def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt", gjahr="1997", bukrs=None):
-    return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs)
+def get_ap_ar_doc_flow_transactions_log(con, ref_type="Goods receipt", gjahr="1997", mandt="800", bukrs="1000"):
+    return algo.ap_ar.doc_flow_transactions_log.apply(con, ref_type=ref_type, gjahr=gjahr, bukrs=bukrs, mandt=mandt)
 
 
 def get_ap_ar_obj_centr_log(con, gjahr="1997", bukrs=None):

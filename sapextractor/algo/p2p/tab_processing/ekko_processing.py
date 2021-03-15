@@ -7,7 +7,7 @@ def apply(con, mandt="800", bukrs="1000"):
     ekko = ekko.rename(columns={"event_ERNAM": "event_USERNAME", "event_AEDAT": "event_timestamp"})
     ekko = ekko.sort_values("event_timestamp")
     ekko = ekko.groupby("event_EBELN").first().reset_index()
-    ekko["event_timestamp"] = pd.to_datetime(ekko["event_timestamp"], errors="coerce")
+    ekko["event_timestamp"] = pd.to_datetime(ekko["event_timestamp"], errors="coerce", format=con.DATE_FORMAT)
     ekko["event_activity"] = "Create Purchase Order"
     ekko["event_FROMTABLE"] = "EKKO"
     ekko["event_node"] = "EKKO_"+ekko["event_EBELN"]

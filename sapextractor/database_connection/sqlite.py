@@ -9,7 +9,10 @@ class SqliteConnection(DatabaseConnection):
     def __init__(self, path):
         self.path = path
         self.con = sqlite3.connect(self.path)
-        constants.TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
+        self.TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
+        self.DATE_FORMAT = None
+        constants.TIMESTAMP_FORMAT = self.TIMESTAMP_FORMAT
+        constants.DATE_FORMAT = self.DATE_FORMAT
         self.table_prefix = ""
         DatabaseConnection.__init__(self)
 

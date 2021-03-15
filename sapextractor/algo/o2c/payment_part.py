@@ -14,7 +14,7 @@ def apply(con, gjahr="2020", mandt="800"):
         bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
     bseg = bseg.dropna(subset=["AUGBL"])
     try:
-        bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format="%d.%m.%Y")
+        bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format=con.DATE_FORMAT)
     except:
         bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"])
     bseg = bseg.to_dict("records")

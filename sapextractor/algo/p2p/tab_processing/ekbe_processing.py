@@ -7,7 +7,7 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR"], additional_query_part=additional_query_part)
     ekbe.columns = ["event_"+x for x in ekbe.columns]
-    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce")
+    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     ekbe = ekbe.dropna(subset=["event_timestamp"])
     ekbe["event_FROMTABLE"] = "EKBE"
     ekbe["event_node"] = "EKBEGR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]
@@ -23,7 +23,7 @@ def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR"], additional_query_part=additional_query_part)
     ekbe.columns = ["event_"+x for x in ekbe.columns]
-    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce")
+    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     ekbe = ekbe.dropna(subset=["event_timestamp"])
     ekbe["event_FROMTABLE"] = "EKBE"
     ekbe["event_node"] = "EKBEIR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]

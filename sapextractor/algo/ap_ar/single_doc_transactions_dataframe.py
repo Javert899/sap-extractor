@@ -3,8 +3,8 @@ from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 
 
-def apply(con, gjahr="1997", bukrs=None, **ext_arg):
-    bkpf = ap_ar_common.get_full_dataframe(con, gjahr=gjahr, bukrs=bukrs, filter_columns=True)
+def apply(con, gjahr="1997", mandt="800", bukrs="1000", **ext_arg):
+    bkpf = ap_ar_common.get_full_dataframe(con, gjahr=gjahr, bukrs=bukrs, mandt=mandt, filter_columns=True)
     bkpf["event_activity"] = bkpf["event_ONLYACT"]
     ren_cols = {"event_activity": "concept:name", "event_timestamp": "time:timestamp", "event_USNAM": "org:resource"}
     bkpf = bkpf.rename(columns=ren_cols)

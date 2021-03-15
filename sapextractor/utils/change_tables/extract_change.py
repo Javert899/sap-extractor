@@ -82,8 +82,8 @@ def apply(con, objectclas=None, tabname=None, mandt="800"):
 
 
 def get_changes_dataframe_two_mapping(con, orig_df, change_key, target_key, resource_column=None, objectclas=None,
-                                      tabname=None):
-    changes = apply(con, objectclas=objectclas, tabname=tabname)
+                                      tabname=None, mandt="800"):
+    changes = apply(con, objectclas=objectclas, tabname=tabname, mandt=mandt)
     mapping = {x[change_key]: x[target_key] for x in
                orig_df[[change_key, target_key]].dropna(subset=[change_key, target_key], how="any").to_dict("records")}
     changes = {x: y for x, y in changes.items() if x in mapping}

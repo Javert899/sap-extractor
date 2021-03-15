@@ -3,8 +3,8 @@ from pm4pymdl.objects.ocel.exporter import exporter as jmd_exporter
 from pm4pymdl.objects.mdl.exporter import exporter as mdl_exporter
 
 
-def apply(con, gjahr="1997", bukrs=None, **ext_arg):
-    bkpf = ap_ar_common.get_full_dataframe(con, gjahr=gjahr, bukrs=bukrs, filter_columns=False)
+def apply(con, gjahr="1997", mandt="800", bukrs="1000", **ext_arg):
+    bkpf = ap_ar_common.get_full_dataframe(con, gjahr=gjahr, bukrs=bukrs, mandt=mandt, filter_columns=False)
     bkpf["event_activity"] = bkpf["event_ONLYACT"] + " (" + bkpf["event_BLART"] + ")"
     bkpf["event_id"] = bkpf.index.astype(str)
     bkpf = bkpf.sort_values("event_timestamp")

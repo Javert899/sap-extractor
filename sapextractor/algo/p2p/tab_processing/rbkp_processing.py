@@ -10,11 +10,11 @@ def apply(con, gjahr=None, mandt="800", bukrs="1000"):
     rbkp["event_FROMTABLE"] = "RBKP"
     rbkp["event_node"] = "RBKP_"+rbkp["event_BELNR"]+rbkp["event_GJAHR"]
     rbkp1 = rbkp.copy()
-    rbkp1["event_timestamp"] = pd.to_datetime(rbkp1["event_BLDAT"], errors="coerce")
+    rbkp1["event_timestamp"] = pd.to_datetime(rbkp1["event_BLDAT"], errors="coerce", format=con.DATE_FORMAT)
     rbkp1["event_activity"] = "Invoice Emitted"
     rbkp1 = rbkp1.dropna(subset=["event_timestamp"])
     rbkp2 = rbkp.copy()
-    rbkp2["event_timestamp"] = pd.to_datetime(rbkp1["event_BUDAT"], errors="coerce")
+    rbkp2["event_timestamp"] = pd.to_datetime(rbkp1["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     rbkp2["event_activity"] = "Invoice Posted"
     rbkp2 = rbkp2.dropna(subset=["event_timestamp"])
     rbkp2["event_timestamp"] = rbkp2["event_timestamp"] + pd.Timedelta("3 seconds")

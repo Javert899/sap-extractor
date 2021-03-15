@@ -7,7 +7,7 @@ def apply(con, mandt="800", bukrs="1000"):
     eban = eban.rename(columns={"event_ERNAM": "event_USERNAME", "event_ERDAT": "event_timestamp"})
     eban = eban.sort_values("event_timestamp")
     eban = eban.groupby("event_BANFN").first().reset_index()
-    eban["event_timestamp"] = pd.to_datetime(eban["event_timestamp"])
+    eban["event_timestamp"] = pd.to_datetime(eban["event_timestamp"], format=con.DATE_FORMAT)
     eban["event_activity"] = "Create Purchase Requisition"
     eban["event_FROMTABLE"] = "EBAN"
     eban["event_node"] = "EBAN_"+eban["event_BANFN"]
