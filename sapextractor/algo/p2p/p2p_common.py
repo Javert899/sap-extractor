@@ -16,43 +16,43 @@ def add_edges_to_graph(edges, nodes_connections, G):
     return nodes_connections, G
 
 
-def extract_tables_and_graph(con, gjahr=None, min_extr_date=None):
+def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", bukrs="1000"):
     G = nx.DiGraph()
     nodes_types = {}
     nodes_connections = {}
-    eban, eban_nodes_types = eban_processing.apply(con)
+    eban, eban_nodes_types = eban_processing.apply(con, mandt=mandt, bukrs=bukrs)
     for n in eban_nodes_types:
         G.add_node(n)
     nodes_types.update(eban_nodes_types)
-    ekko, ekko_nodes_types = ekko_processing.apply(con)
+    ekko, ekko_nodes_types = ekko_processing.apply(con, mandt=mandt, bukrs=bukrs)
     for n in ekko_nodes_types:
         G.add_node(n)
     nodes_types.update(ekko_nodes_types)
-    eban_ekko_connection = ekpo_processing.eban_ekko_connection(con)
+    eban_ekko_connection = ekpo_processing.eban_ekko_connection(con, mandt=mandt, bukrs=bukrs)
     nodes_connections, G = add_edges_to_graph(eban_ekko_connection, nodes_connections, G)
 
-    rbkp, rbkp_nodes_types = rbkp_processing.apply(con, gjahr=gjahr)
+    rbkp, rbkp_nodes_types = rbkp_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     for n in rbkp_nodes_types:
         G.add_node(n)
     nodes_types.update(rbkp_nodes_types)
-    ekko_rbkp_connections = rseg_processing.apply(con, gjahr=gjahr)
+    ekko_rbkp_connections = rseg_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     nodes_connections, G = add_edges_to_graph(ekko_rbkp_connections, nodes_connections, G)
 
-    gr, gr_nodes_types = ekbe_processing.goods_receipt(con, gjahr=gjahr)
+    gr, gr_nodes_types = ekbe_processing.goods_receipt(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     for n in gr_nodes_types:
         G.add_node(n)
     nodes_types.update(gr_nodes_types)
     gr_ekko_connections = ekbe_processing.goods_receipt_ekko_connection(gr)
     nodes_connections, G = add_edges_to_graph(gr_ekko_connections, nodes_connections, G)
 
-    ir, ir_nodes_types = ekbe_processing.invoice_receipt(con, gjahr=gjahr)
+    ir, ir_nodes_types = ekbe_processing.invoice_receipt(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     for n in ir_nodes_types:
         G.add_node(n)
     nodes_types.update(ir_nodes_types)
     ir_ekko_connections = ekbe_processing.invoice_receipt_ekko_connection(ir)
     nodes_connections, G = add_edges_to_graph(ir_ekko_connections, nodes_connections, G)
 
-    bkpf_events, bkpf_doc_types, bkpf_connections = bkpf_processing.apply(con, gjahr=gjahr)
+    bkpf_events, bkpf_doc_types, bkpf_connections = bkpf_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     for n in bkpf_doc_types:
         G.add_node(n)
     nodes_types.update(bkpf_doc_types)
@@ -60,11 +60,11 @@ def extract_tables_and_graph(con, gjahr=None, min_extr_date=None):
 
     nodes_connections = pd.DataFrame([{"node": x, "RELATED_DOCUMENTS": list(y)} for x, y in nodes_connections.items()])
     dataframe = pd.concat([eban, ekko, rbkp, gr, ir, bkpf_events])
-    dataframe = dataframe.sort_values("event_timestamp")
-    dataframe = dataframe.merge(nodes_connections, left_on="event_node", right_on="node", suffixes=('', '_r'), how="left")
-
-    if min_extr_date is not None:
-        min_extr_date = parser.parse(min_extr_date)
-        dataframe = dataframe[dataframe["event_timestamp"] >= min_extr_date]
+    if len(dataframe) > 0:
+        dataframe = dataframe.sort_values("event_timestamp")
+        dataframe = dataframe.merge(nodes_connections, left_on="event_node", right_on="node", suffixes=('', '_r'), how="left")
+        if min_extr_date is not None:
+            min_extr_date = parser.parse(min_extr_date)
+            dataframe = dataframe[dataframe["event_timestamp"] >= min_extr_date]
 
     return dataframe, G, nodes_types

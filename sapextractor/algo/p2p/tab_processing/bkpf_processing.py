@@ -3,17 +3,17 @@ from frozendict import frozendict
 from sapextractor.algo.p2p.tab_processing import bsak_processing
 
 
-def apply(con, gjahr=None):
-    awkey_docs, doc_dates, doc_types = extract_docs_from_bkpf(con, gjahr=gjahr)
-    clearances = bsak_processing.apply(con, gjahr=gjahr)
+def apply(con, gjahr=None, mandt="800", bukrs="1000"):
+    awkey_docs, doc_dates, doc_types = extract_docs_from_bkpf(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
+    clearances = bsak_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     events, doc_types, connections = mix_bkpf_bseg(awkey_docs, doc_dates, doc_types, clearances)
     return events, doc_types, connections
 
 
-def extract_docs_from_bkpf(con, gjahr=None):
-    additional_query_part = ""
+def extract_docs_from_bkpf(con, gjahr=None, mandt="800", bukrs="1000"):
+    additional_query_part = " WHERE MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
     if gjahr is not None:
-        additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
+        additional_query_part += " AND GJAHR = '"+gjahr+"'"
     bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "BLART", "BLDAT", "AWKEY"], additional_query_part=additional_query_part)
     bkpf["BLDAT"] = pd.to_datetime(bkpf["BLDAT"], errors="coerce") + pd.Timedelta("6 seconds")
     bkpf = bkpf.dropna(subset=["BLDAT"])

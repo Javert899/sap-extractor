@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-def goods_receipt(con, gjahr=None):
-    additional_query_part = " WHERE VGABE = '1'"
+def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
+    additional_query_part = " WHERE VGABE = '1' AND MANDT = '"+mandt+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR"], additional_query_part=additional_query_part)
@@ -17,8 +17,8 @@ def goods_receipt(con, gjahr=None):
     return ekbe, ekbe_nodes_types
 
 
-def invoice_receipt(con, gjahr=None):
-    additional_query_part = " WHERE VGABE = '2'"
+def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
+    additional_query_part = " WHERE VGABE = '2' AND MANDT ='"+mandt+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR"], additional_query_part=additional_query_part)

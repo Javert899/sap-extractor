@@ -8,7 +8,10 @@ from sapextractor.utils.change_tables import extract_change
 
 
 def get_changes(con, dataframe, mandt="800"):
-    vbeln_values = dataframe[["event_VBELN", "event_VBTYP_N"]].to_dict("r")
+    if len(dataframe) > 0:
+        vbeln_values = dataframe[["event_VBELN", "event_VBTYP_N"]].to_dict("r")
+    else:
+        vbeln_values = []
     vbeln_values = {x["event_VBELN"]: x["event_VBTYP_N"] for x in vbeln_values}
     ret = []
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
@@ -39,12 +42,13 @@ def get_changes(con, dataframe, mandt="800"):
 def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True,
           enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None, mandt="800"):
     dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date, mandt=mandt)
-    if keep_first:
+    if keep_first and len(dataframe) > 0:
         dataframe = dataframe.groupby("event_VBELN").first().reset_index()
     if allowed_act_doc_types is not None:
         allowed_act_doc_types = set(allowed_act_doc_types)
         dataframe = dataframe[dataframe["event_activity"].isin(allowed_act_doc_types)]
-    dataframe = dataframe.sort_values("event_timestamp")
+    if len(dataframe) > 0:
+        dataframe = dataframe.sort_values("event_timestamp")
     if enable_changes:
         changes = get_changes(con, dataframe, mandt=mandt)
     else:
@@ -56,7 +60,8 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020
         changes = changes[changes["event_activity"].isin(allowed_act_changes)]
     dataframe = pd.concat([dataframe, changes])
     dataframe["event_id"] = dataframe.index.astype(str)
-    dataframe = dataframe.sort_values("event_timestamp")
+    if len(dataframe) > 0:
+        dataframe = dataframe.sort_values("event_timestamp")
     dataframe.type = "succint"
     return dataframe
 

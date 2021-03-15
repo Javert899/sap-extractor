@@ -1,10 +1,10 @@
 import pandas as pd
 
 
-def apply(con, gjahr=None):
-    additional_query_part = ""
+def apply(con, gjahr=None, mandt="800", bukrs="1000"):
+    additional_query_part = " WHERE MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
     if gjahr is not None:
-        additional_query_part = " WHERE GJAHR = '"+gjahr+"'"
+        additional_query_part += " AND GJAHR = '"+gjahr+"'"
     rseg = con.prepare_and_execute_query("RSEG", ["BELNR", "GJAHR", "EBELN"], additional_query_part=additional_query_part)
     rseg = rseg.dropna(subset=["EBELN"])
     rseg = rseg.to_dict("records")

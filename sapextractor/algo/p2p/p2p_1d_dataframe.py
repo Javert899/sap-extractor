@@ -4,20 +4,21 @@ from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 
 
-def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00"):
-    dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date)
-    dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
-    anc_succ = build_graph.get_ancestors_successors_from_graph(G, nodes_types, ref_type=ref_type)
-    dataframe = dataframe.merge(anc_succ, left_on="event_node", right_on="node", suffixes=('', '_r'), how="right")
-    dataframe = dataframe.dropna(subset=["event_activity", "event_timestamp"])
-    cols = {x: x.split("event_")[-1] for x in dataframe.columns}
-    cols["event_activity"] = "concept:name"
-    cols["event_timestamp"] = "time:timestamp"
-    cols["event_USERNAME"] = "org:resource"
-    dataframe = dataframe.rename(columns=cols)
-    dataframe = dataframe.sort_values("time:timestamp")
-    dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
-    dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
+def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
+    dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
+    if len(dataframe) > 0:
+        dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
+        anc_succ = build_graph.get_ancestors_successors_from_graph(G, nodes_types, ref_type=ref_type)
+        dataframe = dataframe.merge(anc_succ, left_on="event_node", right_on="node", suffixes=('', '_r'), how="right")
+        dataframe = dataframe.dropna(subset=["event_activity", "event_timestamp"])
+        cols = {x: x.split("event_")[-1] for x in dataframe.columns}
+        cols["event_activity"] = "concept:name"
+        cols["event_timestamp"] = "time:timestamp"
+        cols["event_USERNAME"] = "org:resource"
+        dataframe = dataframe.rename(columns=cols)
+        dataframe = dataframe.sort_values("time:timestamp")
+        dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
+        dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
 

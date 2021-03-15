@@ -1,8 +1,8 @@
 import pandas as pd
 
 
-def apply(con):
-    ekko = con.prepare_and_execute_query("EKKO", ["EBELN", "ERNAM", "AEDAT", "LIFNR", "ZTERM"])
+def apply(con, mandt="800", bukrs="1000"):
+    ekko = con.prepare_and_execute_query("EKKO", ["EBELN", "ERNAM", "AEDAT", "LIFNR", "ZTERM"], additional_query_part=" WHERE MANDT ='"+mandt+"'")
     ekko.columns = ["event_"+x for x in ekko.columns]
     ekko = ekko.rename(columns={"event_ERNAM": "event_USERNAME", "event_AEDAT": "event_timestamp"})
     ekko = ekko.sort_values("event_timestamp")
