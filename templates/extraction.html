@@ -100,8 +100,6 @@
 							<td style="width: 60%">
 								Extraction Type:
 								<select id="apar_ext_type" name="apar_ext_type" onchange="apArExtChange()">
-									<option value="single_doc_transactions_dataframe">Single transactions (CSV)</option>
-									<option value="single_doc_transactions_log">Single transactions (XES)</option>
 									<option value="document_flow_dataframe">Document flow (CSV)</option>
 									<option value="document_flow_log" selected="selected">Document flow (XES)</option>
 									<option value="doc_flow_transactions_dataframe">Document flow transactions (CSV)</option>
@@ -117,22 +115,37 @@
 								</div>
 								<div id="document_flow_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow):</p>
-									Reference document type: <input type="text" id="apar_df_csv_reference_type" value="Goods receipt"></input>
+									Reference document type: <input type="text" id="apar_df_csv_reference_type" value="Goods receipt"></input> <br/>
+									Fiscal year: <input type="text" id="apar_df_csv_fiscal_year" value="1997"></input> <br/>
+									Client: <input type="text" id="apar_df_csv_client" value="800"></input> <br/>
+									Company code: <input type="text" id="apar_df_csv_company_code" value="1000"></input> <br/>
 								</div>
 								<div id="document_flow_log" style="display: ">
 									<p>Insert the parameters for the XES extraction (document flow):</p>
-									Reference document type: <input type="text" id="apar_df_xes_reference_type" value="Goods receipt"></input>
+									Reference document type: <input type="text" id="apar_df_xes_reference_type" value="Goods receipt"></input> <br/>
+									Fiscal year: <input type="text" id="apar_df_xes_fiscal_year" value="1997"></input> <br/>
+									Client: <input type="text" id="apar_df_xes_client" value="800"></input> <br/>
+									Company code: <input type="text" id="apar_df_xes_company_code" value="1000"></input> <br/>
 								</div>
 								<div id="doc_flow_transactions_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
-									Reference document type: <input type="text" id="apar_dft_csv_reference_type" value="Goods receipt"></input>
+									Reference document type: <input type="text" id="apar_dft_csv_reference_type" value="Goods receipt"></input> <br/>
+									Fiscal year: <input type="text" id="apar_dft_csv_fiscal_year" value="1997"></input> <br/>
+									Client: <input type="text" id="apar_dft_csv_client" value="800"></input> <br/>
+									Company code: <input type="text" id="apar_dft_csv_company_code" value="1000"></input> <br/>
 								</div>
 								<div id="doc_flow_transactions_xes" style="display: none">
 									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
-									Reference document type: <input type="text" id="apar_dft_xes_reference_type" value="Goods receipt"></input>
+									Reference document type: <input type="text" id="apar_dft_xes_reference_type" value="Goods receipt"></input> <br/>
+									Fiscal year: <input type="text" id="apar_dft_xes_fiscal_year" value="1997"></input> <br/>
+									Client: <input type="text" id="apar_dft_xes_client" value="800"></input> <br/>
+									Company code: <input type="text" id="apar_dft_xes_company_code" value="1000"></input> <br/>
 								</div>
 								<div id="apar_obj_centr_log" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
+									Fiscal year: <input type="text" id="apar_ocel_fiscal_year" value="1997"></input> <br/>
+									Client: <input type="text" id="apar_ocel_client" value="800"></input> <br/>
+									Company code: <input type="text" id="apar_ocel_company_code" value="1000"></input> <br/>
 								</div>
 							</td>
 						</tr>
@@ -159,17 +172,23 @@
 									Central table for the extraction: <input type="text" id="p2p_csv_central_table" value="EKKO"></input> <br />
 									Minimum extraction date: <input type="text" id="p2p_csv_min_ext_date" value="2014-01-01 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="p2p_csv_fiscal_year" value="2014" /> <br />
+									Client: <input type="text" id="p2p_csv_client" value="800" /> <br />
+									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
 									Central table for the extraction: <input type="text" id="p2p_xes_central_table" value="EKKO"></input> <br />
 									Minimum extraction date: <input type="text" id="p2p_xes_min_ext_date" value="2014-01-01 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="p2p_xes_fiscal_year" value="2014" /> <br />
+									Client: <input type="text" id="p2p_xes_client" value="800" /> <br />
+									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
 								</div>
 								<div id="p2p_ocel" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
 									Minimum extraction date: <input type="text" id="p2p_ocel_min_ext_date" value="2014-01-01 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="p2p_ocel_fiscal_year" value="2014" /> <br />
+									Client: <input type="text" id="p2p_ocel_client" value="800" /> <br />
+									Company code: <input type="text" id="p2p_ocel_company_code" value="1000" /> <br />
 								</div>
 							</td>
 						</tr>
@@ -660,29 +679,44 @@
 		function getAPARparametersDFCSV(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("apar_df_csv_reference_type").value;
+			ext_args["gjahr"] = document.getElementById("apar_df_csv_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("apar_df_csv_client").value;
+			ext_args["bukrs"] = document.getElementById("apar_df_csv_company_code").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFXES(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("apar_df_xes_reference_type").value;
+			ext_args["gjahr"] = document.getElementById("apar_df_xes_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("apar_df_xes_client").value;
+			ext_args["bukrs"] = document.getElementById("apar_df_xes_company_code").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFTCSV(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("apar_dft_csv_reference_type").value;
+			ext_args["gjahr"] = document.getElementById("apar_dft_csv_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("apar_dft_csv_client").value;
+			ext_args["bukrs"] = document.getElementById("apar_dft_csv_company_code").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersDFTXES(ext_type) {
 			let ext_args = {};
 			ext_args["ref_type"] = document.getElementById("apar_dft_xes_reference_type").value;
+			ext_args["gjahr"] = document.getElementById("apar_dft_xes_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("apar_dft_xes_client").value;
+			ext_args["bukrs"] = document.getElementById("apar_dft_xes_company_code").value;
 			return ext_args;
 		}
 		
 		function getAPARparametersOL(ext_type) {
 			let ext_args = {};
+			ext_args["gjahr"] = document.getElementById("apar_ocel_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("apar_ocel_client").value;
+			ext_args["bukrs"] = document.getElementById("apar_ocel_company_code").value;
 			return ext_args;
 		}
 		
@@ -703,6 +737,8 @@
 			ext_args["ref_type"] = document.getElementById("p2p_csv_central_table").value;
 			ext_args["min_extr_date"] = document.getElementById("p2p_csv_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("p2p_csv_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("p2p_csv_client").value;
+			ext_args["bukrs"] = document.getElementById("p2p_csv_company_code").value;
 			return ext_args;
 		}
 		
@@ -711,6 +747,8 @@
 			ext_args["ref_type"] = document.getElementById("p2p_xes_central_table").value;
 			ext_args["min_extr_date"] = document.getElementById("p2p_xes_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("p2p_xes_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("p2p_xes_client").value;
+			ext_args["bukrs"] = document.getElementById("p2p_xes_company_code").value;
 			return ext_args;
 		}
 		
@@ -718,6 +756,8 @@
 			let ext_args = {};
 			ext_args["min_extr_date"] = document.getElementById("p2p_ocel_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("p2p_ocel_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("p2p_ocel_client").value;
+			ext_args["bukrs"] = document.getElementById("p2p_ocel_company_code").value;
 			return ext_args;
 		}
 	</script>

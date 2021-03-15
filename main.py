@@ -100,12 +100,12 @@ def download_event_log():
         temp_file.close()
         from pm4pymdl.objects.ocel.exporter import exporter as ocel_exporter
         ocel_exporter.apply(log, temp_file.name)
-    elif "dataframe" in ext_type:
+    elif "dataframe" in ext_type or "csv" in ext_type:
         extension = ".csv"
         temp_file = tempfile.NamedTemporaryFile(suffix=extension)
         temp_file.close()
         log.to_csv(temp_file.name, index=False)
-    elif "log" in ext_type:
+    elif "log" in ext_type or "xes" in ext_type:
         extension = ".xes"
         temp_file = tempfile.NamedTemporaryFile(suffix=extension)
         temp_file.close()
