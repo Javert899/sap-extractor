@@ -9,8 +9,11 @@ from sapextractor.utils.graph_building import build_graph
 from sapextractor.algo.o2c import payment_part
 
 
-def extract_changes_vbfa(con, dataframe):
-    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
+def extract_changes_vbfa(con, dataframe, mandt="800"):
+    if len(dataframe) > 0:
+        case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
+    else:
+        case_vbeln = []
     case_vbeln_dict = {}
     for x in case_vbeln:
         caseid = x["case:concept:name"]
@@ -21,7 +24,7 @@ def extract_changes_vbfa(con, dataframe):
     ret = []
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
                 ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
-        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
+        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1], mandt=mandt)
         changes = {x: y for x, y in changes.items() if x in case_vbeln_dict}
         for x, y in changes.items():
             y = y[[xx for xx in y.columns if xx.startswith("event_")]]
@@ -43,8 +46,11 @@ def extract_changes_vbfa(con, dataframe):
     return ret
 
 
-def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
-    case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
+def extract_bkpf_bsak(con, dataframe, gjahr="2020", mandt="800"):
+    if len(dataframe) > 0:
+        case_vbeln = dataframe[["case:concept:name", "VBELN"]].to_dict("records")
+    else:
+        case_vbeln = []
     case_vbeln_dict = {}
     for x in case_vbeln:
         caseid = x["case:concept:name"]
@@ -53,7 +59,7 @@ def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
             case_vbeln_dict[vbeln] = set()
         case_vbeln_dict[vbeln].add(caseid)
 
-    dict_awkey, clearance_docs_dates, blart_vals = payment_part.apply(con, gjahr=gjahr)
+    dict_awkey, clearance_docs_dates, blart_vals = payment_part.apply(con, gjahr=gjahr, mandt=mandt)
 
     intersect = set(case_vbeln_dict.keys()).intersection(dict_awkey.keys())
 
@@ -77,38 +83,40 @@ def extract_bkpf_bsak(con, dataframe, gjahr="2020"):
     return ret
 
 
-def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None):
-    dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
+def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None, mandt="800"):
+    dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date, mandt=mandt)
     dataframe = dataframe[[x for x in dataframe.columns if x.startswith("event_")]]
     cols = {x: x.split("event_")[-1] for x in dataframe.columns}
     cols["event_activity"] = "concept:name"
     cols["event_timestamp"] = "time:timestamp"
     dataframe = dataframe.rename(columns=cols)
-    ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
-                                                       ref_type=ref_type)
-    # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
-    dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
-    dataframe = dataframe.reset_index()
-    if keep_first:
-        dataframe = dataframe.groupby(["case:concept:name", "VBELN"]).first().reset_index()
-    if allowed_act_doc_types is not None:
-        allowed_act_doc_types = set(allowed_act_doc_types)
-        dataframe = dataframe[dataframe["concept:name"].isin(allowed_act_doc_types)]
+    if len(dataframe) > 0:
+        ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
+                                                           ref_type=ref_type)
+        # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
+        dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
+        dataframe = dataframe.reset_index()
+        if keep_first:
+            dataframe = dataframe.groupby(["case:concept:name", "VBELN"]).first().reset_index()
+        if allowed_act_doc_types is not None:
+            allowed_act_doc_types = set(allowed_act_doc_types)
+            dataframe = dataframe[dataframe["concept:name"].isin(allowed_act_doc_types)]
     if enable_changes:
-        changes = extract_changes_vbfa(con, dataframe)
+        changes = extract_changes_vbfa(con, dataframe, mandt=mandt)
     else:
         changes = pd.DataFrame()
     if enable_payments:
-        payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr)
+        payments = extract_bkpf_bsak(con, dataframe, gjahr=gjahr, mandt=mandt)
     else:
         payments = pd.DataFrame()
     if allowed_act_changes is not None:
         allowed_act_changes = set(allowed_act_changes)
         changes = changes[changes["concept:name"].isin(allowed_act_changes)]
     dataframe = pd.concat([dataframe, changes, payments])
-    dataframe = dataframe.sort_values("time:timestamp")
-    dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1,
-                                                max_case_size=constants.MAX_CASE_SIZE)
+    if len(dataframe) > 0:
+        dataframe = dataframe.sort_values("time:timestamp")
+        dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1,
+                                                    max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
 

@@ -2,8 +2,8 @@ import pandas as pd
 from sapextractor.utils.blart import extract_blart
 
 
-def apply(con, gjahr="2020"):
-    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "AWKEY", "BLART"], additional_query_part=" WHERE GJAHR = '"+gjahr+"'")
+def apply(con, gjahr="2020", mandt="800"):
+    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "AWKEY", "BLART"], additional_query_part=" WHERE GJAHR = '"+gjahr+"' AND MANDT = '"+mandt+"'")
     blart_vals = set(bkpf["BLART"].unique())
     blart_vals = {x: x for x in blart_vals}
     blart_vals = extract_blart.apply_static(con, doc_types=blart_vals)

@@ -7,13 +7,13 @@ from sapextractor.utils import constants
 from sapextractor.utils.change_tables import extract_change
 
 
-def get_changes(con, dataframe):
+def get_changes(con, dataframe, mandt="800"):
     vbeln_values = dataframe[["event_VBELN", "event_VBTYP_N"]].to_dict("r")
     vbeln_values = {x["event_VBELN"]: x["event_VBTYP_N"] for x in vbeln_values}
     ret = []
     for tup in [("VERKBELEG", "VBAK"), ("VERKBELEG", "VBAP"), ("VERKBELEG", "VBUK"), ("LIEFERUNG", "LIKP"),
                 ("LIEFERUNG", "LIPS"), ("LIEFERUNG", "VBUK")]:
-        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1])
+        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1], mandt=mandt)
         changes = {x: y for x, y in changes.items() if x in vbeln_values}
         for x, y in changes.items():
             awkey = list(y["event_AWKEY"])[0]
@@ -37,8 +37,8 @@ def get_changes(con, dataframe):
 
 
 def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True,
-          enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None):
-    dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date)
+          enable_payments=True, allowed_act_doc_types=None, allowed_act_changes=None, mandt="800"):
+    dataframe = o2c_common.apply(con, keep_first=keep_first, min_extr_date=min_extr_date, mandt=mandt)
     if keep_first:
         dataframe = dataframe.groupby("event_VBELN").first().reset_index()
     if allowed_act_doc_types is not None:
@@ -46,7 +46,7 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020
         dataframe = dataframe[dataframe["event_activity"].isin(allowed_act_doc_types)]
     dataframe = dataframe.sort_values("event_timestamp")
     if enable_changes:
-        changes = get_changes(con, dataframe)
+        changes = get_changes(con, dataframe, mandt=mandt)
     else:
         changes = pd.DataFrame()
     if len(changes) > 0:
