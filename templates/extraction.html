@@ -58,6 +58,7 @@
 									Reference document type: <input type="text" id="o2c_log_reference_type" value="Order" /> <br />
 									Minimum extraction date: <input type="text" id="o2c_log_min_ext_date" value="2020-12-21 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="o2c_log_fiscal_year" value="2020" /> <br />
+									Client: <input type="text" id="o2c_log_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_log_include_changes" name="o2c_log_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_log_include_payments" name="o2c_log_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
@@ -69,6 +70,7 @@
 									Reference document type: <input type="text" id="o2c_df_reference_type" value="Order" /> <br />
 									Minimum extraction date: <input type="text" id="o2c_df_min_ext_date" value="2020-12-21 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="o2c_df_fiscal_year" value="2020" /> <br />
+									Client: <input type="text" id="o2c_df_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_df_include_changes" name="o2c_df_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_df_include_payments" name="o2c_df_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
@@ -79,6 +81,7 @@
 									<p>Insert the parameters for the object-centric log extraction:<br />
 									Minimum extraction date: <input type="text" id="o2c_obcen_min_ext_date" value="2020-12-21 00:00:00" /> <br />
 									Fiscal year: <input type="text" id="o2c_obcen_fiscal_year" value="2020" /> <br />
+									Client: <input type="text" id="o2c_obcen_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_obcen_include_changes" name="o2c_obcen_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_obcen_include_payments" name="o2c_obcen_include_payments" checked>Include payments</input><br />
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
@@ -618,6 +621,7 @@
 			ext_args["ref_type"] = document.getElementById("o2c_log_reference_type").value;
 			ext_args["min_extr_date"] = document.getElementById("o2c_log_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("o2c_log_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("o2c_log_client").value;
 			ext_args["enable_changes"] = document.getElementById("o2c_log_include_changes").checked;
 			ext_args["enable_payments"] = document.getElementById("o2c_log_include_payments").checked;
 			return ext_args;
@@ -628,6 +632,7 @@
 			ext_args["ref_type"] = document.getElementById("o2c_df_reference_type").value;
 			ext_args["min_extr_date"] = document.getElementById("o2c_df_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("o2c_df_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("o2c_df_client").value;
 			ext_args["enable_changes"] = document.getElementById("o2c_df_include_changes").checked;
 			ext_args["enable_payments"] = document.getElementById("o2c_df_include_payments").checked;
 			return ext_args;
@@ -637,6 +642,7 @@
 			let ext_args = {};
 			ext_args["min_extr_date"] = document.getElementById("o2c_obcen_min_ext_date").value;
 			ext_args["gjahr"] = document.getElementById("o2c_obcen_fiscal_year").value;
+			ext_args["mandt"] = document.getElementById("o2c_obcen_client").value;
 			ext_args["enable_changes"] = document.getElementById("o2c_obcen_include_changes").checked;
 			ext_args["enable_payments"] = document.getElementById("o2c_obcen_include_payments").checked;
 			return ext_args;
