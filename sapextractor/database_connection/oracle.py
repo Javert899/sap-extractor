@@ -49,7 +49,7 @@ class OracleConnection(DatabaseConnection):
 
     def get_list_tables(self):
         cursor = self.con.cursor()
-        cursor.execute("SELECT table_name FROM dba_tables WHERE owner = '" + constants.ORACLE_OWNER + "'")
+        cursor.execute("SELECT table_name FROM dba_tables WHERE owner = '" + self.table_prefix + "'")
         tables = cursor.fetchall()
         tables = [x[0] for x in tables]
         return tables
@@ -97,7 +97,7 @@ class OracleConnection(DatabaseConnection):
 
     def get_columns(self, table_name):
         cursor = self.con.cursor()
-        cursor.execute("select column_name from sys.dba_tab_columns where table_name = '%s' and owner = '%s'" % (table_name, constants.ORACLE_OWNER))
+        cursor.execute("select column_name from sys.dba_tab_columns where table_name = '%s' and owner = '%s'" % (table_name, self.table_prefix[:-1]))
         columns = cursor.fetchall()
         columns = [x[0] for x in columns]
         return columns
@@ -110,7 +110,7 @@ class OracleConnection(DatabaseConnection):
         table_columns = self.get_columns(table_name)
         new_columns = find_corr.apply(columns, table_columns)
         columns = new_columns
-        table_name = constants.ORACLE_OWNER + "." + table_name
+        table_name = self.table_prefix + table_name
         return "SELECT "+",".join(columns)+" FROM "+table_name
 
     def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
