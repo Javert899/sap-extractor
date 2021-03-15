@@ -9,9 +9,9 @@ def apply(con, gjahr="2020", mandt="800"):
     blart_vals = extract_blart.apply_static(con, doc_types=blart_vals)
     bkpf = bkpf.to_dict("records")
     try:
-        bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
+        bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=" WHERE GJAHR = '"+gjahr+"' AND MANDT='"+mandt+"'")
     except:
-        bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "BUZEI", "AUGDT", "AUGBL"])
+        bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=" WHERE GJAHR = '"+gjahr+"' AND MANDT='"+mandt+"'")
     bseg = bseg.dropna(subset=["AUGBL"])
     try:
         bseg["AUGDT"] = pd.to_datetime(bseg["AUGDT"], format=con.DATE_FORMAT)
