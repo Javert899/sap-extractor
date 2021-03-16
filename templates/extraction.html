@@ -222,7 +222,7 @@
 			<button onclick="javascript:updateDocTypesSelection()">Update Selection</button>
 			<p>Select the ones that you want to consider in your event log, and click 'Update Selection':</p>
 		</div>
-		<div class="center" id="apaprDfgDiv" style="display: none">
+		<div class="center" id="aparDfgDiv" style="display: none">
 			<p>This graph shows the document types of the SAP instance related to the AP/AR process.</p>
 			<div id="aparDfgVis">
 			</div>
@@ -338,7 +338,7 @@
 				obj = btoa(obj);
 				$.get("http://localhost:5000/bkpfGetDfg?parameters="+obj, function(data) {
 
-					document.getElementById("aparDfgVis").innerHTML = data["dfg"];
+					document.getElementById("aparDfgVis").innerHTML = data["ser"];
 
 					document.getElementById("aparDfgDiv").style.display = "";
 					aparDfgInitialized = true;
