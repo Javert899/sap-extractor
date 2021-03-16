@@ -54,6 +54,32 @@ def vbfaGetDfg():
     return jsonify({"dfg": dfg, "act_count": act_count, "ser": ser})
 
 
+@app.route("/bkpfGetDfg")
+def bkpfGetDfg():
+    parameters = request.args.get("parameters")
+
+    try:
+        parameters = json.loads(base64.b64decode(parameters))
+    except:
+        import traceback
+        traceback.print_exc()
+        parameters = {}
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.algo.ap_ar import graph_retrieval_util
+    dfg, act_count, sa, ea = graph_retrieval_util.extract_dfg_apar(c)
+    dfg, sa, ea, act_count = dfg_filtering.filter_dfg_on_paths_percentage(dfg, sa, ea, act_count, 0.2, keep_all_activities=False)
+    gviz = pm4py.visualization.dfg.visualizer.apply(dfg, activities_count=act_count, parameters={"format": "svg", "start_activities": sa, "end_activities": ea})
+    ser = pm4py.visualization.dfg.visualizer.serialize(gviz).decode("utf-8")
+    dfg = sorted([[x[0], x[1], y] for x, y in dfg.items()], key=lambda x: x[1], reverse=True)
+    act_count = sorted([(x, y) for x, y in act_count.items()], key=lambda x: x[1], reverse=True)
+
+    return jsonify({"dfg": dfg, "act_count": act_count, "ser": ser})
+
+
 @app.route("/vbfaChangeActivityUtil")
 def vbfaChangeActivityUtil():
     parameters = request.args.get("parameters")

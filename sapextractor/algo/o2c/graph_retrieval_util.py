@@ -2,7 +2,7 @@ from sapextractor.utils.vbtyp import extract_vbtyp
 
 
 def extract_dfg(con, mandt="800"):
-    vbfa = con.execute_read_sql("SELECT VBTYP_V, VBTYP_N, Count(*) FROM "+con.table_prefix+"VBFA WHERE MANDT = '"+mandt+"' GROUP BY VBTYP_V, VBTYP_N", ["VBTYP_V", "VBTYP_N", "COUNT"])
+    vbfa = con.execute_read_sql("SELECT VBTYP_V, VBTYP_N, Count(*) FROM "+con.table_prefix+"VBFA GROUP BY VBTYP_V, VBTYP_N", ["VBTYP_V", "VBTYP_N", "COUNT"])
     doc_types = set(vbfa["VBTYP_N"].unique()).union(set(vbfa["VBTYP_V"].unique()))
     vbtyp = extract_vbtyp.apply_static(con, doc_types=doc_types)
     vbfa["VBTYP_V"] = vbfa["VBTYP_V"].map(vbtyp)
