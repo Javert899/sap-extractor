@@ -1,4 +1,3 @@
-from sapextractor.utils.vbtyp import extract_vbtyp
 from sapextractor.utils.blart import extract_blart
 
 

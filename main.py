@@ -28,6 +28,44 @@ def welcome():
     return response
 
 
+@app.route("/o2cClientTable")
+def o2cClientTable():
+    parameters = request.args.get("parameters")
+
+    try:
+        parameters = json.loads(base64.b64decode(parameters))
+    except:
+        import traceback
+        traceback.print_exc()
+        parameters = {}
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.algo.o2c import freq_client
+    return {"res": freq_client.apply(c)}
+
+
+@app.route("/aparClientTable")
+def aparClientTable():
+    parameters = request.args.get("parameters")
+
+    try:
+        parameters = json.loads(base64.b64decode(parameters))
+    except:
+        import traceback
+        traceback.print_exc()
+        parameters = {}
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.algo.ap_ar import freq_doc_types
+    return {"res": freq_doc_types.apply(c)}
+
+
 @app.route("/vbfaGetDfg")
 def vbfaGetDfg():
     parameters = request.args.get("parameters")
