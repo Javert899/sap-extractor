@@ -66,6 +66,25 @@ def aparClientTable():
     return {"res": freq_doc_types.apply(c)}
 
 
+@app.route("/p2pClientTable")
+def p2pClientTable():
+    parameters = request.args.get("parameters")
+
+    try:
+        parameters = json.loads(base64.b64decode(parameters))
+    except:
+        import traceback
+        traceback.print_exc()
+        parameters = {}
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.algo.p2p import freq_doc_types
+    return {"res": freq_doc_types.apply(c)}
+
+
 @app.route("/vbfaGetDfg")
 def vbfaGetDfg():
     parameters = request.args.get("parameters")
