@@ -54,13 +54,17 @@ class MicSqlDatabaseConnection(DatabaseConnection):
         raise Exception("not implemented")
 
     def format_table_name(self, table_name):
-        raise Exception("not implemented")
+        return table_name
 
     def prepare_query(self, table_name, columns):
-        raise Exception("not implemented")
+        table_name = self.table_prefix + table_name
+        return "SELECT " + ",".join(columns) + " FROM " + table_name
 
     def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
-        raise Exception("not implemented")
+        query = self.prepare_query(table_name, columns) + additional_query_part
+        dataframe = self.execute_read_sql(query, columns)
+        dataframe.columns = columns
+        return dataframe
 
 
 def apply(hostname="127.0.0.1", username="sa", password="", database="prova", table_prefix=""):
