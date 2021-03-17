@@ -15,11 +15,11 @@
 					<option value="oracle" selected="selected">Oracle Connection</option>
 				</select>
 				<br />
-				<div id="sqlite_conn_parameters" style="display:">
+				<div id="sqlite_conn_parameters" style="display:none">
 					<p><b>Parameters of connection to the SQLite database:</b></p>
 					SQLite Database Path:&nbsp;&nbsp;<input type="text" id="sqlite_db_path" value="sap.sqlite"></input><br />
 				</div>
-				<div id="oracle_conn_parameters" style="display:none">
+				<div id="oracle_conn_parameters" style="display:">
 					<p><b>Parameters of connection to the Oracle database:</b></p>
 					Oracle Hostname:&nbsp;&nbsp;<input type="text" id="oracle_hostname" value="127.0.0.1"></input><br />
 					Oracle Port:&nbsp;&nbsp;<input type="text" id="oracle_port" value="1521"></input><br />
@@ -61,9 +61,10 @@
 									Client: <input type="text" id="o2c_log_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_log_include_changes" name="o2c_log_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_log_include_payments" name="o2c_log_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
@@ -73,9 +74,10 @@
 									Client: <input type="text" id="o2c_df_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_df_include_changes" name="o2c_df_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_df_include_payments" name="o2c_df_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:<br />
@@ -84,13 +86,40 @@
 									Client: <input type="text" id="o2c_obcen_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_obcen_include_changes" name="o2c_obcen_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_obcen_include_payments" name="o2c_obcen_include_payments" checked>Include payments</input><br />
+									<button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Shows the explanation of the ER diagram</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 							</td>
 						</tr>
 					</table>
+					<div class="center" id="o2cErExplanation" style="display: none">
+						<p>In this part, we provide an explanation of the tables as shown in the ER diagram.</p>
+						<p>The creation activities for the documents of each document type (e.g. Order, Delivery, Invoice), and the connections between them, are extracted from
+						the table <b>VBFA</b>.</p>
+						<p>The changes that happen to these documents (for example, the insertion of a new item in an existing order) are reported inside the tables <b>CDHDR</b> and <b>CDPOS</b>.</p>
+						<p>The information about the payments is extracted from the <b>BKPF</b> and <b>BSEG</b> tables. These contain all the billing documents, and therefore
+						invoices, payments, accounting documents are reported in these tables. These tables are linked to <b>VBFA</b> (sales order documents) and <b>CDHDR/CDPOS</b> (change tables).</p>
+						<p><b>DD07T</b> and <b>T003T</b> are technical tables reporting the human-understandable names for each document type.</p>
+					</div>
+					<div class="center" id="o2cClientListContainer" style="display: none">
+						<p><b>O2C clients list (from the table EKKO)</p>
+						<div id="o2cClientList">
+						</div>
+					</div>
+					<div class="center" id="o2cDfgDiv" style="display: none">
+						<p>This graph shows the document types of the SAP instance related to the Order-to-Cash process.</p>
+						<div id="o2cDfgVis">
+						</div>
+						<button onclick="javascript:updateDocTypesSelection()">Update Selection</button>
+						<p>Select the ones that you want to consider in your event log, and click 'Update Selection':</p>
+					</div>
+					<div class="center" id="o2cChangesListDiv" style="display: none">
+						<p>This section shows the change activities of the SAP instance related to the Order-to-Cash process.</p>
+						<button onclick="javascript:updateChangeActivitiesList()">Update Change Activities</button>
+						<p>Select the ones that you want to consider in your event log, and click 'Update Change Activities'</p>
+					</div>
 				</div>
 				<div id="ap_ar" style="display: none">
 					<p><b>Accounts Payable / Accounts Receivable</b></p>
@@ -104,9 +133,9 @@
 								Extraction Type:
 								<select id="apar_ext_type" name="apar_ext_type" onchange="apArExtChange()">
 									<option value="document_flow_dataframe">Document flow (CSV)</option>
-									<option value="document_flow_log" selected="selected">Document flow (XES)</option>
+									<option value="document_flow_log">Document flow (XES)</option>
 									<option value="doc_flow_transactions_dataframe">Document flow transactions (CSV)</option>
-									<option value="doc_flow_transactions_xes">Document flow transactions (XES)</option>
+									<option value="doc_flow_transactions_xes" selected="selected">Document flow transactions (XES)</option>
 									<option value="apar_obj_centr_log">Object-Centric Log</option>
 								</select>
 								<br />
@@ -118,46 +147,73 @@
 								</div>
 								<div id="document_flow_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow):</p>
-									Reference document type: <input type="text" id="apar_df_csv_reference_type" value="Goods receipt"></input> <br/>
-									Fiscal year: <input type="text" id="apar_df_csv_fiscal_year" value="1997"></input> <br/>
+									Reference document type: <input type="text" id="apar_df_csv_reference_type" value="Vendor payment"></input> <br/>
+									Fiscal year: <input type="text" id="apar_df_csv_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_df_csv_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_df_csv_company_code" value="1000"></input> <br/>
+									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
-								<div id="document_flow_log" style="display: ">
+								<div id="document_flow_log" style="display: none">
 									<p>Insert the parameters for the XES extraction (document flow):</p>
-									Reference document type: <input type="text" id="apar_df_xes_reference_type" value="Goods receipt"></input> <br/>
-									Fiscal year: <input type="text" id="apar_df_xes_fiscal_year" value="1997"></input> <br/>
+									Reference document type: <input type="text" id="apar_df_xes_reference_type" value="Vendor payment"></input> <br/>
+									Fiscal year: <input type="text" id="apar_df_xes_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_df_xes_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_df_xes_company_code" value="1000"></input> <br/>
+									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="doc_flow_transactions_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
-									Reference document type: <input type="text" id="apar_dft_csv_reference_type" value="Goods receipt"></input> <br/>
-									Fiscal year: <input type="text" id="apar_dft_csv_fiscal_year" value="1997"></input> <br/>
+									Reference document type: <input type="text" id="apar_dft_csv_reference_type" value="Vendor payment"></input> <br/>
+									Fiscal year: <input type="text" id="apar_dft_csv_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_dft_csv_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_dft_csv_company_code" value="1000"></input> <br/>
+									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
-								<div id="doc_flow_transactions_xes" style="display: none">
+								<div id="doc_flow_transactions_xes" style="display: ">
 									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
-									Reference document type: <input type="text" id="apar_dft_xes_reference_type" value="Goods receipt"></input> <br/>
-									Fiscal year: <input type="text" id="apar_dft_xes_fiscal_year" value="1997"></input> <br/>
+									Reference document type: <input type="text" id="apar_dft_xes_reference_type" value="Vendor payment"></input> <br/>
+									Fiscal year: <input type="text" id="apar_dft_xes_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_dft_xes_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_dft_xes_company_code" value="1000"></input> <br/>
+									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="apar_obj_centr_log" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
-									Fiscal year: <input type="text" id="apar_ocel_fiscal_year" value="1997"></input> <br/>
+									Fiscal year: <input type="text" id="apar_ocel_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_ocel_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_ocel_company_code" value="1000"></input> <br/>
+									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 							</td>
 						</tr>
 					</table>
+					<div class="center" id="aparErExplanation" style="display: none">
+						<p>In this part, we provide an explanation of the tables as shown in the ER diagram.</p>
+						<p>The table <b>BKPF</b> collects all the billing documents (invoices, payments, accounting ...).</p>
+						<p>The table <b>BSEG</b> contains the <i>clearing</i> relationship between documents (for example, a payment can clear an invoice).</p>
+						<p>The tables <b>TSTCT</b> and <b>T003T</b> are technical tables (containing respectively the list of transactions and document types
+						of the system).</p>
+					</div>
+					<div class="center" id="aparClientListContainer" style="display: none">
+						<p><b>AP/AR clients/company code/fiscal year/document types list (from the table BKPF)</p>
+						<div id="aparClientList">
+						</div>
+					</div>
+					<div class="center" id="aparDfgDiv" style="display: none">
+						<p>This graph shows the document types of the SAP instance related to the AP/AR process.</p>
+						<div id="aparDfgVis">
+						</div>
+					</div>
 				</div>
 				<div id="p2p" style="display: none">
 					<p><b>Procure-to-Pay</b></p>
@@ -182,6 +238,8 @@
 									Fiscal year: <input type="text" id="p2p_csv_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_csv_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
+									<button onclick="javascript:p2pClient()">Show Clients</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
@@ -190,6 +248,8 @@
 									Fiscal year: <input type="text" id="p2p_xes_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_xes_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
+									<button onclick="javascript:p2pClient()">Show Clients</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 								<div id="p2p_ocel" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
@@ -197,41 +257,32 @@
 									Fiscal year: <input type="text" id="p2p_ocel_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_ocel_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_ocel_company_code" value="1000" /> <br />
+									<button onclick="javascript:p2pClient()">Show Clients</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
 								</div>
 							</td>
 						</tr>
 					</table>
+					<div class="center" id="p2pErExplanation" style="display: none">
+						<p>In this part, we provide an explanation of the tables as shown in the ER diagram.</p>
+						<b>The tables <b>EKKO</b> (master table) and <b>EKPO</b> (detail table) contain the information about the purchase orders.</p>
+						<p>The table <b>EKBE</b> contains the goods receipts and the invoice receipts. Moreover, it puts purchase orders and invoices in relationship.</p>
+						<p>The tables <b>RBKP</b> (master table) and <b>RSEG</b> (detail table) contain the information on the invoices posting.</p>
+						<p>The tables <b>BKPF</b> (master table) and <b>BSEG</b> (detail table) contain the information on the payments. An invoice in RBKP is related to a document in BKPF.</p>
+						<p>The tables <b>CDHDR</b> (master table) and <b>CDPOS</b> (detail table) contain the information about changes happening in the purchase orders and invoices tables.</p>
+						<p>The tables <b>TSTCT</b> and <b>T003T</b> are technical tables (containing respectively the list of transactions and document types
+						of the system).</p>
+					</div>
+					<div class="center" id="p2pClientListContainer" style="display: none">
+						<p><b>P2P clients/company code/fiscal year/document types list (from the table RBKP)</p>
+						<div id="p2pClientList">
+						</div>
+					</div>
 				</div>
 			</div>
 			<br />
 			<button onclick="javascript:extract()">Extract the Event Log</button>
         </div>
-		<div class="center" id="o2cErExplanation" style="display: none">
-			<p>In this part, we provide an explanation of the tables as shown in the ER diagram.</p>
-			<p>The creation activities for the documents of each document type (e.g. Order, Delivery, Invoice), and the connections between them, are extracted from
-			the table <b>VBFA</b>.</p>
-			<p>The changes that happen to these documents (for example, the insertion of a new item in an existing order) are reported inside the tables <b>CDHDR</b> and <b>CDPOS</b>.</p>
-			<p>The information about the payments is extracted from the <b>BKPF</b> and <b>BSEG</b> tables. These contain all the billing documents, and therefore
-			invoices, payments, accounting documents are reported in these tables. These tables are linked to <b>VBFA</b> (sales order documents) and <b>CDHDR/CDPOS</b> (change tables).</p>
-			<p><b>DD07T</b> and <b>T003T</b> are technical tables reporting the human-understandable names for each document type.</p>
-		</div>
-		<div class="center" id="o2cDfgDiv" style="display: none">
-			<p>This graph shows the document types of the SAP instance related to the Order-to-Cash process.</p>
-			<div id="o2cDfgVis">
-			</div>
-			<button onclick="javascript:updateDocTypesSelection()">Update Selection</button>
-			<p>Select the ones that you want to consider in your event log, and click 'Update Selection':</p>
-		</div>
-		<div class="center" id="aparDfgDiv" style="display: none">
-			<p>This graph shows the document types of the SAP instance related to the AP/AR process.</p>
-			<div id="aparDfgVis">
-			</div>
-		</div>
-		<div class="center" id="o2cChangesListDiv" style="display: none">
-			<p>This section shows the change activities of the SAP instance related to the Order-to-Cash process.</p>
-			<button onclick="javascript:updateChangeActivitiesList()">Update Change Activities</button>
-			<p>Select the ones that you want to consider in your event log, and click 'Update Change Activities'</p>
-		</div>
     </body>
 	<script type="text/javascript">
 		var aparDfgInitialized = false;
@@ -246,6 +297,14 @@
 		
 		function showO2cErExplanation() {
 			document.getElementById("o2cErExplanation").style.display = "";
+		}
+		
+		function showAPARErExplanation() {
+			document.getElementById("aparErExplanation").style.display = "";
+		}
+		
+		function showP2PErExplanation() {
+			document.getElementById("p2pErExplanation").style.display = "";
 		}
 		
 		function updateDocTypesSelection() {
@@ -274,21 +333,50 @@
 			}
 		}
 		
+		function getBasicObject() {
+			let db_type = document.getElementById("connection_types").value;
+			let db_con_args = {};
+			if (db_type == "sqlite") {
+				db_con_args = getSqliteDbConArgs();
+			}
+			else if (db_type == "oracle") {
+				db_con_args = getOracleDbConArgs();
+			}
+			var obj = {};
+			obj["db_type"] = db_type;
+			obj["db_con_args"] = db_con_args;
+			obj = JSON.stringify(obj);
+			obj = btoa(obj);
+			return obj;
+		}
+		
+		function o2cClient() {
+			let obj = getBasicObject();
+			$.get("http://localhost:5000/o2cClientTable?parameters="+obj, function(data) {
+				document.getElementById("o2cClientListContainer").style.display = "";
+				document.getElementById("o2cClientList").innerHTML = data["res"];
+			});
+		}
+		
+		function aparClient() {
+			let obj = getBasicObject();
+			$.get("http://localhost:5000/aparClientTable?parameters="+obj, function(data) {
+				document.getElementById("aparClientListContainer").style.display = "";
+				document.getElementById("aparClientList").innerHTML = data["res"];
+			});
+		}
+		
+		function p2pClient() {
+			let obj = getBasicObject();
+			$.get("http://localhost:5000/p2pClientTable?parameters="+obj, function(data) {
+				document.getElementById("p2pClientListContainer").style.display = "";
+				document.getElementById("p2pClientList").innerHTML = data["res"];
+			});
+		}
+		
 		function o2cGraph() {
 			if (!o2cDfgInitialized) {
-				let db_type = document.getElementById("connection_types").value;
-				let db_con_args = {};
-				if (db_type == "sqlite") {
-					db_con_args = getSqliteDbConArgs();
-				}
-				else if (db_type == "oracle") {
-					db_con_args = getOracleDbConArgs();
-				}
-				var obj = {};
-				obj["db_type"] = db_type;
-				obj["db_con_args"] = db_con_args;
-				obj = JSON.stringify(obj);
-				obj = btoa(obj);
+				let obj = getBasicObject();
 				$.get("http://localhost:5000/vbfaGetDfg?parameters="+obj, function(data) {
 					o2cDfg = data["dfg"];
 					o2cActivities = data["act_count"];
@@ -323,19 +411,7 @@
 
 		function aparGraph() {
 			if (!aparDfgInitialized) {
-				let db_type = document.getElementById("connection_types").value;
-				let db_con_args = {};
-				if (db_type == "sqlite") {
-					db_con_args = getSqliteDbConArgs();
-				}
-				else if (db_type == "oracle") {
-					db_con_args = getOracleDbConArgs();
-				}
-				var obj = {};
-				obj["db_type"] = db_type;
-				obj["db_con_args"] = db_con_args;
-				obj = JSON.stringify(obj);
-				obj = btoa(obj);
+				let obj = getBasicObject();
 				$.get("http://localhost:5000/bkpfGetDfg?parameters="+obj, function(data) {
 
 					document.getElementById("aparDfgVis").innerHTML = data["ser"];
@@ -348,20 +424,7 @@
 		
 		function o2cChangeList() {
 			if (!o2cChangeInitialized) {
-				let db_type = document.getElementById("connection_types").value;
-				let db_con_args = {};
-				if (db_type == "sqlite") {
-					db_con_args = getSqliteDbConArgs();
-				}
-				else if (db_type == "oracle") {
-					db_con_args = getOracleDbConArgs();
-				}
-				var obj = {};
-				obj["db_type"] = db_type;
-				obj["db_con_args"] = db_con_args;
-				obj = JSON.stringify(obj);
-				obj = btoa(obj);
-				
+				let obj = getBasicObject();
 				
 				$.get("http://localhost:5000/vbfaChangeActivityUtil?parameters="+obj, function(data) {
 					o2cAllChangeActivities = data["changes_count"];
