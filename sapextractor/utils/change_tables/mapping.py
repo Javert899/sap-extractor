@@ -109,6 +109,72 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Delivery is for single warehouse", 1
     elif fname == "LISPL" and value_new == "B":
         return "Delivery is not for single warehouse", 1
+    elif fname == "PROCSTAT" and value_new == "5":
+        return "Purchasing document processing state: Release completed", 1
+    elif fname == "PROCSTAT" and value_new == "3":
+        return "Purchasing document processing state: In release", 1
+    elif fname == "ELIKZ" and value_new == "X":
+        return "Delivery Completed Indicator: Yes", 1
+    elif fname == "STATU" and value_new == "A" and tabname == "EKKO":
+        return "Status of Purchasing Document: RFQ with Quotation", 1
+    elif fname == "STATU" and value_new == "A" and tabname == "EKPO":
+        return "Status of Purchasing Document: Quotation Exists in Case of RFQ Item", 1
+    elif fname == "PROCSTAT" and value_new == "2":
+        return "Purchasing document processing state: Active", 1
+    elif fname == "PROCSTAT" and value_new == "1":
+        return "Purchasing document processing state: Version in process", 1
+    elif fname == "RBSTAT" and value_new == "5":
+        return "Invoice document status: Posted", 1
+    elif fname == "RBSTAT" and value_new == "B":
+        return "Invoice document status: Parked and completed", 1
+    elif fname == "RBSTAT" and value_new == "B":
+        return "Invoice document status: Parked", 1
+    elif fname == "WEUNB" and value_new == "B":
+        return "Goods Receipt, Non-Valuated: Yes", 1
+    elif fname == "XMWST" and value_new == "B":
+        return "Calculate tax automatically: Yes", 1
+    elif tabname == "EKPO" and fname == "AEDAT":
+        return "Change Date of the Last Document Change", 1
+    elif tabname == "EKPO" and fname == "LOEKZ":
+        return "Change Deletion indicator in purchasing document", 1
+    elif tabname == "EBAN" and fname == "LOEKZ":
+        return "Change Deletion indicator in purchasing document", 1
+    elif tabname == "EKKO" and fname == "FRGKE":
+        return "Change Release Indicator: Purchasing Document", 1
+    elif tabname == "EKKO" and fname == "FRGZU":
+        return "Change Release State", 1
+    elif tabname == "EKKO" and fname == "RLWRT":
+        return "Change Total value at time of release", 1
+    elif tabname == "EBAN" and fname == "FRGZU":
+        return "Change Release State", 1
+    elif tabname == "EBAN" and fname == "RLWRT":
+        return "Change Total value at time of release", 1
+    elif tabname == "EBAN" and fname == "FRGKZ":
+        return "Change Indicator: Release Required", 1
+    elif tabname == "EBAN" and fname == "MENGE":
+        return "Change Quantity", 1
+    elif tabname == "EKPO" and fname == "FIPOS":
+        return "Change Commitment Item", 1
+    elif tabname == "EKPO" and fname == "WERKS":
+        return "Change Plant", 1
+    elif tabname == "EKPO" and fname == "MENGE":
+        return "Change Quantity", 1
+    elif tabname == "EKET" and fname == "MENGE":
+        return "Change Quantity", 1
+    elif tabname == "EKPO" and fname == "BPRME":
+        return "Change Order Price Unit (Purchasing)", 1
+    elif tabname == "EKPO" and fname == "KTWRT":
+        return "Change Target Value for Header Area per Distribution", 1
+    elif tabname == "EBAN" and fname == "MEINS":
+        return "Change Base Unit of Measure", 1
+    elif tabname == "EBKN" and fname == "MENGE":
+        return "Change Quantity", 1
+    elif tabname == "EKKN" and fname == "MENGE":
+        return "Change Quantity", 1
+    elif tabname == "EKKO" and fname == "ZTERM":
+        return "Change Terms of Payment Key", 1
+    elif tabname == "EBAN" and fname == "EKORG":
+        return "Change Purchasing Organization", 1
     elif fname == "WADAT_IST":
         try:
             value_new = parser.parse(value_new).timestamp()
@@ -144,6 +210,28 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Remove Delivery Item", 2
     elif fname == "KEY" and tabname == "LIPS" and chngind == "I":
         return "Insert Delivery Item", 2
+    elif fname == "KEY" and tabname == "EKPA" and chngind == "I":
+        return "Associate Partner", 2
+    elif fname == "KEY" and tabname == "EKET" and chngind == "I":
+        return "Scheduling Agreement", 2
+    elif fname == "KEY" and tabname == "RBTX" and chngind == "D":
+        return "Remove Taxation", 2
+    elif fname == "KEY" and tabname == "EKPO" and chngind == "I":
+        return "Insert Purchase Order Item", 2
+    elif fname == "KEY" and tabname == "EKKO" and chngind == "I":
+        return "Update Purchase Order", 2
+    elif fname == "KEY" and tabname == "EKKN" and chngind == "I":
+        return "Assign PO Account", 2
+    elif fname == "KEY" and tabname == "EKBN" and chngind == "I":
+        return "Assign PR Account", 2
+    elif fname == "KEY" and tabname == "EBAN" and chngind == "I":
+        return "Update Purchase Requisition", 2
+    elif fname == "KEY" and tabname == "EKES" and chngind == "I":
+        return "Vendor Confirmation", 2
+    elif fname == "KEY" and tabname == "EKKN" and chngind == "D":
+        return "Remove PO Account", 2
+    elif fname == "KEY" and tabname == "RBTX" and chngind == "I":
+        return "Insert Taxation", 2
     else:
         if return_however:
             return "Changed "+fnames[fname], 0
