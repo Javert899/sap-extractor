@@ -6,6 +6,7 @@ def apply(con, gjahr=None, mandt="800", bukrs="1000"):
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     rbkp = con.prepare_and_execute_query("RBKP", ["BELNR", "GJAHR", "BLDAT", "BUDAT", "USNAME", "TCODE", "LIFNR"], additional_query_part=additional_query_part)
+    rbkp["OBJECTID"] = rbkp["BELNR"] + rbkp["GJAHR"]
     rbkp.columns = ["event_"+x for x in rbkp.columns]
     rbkp["event_FROMTABLE"] = "RBKP"
     rbkp["event_node"] = "RBKP_"+rbkp["event_BELNR"]+rbkp["event_GJAHR"]

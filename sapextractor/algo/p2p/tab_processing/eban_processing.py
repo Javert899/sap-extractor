@@ -3,6 +3,7 @@ import pandas as pd
 
 def apply(con, mandt="800", bukrs="1000"):
     eban = con.prepare_and_execute_query("EBAN", ["BANFN", "ERNAM", "ERDAT"], additional_query_part=" WHERE MANDT = '"+mandt+"'")
+    eban["OBJECTID"] = eban["BANFN"]
     eban.columns = ["event_"+x for x in eban.columns]
     eban = eban.rename(columns={"event_ERNAM": "event_USERNAME", "event_ERDAT": "event_timestamp"})
     eban = eban.sort_values("event_timestamp")
