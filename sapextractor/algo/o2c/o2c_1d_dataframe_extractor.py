@@ -91,8 +91,9 @@ def apply(con, ref_type="Order", keep_first=True, min_extr_date="2020-01-01 00:0
     cols["event_timestamp"] = "time:timestamp"
     dataframe = dataframe.rename(columns=cols)
     if len(dataframe) > 0:
+        all_docs = set(dataframe[dataframe["VBTYP_N"] == ref_type]["VBELN"].unique())
         ancest_succ = build_graph.get_ancestors_successors(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N",
-                                                           ref_type=ref_type)
+                                                           ref_type=ref_type, all_docs=all_docs)
         # ancest_succ = build_graph.get_conn_comp(dataframe, "VBELV", "VBELN", "VBTYP_V", "VBTYP_N", ref_type=ref_type)
         dataframe = dataframe.merge(ancest_succ, left_on="VBELN", right_on="node", suffixes=('', '_r'), how="right")
         dataframe = dataframe.reset_index()

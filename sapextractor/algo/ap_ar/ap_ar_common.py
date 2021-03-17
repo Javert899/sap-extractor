@@ -35,7 +35,7 @@ def extract_bkpf(con, gjahr="1997", mandt="800", bukrs="1000"):
 
 def extract_bseg(con, doc_first_dates, doc_types, gjahr="1997", mandt="800", bukrs="1000"):
     additional_query_part = " WHERE GJAHR = '"+gjahr+"' AND MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
-    bseg = con.prepare_and_execute_query("BSEG", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=additional_query_part)
+    bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=additional_query_part)
     bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
     bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
     bseg["AUGBL_TYPE"] = bseg["AUGBL"].map(doc_types)

@@ -44,25 +44,36 @@ def get_conn_comp(df, prev, curr, prev_type, curr_type, ref_type=""):
     return dataframe
 
 
-def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type=""):
+def get_ancestors_successors(df, prev, curr, prev_type, curr_type, ref_type="", all_docs=None):
     G, types = apply(df, prev, curr, prev_type, curr_type)
 
-    return get_ancestors_successors_from_graph(G, types, ref_type=ref_type)
+    return get_ancestors_successors_from_graph(G, types, ref_type=ref_type, all_docs=all_docs)
 
 
-def get_ancestors_successors_from_graph(G, types, ref_type=""):
+def get_ancestors_successors_from_graph(G, types, ref_type="", all_docs=None):
     list_corresp = []
 
     nodes_ref_type = {x for x,y in types.items() if y == ref_type}
 
-    for index, node in enumerate(nodes_ref_type):
+    index = 0
+    for node in nodes_ref_type:
         all_ancestors = set(nx.ancestors(G, node))
         all_descendants = set(nx.descendants(G, node))
         all_nodes = all_ancestors.union(all_descendants).union({node})
         for n2 in all_nodes:
             new_el = {"node": n2, "type": types[n2], "case:concept:name": str(index)}
             list_corresp.append(new_el)
+        index = index + 1
 
-    dataframe = pd.DataFrame(list_corresp).sort_values("node")
+    if all_docs is not None:
+        all_docs = all_docs.difference(nodes_ref_type)
+        for node in all_docs:
+            new_el = {"node": node, "type": "", "case:concept:name": str(index)}
+            list_corresp.append(new_el)
+            index = index + 1
 
+    if list_corresp:
+        dataframe = pd.DataFrame(list_corresp).sort_values("node")
+    else:
+        dataframe = pd.DataFrame({"node": []})
     return dataframe
