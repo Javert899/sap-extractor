@@ -33,6 +33,7 @@ setup(
         "stringdist",
         "cx_Oracle",
         "plantuml",
-        "frozendict"
+        "frozendict",
+        "pymssql"
     ]
 )

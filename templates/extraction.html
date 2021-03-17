@@ -65,6 +65,7 @@
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
 									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
@@ -78,6 +79,7 @@
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
 									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:<br />
@@ -154,6 +156,7 @@
 									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="document_flow_log" style="display: none">
 									<p>Insert the parameters for the XES extraction (document flow):</p>
@@ -164,6 +167,7 @@
 									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="doc_flow_transactions_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
@@ -174,6 +178,7 @@
 									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="doc_flow_transactions_xes" style="display: ">
 									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
@@ -184,6 +189,7 @@
 									<button onclick="javascript:aparClient()">Show Clients</button>
 									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
 									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="apar_obj_centr_log" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
@@ -240,6 +246,7 @@
 									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
 									<button onclick="javascript:p2pClient()">Show Clients</button>
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
@@ -250,6 +257,7 @@
 									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
 									<button onclick="javascript:p2pClient()">Show Clients</button>
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
 								</div>
 								<div id="p2p_ocel" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
@@ -642,7 +650,7 @@
 			}
 		}
 		
-		function extract() {
+		function extractionObjRetrieval() {
 			let db_type = document.getElementById("connection_types").value;
 			let db_con_args = {};
 			if (db_type == "sqlite") {
@@ -675,7 +683,17 @@
 			console.log(obj);
 			obj = JSON.stringify(obj);
 			obj = btoa(obj);
+			return obj;
+		}
+		
+		function extract() {
+			obj = extractionObjRetrieval();
 			window.open("http://localhost:5000/downloadLog?parameters="+obj);
+		}
+		
+		function showProcessMap() {
+			obj = extractionObjRetrieval();
+			window.open("http://localhost:5000/getProcessSvg?parameters="+obj);
 		}
 		
 		function getSqliteDbConArgs() {

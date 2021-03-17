@@ -205,7 +205,16 @@ def get_process_svg():
         model = discovery.apply(log, model_type_variant="model3", node_freq_variant="type31", edge_freq_variant="type11")
         gviz = vis_factory.apply(model, parameters={"format": "svg"})
     elif log_type == 1 or log_type == 2:
-        dfg, sa, ea = pm4py.discover_dfg(log)
+        import pandas as pd
+        if type(log) is pd.DataFrame:
+            from pm4py.objects.dfg.retrieval.pandas import get_dfg_graph
+            dfg = get_dfg_graph(log)
+            from pm4py.statistics.start_activities.pandas import get as pd_sa_get
+            from pm4py.statistics.end_activities.pandas import get as pd_ea_get
+            sa = pd_sa_get.get_start_activities(log)
+            ea = pd_ea_get.get_end_activities(log)
+        else:
+            dfg, sa, ea = pm4py.discover_dfg(log)
         act_count = pm4py.get_attribute_values(log, "concept:name")
         dfg, sa, ea, act_count = dfg_filtering.filter_dfg_on_paths_percentage(dfg, sa, ea, act_count, 0.2,
                                                                               keep_all_activities=True)
