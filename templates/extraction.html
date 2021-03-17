@@ -13,6 +13,7 @@
 				<select id="connection_types" name="connection_types" onchange="changeConnectionType()">
 					<option value="sqlite">SQLite Connection</option>
 					<option value="oracle" selected="selected">Oracle Connection</option>
+					<option value="mic_sql">Microsoft SQL</option>
 				</select>
 				<br />
 				<div id="sqlite_conn_parameters" style="display:none">
@@ -26,6 +27,14 @@
 					Oracle SID:&nbsp;&nbsp;<input type="text" id="oracle_sid" value="XE"></input><br />
 					Oracle Username:&nbsp;&nbsp;<input type="text" id="oracle_username" value="system"></input><br />
 					Oracle Password:&nbsp;&nbsp;<input type="password" id="oracle_password" value="oracle"></input><br />
+				</div>
+				<div id="mssql_conn_parameters" style="display:none">
+					<p><b>Parameters of connection to the MSSQL database:</b></p>
+					MSSQL Hostname:&nbsp;&nbsp;<input type="text" id="mssql_hostname" value="127.0.0.1"></input><br />
+					MSSQL Username:&nbsp;&nbsp;<input type="text" id="mssql_username" value="sa"></input><br />
+					MSSQL Password:&nbsp;&nbsp;<input type="password" id="mssql_password" value=""></input><br />
+					MSSQL Database:&nbsp;&nbsp;<input type="text" id="mssql_database" value="prova"></input><br />
+					MSSQL Table Prefix (with .):&nbsp;&nbsp;<input type="text" id="mssql_table_prefix" value=""></input><br />
 				</div>
 			</div>
 			<br />
@@ -350,6 +359,9 @@
 			else if (db_type == "oracle") {
 				db_con_args = getOracleDbConArgs();
 			}
+			else if (db_type == "mic_sql") {
+				db_con_args = getMicSqlDbConArgs();
+			}
 			var obj = {};
 			obj["db_type"] = db_type;
 			obj["db_con_args"] = db_con_args;
@@ -553,10 +565,17 @@
 			if (connection_type == "sqlite") {
 				document.getElementById("sqlite_conn_parameters").style.display = "";
 				document.getElementById("oracle_conn_parameters").style.display = "none";
+				document.getElementById("mssql_conn_parameters").style.display = "none";
 			}
 			else if (connection_type == "oracle") {
 				document.getElementById("sqlite_conn_parameters").style.display = "none";
 				document.getElementById("oracle_conn_parameters").style.display = "";
+				document.getElementById("mssql_conn_parameters").style.display = "none";
+			}
+			else if (connection_type == "mic_sql") {
+				document.getElementById("sqlite_conn_parameters").style.display = "none";
+				document.getElementById("oracle_conn_parameters").style.display = "none";
+				document.getElementById("mssql_conn_parameters").style.display = "";
 			}
 		}
 		
@@ -659,6 +678,9 @@
 			else if (db_type == "oracle") {
 				db_con_args = getOracleDbConArgs();
 			}
+			else if (db_type == "mic_sql") {
+				db_con_args = getMicSqlDbConArgs();
+			}
 			let process = document.getElementById("available_processes").value;
 			let ext_type = "";
 			let ext_args = {};
@@ -709,6 +731,16 @@
 			db_con_args["sid"] = document.getElementById("oracle_sid").value;
 			db_con_args["username"] = document.getElementById("oracle_username").value;
 			db_con_args["password"] = document.getElementById("oracle_password").value;
+			return db_con_args;
+		}
+		
+		function getMicSqlDbConArgs() {
+			let db_con_args = {};
+			db_con_args["hostname"] = document.getElementById("mssql_hostname").value;
+			db_con_args["username"] = document.getElementById("mssql_username").value;
+			db_con_args["password"] = document.getElementById("mssql_password").value;
+			db_con_args["database"] = document.getElementById("mssql_database").value;
+			db_con_args["table_prefix"] = document.getElementById("mssql_table_prefix").value;
 			return db_con_args;
 		}
 		

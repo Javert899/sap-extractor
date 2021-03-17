@@ -6,5 +6,5 @@ def apply(db_type, db_con_args):
         return sqlite.apply(**db_con_args)
     elif db_type == "oracle":
         return oracle.apply(**db_con_args)
-    elif db_type == "mssql":
+    elif db_type == "mic_sql":
         return mic_sql.apply(**db_con_args)
