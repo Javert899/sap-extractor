@@ -37,6 +37,7 @@ def extract_bseg(con, doc_first_dates, doc_types, gjahr="1997", mandt="800", buk
     additional_query_part = " WHERE GJAHR = '"+gjahr+"' AND MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
     bseg = con.prepare_and_execute_query("BSAK", ["BELNR", "GJAHR", "BUZEI", "AUGDT", "AUGBL"], additional_query_part=additional_query_part)
     bseg = bseg.dropna(subset=["BELNR", "AUGBL", "AUGDT"], how="any")
+    bseg["BLART"] = bseg["BELNR"].map(doc_types)
     bseg["BELNR_TYPE"] = bseg["BELNR"].map(doc_types)
     bseg["AUGBL_TYPE"] = bseg["AUGBL"].map(doc_types)
     bseg = bseg.dropna(subset=["BELNR_TYPE", "AUGBL_TYPE"])
@@ -81,4 +82,5 @@ def get_single_dataframes(con, gjahr="1997", mandt="800", bukrs="1000", filter_c
 
 def get_full_dataframe(con, gjahr="1997", mandt="800", bukrs="1000", filter_columns=False):
     bkpf, bseg = get_single_dataframes(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs, filter_columns=filter_columns)
-    return pd.concat([bkpf, bseg])
+    ret = pd.concat([bkpf, bseg])
+    return ret
