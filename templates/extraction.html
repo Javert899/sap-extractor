@@ -51,7 +51,7 @@
 					<table border="0" style="width: 100%">
 						<tr>
 							<td style="width: 40%">
-								<img src="static/o2c_red.png">
+								<img src="static/o2c_red.png" style="width: 568px">
 								</img>
 							</td>
 							<td style="width: 60%">
@@ -70,11 +70,12 @@
 									Client: <input type="text" id="o2c_log_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_log_include_changes" name="o2c_log_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_log_include_payments" name="o2c_log_include_payments" checked>Include payments</input><br />
-									<button onclick="javascript:o2cClient()">Show Clients</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button><br />
+									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="o2c_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction:</p>
@@ -84,11 +85,12 @@
 									Client: <input type="text" id="o2c_df_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_df_include_changes" name="o2c_df_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_df_include_payments" name="o2c_df_include_payments" checked>Include payments</input><br />
-									<button onclick="javascript:o2cClient()">Show Clients</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button><br />
+									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="o2c_obj" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:<br />
@@ -97,10 +99,12 @@
 									Client: <input type="text" id="o2c_obcen_client" value="800" /> <br />
 									<input type="checkbox" id="o2c_obcen_include_changes" name="o2c_obcen_include_changes" checked>Include invoices</input><br />
   									<input type="checkbox" id="o2c_obcen_include_payments" name="o2c_obcen_include_payments" checked>Include payments</input><br />
-									<button onclick="javascript:o2cClient()">Show Clients</button>
+									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:o2cClient()">Show Clients</button>
 									<button onclick="javascript:o2cGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:o2cChangeList()">Show Changes List</button>
-									<button onclick="javascript:showO2cErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:o2cChangeList()">Show Changes List</button><br />
+									<b>Extraction utilities:</b>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 							</td>
 						</tr>
@@ -137,7 +141,7 @@
 					<table border="0" style="width: 100%">
 						<tr>
 							<td style="width: 40%">
-								<img src="static/bkpf_red.png" style="width: 90%">
+								<img src="static/bkpf_red.png" style="width: 663px">
 								</img>
 							</td>
 							<td style="width: 60%">
@@ -162,10 +166,11 @@
 									Fiscal year: <input type="text" id="apar_df_csv_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_df_csv_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_df_csv_company_code" value="1000"></input> <br/>
-									<button onclick="javascript:aparClient()">Show Clients</button>
-									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:aparClient()">Show Statistics</button>
+									<button onclick="javascript:aparGraph()">Show Document Types Graph</button><br />
+									<b>Extraction utilities:</b> <button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="document_flow_log" style="display: none">
 									<p>Insert the parameters for the XES extraction (document flow):</p>
@@ -173,10 +178,11 @@
 									Fiscal year: <input type="text" id="apar_df_xes_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_df_xes_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_df_xes_company_code" value="1000"></input> <br/>
-									<button onclick="javascript:aparClient()">Show Clients</button>
-									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:aparClient()">Show Statistics</button>
+									<button onclick="javascript:aparGraph()">Show Document Types Graph</button><br />
+									<b>Extraction utilities:</b> <button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="doc_flow_transactions_dataframe" style="display: none">
 									<p>Insert the parameters for the CSV extraction (document flow transactions):</p>
@@ -184,10 +190,11 @@
 									Fiscal year: <input type="text" id="apar_dft_csv_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_dft_csv_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_dft_csv_company_code" value="1000"></input> <br/>
-									<button onclick="javascript:aparClient()">Show Clients</button>
-									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:aparClient()">Show Statistics</button>
+									<button onclick="javascript:aparGraph()">Show Document Types Graph</button><br />
+									<b>Extraction utilities:</b> <button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="doc_flow_transactions_xes" style="display: ">
 									<p>Insert the parameters for the XES extraction (document flow transactions):</p>
@@ -195,19 +202,21 @@
 									Fiscal year: <input type="text" id="apar_dft_xes_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_dft_xes_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_dft_xes_company_code" value="1000"></input> <br/>
-									<button onclick="javascript:aparClient()">Show Clients</button>
-									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:aparClient()">Show Statistics</button>
+									<button onclick="javascript:aparGraph()">Show Document Types Graph</button><br />
+									<b>Extraction utilities:</b> <button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="apar_obj_centr_log" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
 									Fiscal year: <input type="text" id="apar_ocel_fiscal_year" value="1996"></input> <br/>
 									Client: <input type="text" id="apar_ocel_client" value="800"></input> <br/>
 									Company code: <input type="text" id="apar_ocel_company_code" value="1000"></input> <br/>
-									<button onclick="javascript:aparClient()">Show Clients</button>
-									<button onclick="javascript:aparGraph()">Show Document Types Graph</button>
-									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showAPARErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:aparClient()">Show Statistics</button>
+									<button onclick="javascript:aparGraph()">Show Document Types Graph</button><br />
+									<b>Extraction utilities:</b> <button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 							</td>
 						</tr>
@@ -235,7 +244,7 @@
 					<table border="0" style="width: 100%">
 						<tr>
 							<td style="width: 40%">
-								<img src="static/other.png">
+								<img src="static/other.png" style="width: 682px">
 								</img>
 							</td>
 							<td style="width: 60%">
@@ -253,9 +262,10 @@
 									Fiscal year: <input type="text" id="p2p_csv_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_csv_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
-									<button onclick="javascript:p2pClient()">Show Clients</button>
-									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
+									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="p2p_1d_log" style="display: ">
 									<p>Insert the parameters for the XES extraction:</p>
@@ -264,9 +274,10 @@
 									Fiscal year: <input type="text" id="p2p_xes_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_xes_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
-									<button onclick="javascript:p2pClient()">Show Clients</button>
-									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
-									<button onclick="javascript:showProcessMap()">Show the Process Map (full extraction)</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
+									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
+									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 								<div id="p2p_ocel" style="display: none">
 									<p>Insert the parameters for the object-centric log extraction:</p>
@@ -274,8 +285,9 @@
 									Fiscal year: <input type="text" id="p2p_ocel_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_ocel_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_ocel_company_code" value="1000" /> <br />
-									<button onclick="javascript:p2pClient()">Show Clients</button>
-									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button>
+									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
+									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
+									<b>Extraction utilities:</b><button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
 							</td>
 						</tr>
@@ -298,7 +310,6 @@
 				</div>
 			</div>
 			<br />
-			<button onclick="javascript:extract()">Extract the Event Log</button>
         </div>
     </body>
 	<script type="text/javascript">
