@@ -1,6 +1,6 @@
-# Process Mining SAP ERP R/3 extractor (Python)
+# Process Mining SAP ERP ECC extractor (Python)
 
-This project implements some connectors for the mainstream processes in SAP ERP R/3.
+This project implements some connectors for the mainstream processes in SAP ERP ECC.
 
 ### Install
 
