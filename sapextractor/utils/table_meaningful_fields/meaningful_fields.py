@@ -23,6 +23,10 @@ def apply(con, tab_name):
     timestamp_resource = table_datumresource.to_dict("r")
     timestamp_resource = {x["DOMNAME"]: x["FIELDNAME"] for x in timestamp_resource}
     fname_checktable = {x["FIELDNAME"]: x["CHECKTABLE"] for x in table_dict}
+    if "event_AWKEY" in fields_with_type:
+        fields_with_type["event_AWKEY"] = "AWKEY"
+    if "event_OBJECTID" in fields_with_type:
+        fields_with_type["event_OBJECTID"] = "AWKEY"
     return primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable
 
 

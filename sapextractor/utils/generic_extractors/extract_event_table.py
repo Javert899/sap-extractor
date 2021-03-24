@@ -1,24 +1,27 @@
-from sapextractor.utils.table_meaningful_fields import meaningful_fields
 import uuid
+
 import pandas as pd
 from pm4pymdl.algo.mvp.utils import exploded_mdl_to_succint_mdl
+
+from sapextractor.utils.table_meaningful_fields import meaningful_fields
 
 
 def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=10):
     if key_spec is None:
         key_spec = {}
-    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(con, tab_name)
+    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+        con, tab_name)
     fields = [x for x in fields_with_type if x != "event_CUSTOMOBJECTID"]
     fields = [x for x in fields if x in primary_keys or x in foreign_keys or x in timestamp_resource.values()]
     fields = [x.split("event_")[1] for x in fields]
-    query = "SELECT "+",".join(fields)+" FROM "+con.table_prefix+tab_name+" WHERE MANDT = '"+mandt+"'"
+    query = "SELECT " + ",".join(fields) + " FROM " + con.table_prefix + tab_name + " WHERE MANDT = '" + mandt + "'"
     for key in primary_keys:
         if key in key_spec:
-            query += " AND "+key+"='"+key_spec[key]+"'"
+            query += " AND " + key + "='" + key_spec[key] + "'"
     df = con.execute_read_sql(query, fields)
     df.columns = ["event_" + x for x in df.columns]
     df["event_id"] = df.apply(lambda _: str(uuid.uuid4()), axis=1)
-    df["event_activity"] = "dummy ("+tab_name+")"
+    df["event_activity"] = "dummy (" + tab_name + ")"
     df["event_timestamp"] = df[timestamp_resource["DATUM"]]
     allowed_cols = []
     for c in df.columns:
@@ -36,7 +39,8 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
 
 
 def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
-    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(con, tab_name)
+    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+        con, tab_name)
     fields_with_type["event_CUSTOMOBJECTID"] = "AWKEY"
 
     inv_fields_with_type = {}
@@ -58,8 +62,9 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
         idx_keys = frozenset(primary_keys.intersection(el))
         if len(idx_keys) > 0:
             dff = df.set_index(list(idx_keys))
-            for tab_name in cache[el]:
-                not_prim_keys_in_df, join_fields_with_type, df2 = cache[el][tab_name]
+            for tab_name_2 in cache[el]:
+                print("linking ", tab_name, " with ", tab_name_2, " on", idx_keys)
+                not_prim_keys_in_df, join_fields_with_type, df2 = cache[el][tab_name_2]
                 df2 = df2.set_index(list(idx_keys))
                 df2 = dff.join(df2, rsuffix="_2")
                 df2 = df2.reset_index(drop=True)
