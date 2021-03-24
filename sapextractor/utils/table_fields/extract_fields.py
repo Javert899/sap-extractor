@@ -9,6 +9,9 @@ def apply(con, tab_name):
     df = con.execute_read_sql(
         "SELECT FIELDNAME, DOMNAME, KEYFLAG, CHECKTABLE FROM "+con.table_prefix+"DD03VV WHERE TABNAME = '"+tab_name+"' ORDER BY POSITION",
         ["FIELDNAME", "DOMNAME", "KEYFLAG", "CHECKTABLE"])
+    df = df[df["DOMNAME"] != " "]
+    df["FIELDNAME"] = "event_" + df["FIELDNAME"]
+    return df
 
 
 def apply_static(con, tab_name):

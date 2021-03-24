@@ -8,7 +8,7 @@ def apply(con, min_count=1000):
     df = con.execute_read_sql("SELECT DOMNAME, Count(*) FROM "+con.table_prefix+"DD03VV GROUP BY DOMNAME ORDER BY Count(*) DESC", ["DOMNAME", "COUNT"])
     df = df[df["DOMNAME"] != " "]
     df = df[df["COUNT"] >= 1000]
-    return df
+    return set(df["DOMNAME"].unique())
 
 
 def apply_static(con, min_count=1000):
