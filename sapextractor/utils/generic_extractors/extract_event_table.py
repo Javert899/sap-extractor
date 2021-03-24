@@ -18,7 +18,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
     df = con.execute_read_sql(query, fields)
     df.columns = ["event_" + x for x in df.columns]
     df["event_id"] = df.apply(lambda _: str(uuid.uuid4()), axis=1)
-    df["event_activity"] = "dummy"
+    df["event_activity"] = "dummy ("+tab_name+")"
     df["event_timestamp"] = df[timestamp_resource["DATUM"]]
     allowed_cols = []
     for c in df.columns:
