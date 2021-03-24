@@ -18,11 +18,12 @@ def apply(con, tab_name):
     table = pd.concat([table_datumresource, table_other])
     primary_keys = [x for x in table[table["KEYFLAG"] == "X"]["FIELDNAME"].unique() if x != "event_MANDT"]
     foreign_keys = [x for x in table[table["CHECKTABLE"] != " "]["FIELDNAME"].unique() if x != "event_MANDT"]
-    fields_with_type = table.to_dict("r")
-    fields_with_type = {x["FIELDNAME"]: x["DOMNAME"] for x in fields_with_type}
+    table_dict = table.to_dict("r")
+    fields_with_type = {x["FIELDNAME"]: x["DOMNAME"] for x in table_dict}
     timestamp_resource = table_datumresource.to_dict("r")
     timestamp_resource = {x["DOMNAME"]: x["FIELDNAME"] for x in timestamp_resource}
-    return primary_keys, foreign_keys, timestamp_resource, fields_with_type
+    fname_checktable = {x["FIELDNAME"]: x["CHECKTABLE"] for x in table_dict}
+    return primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable
 
 
 def apply_static(con, tab_name):
