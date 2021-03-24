@@ -8,7 +8,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None):
     if key_spec is None:
         key_spec = {}
     primary_keys, foreign_keys, timestamp_resource, fields_with_type = meaningful_fields.apply_static(con, tab_name)
-    fields = [x for x in fields_with_type if x != "CUSTOMOBJECTID"]
+    fields = [x for x in fields_with_type if x != "event_CUSTOMOBJECTID"]
     fields = [x for x in fields if x in primary_keys or x in foreign_keys or x in timestamp_resource.values()]
     fields = [x.split("event_")[1] for x in fields]
     query = "SELECT "+",".join(fields)+" FROM "+con.table_prefix+tab_name+" WHERE MANDT = '"+mandt+"'"
