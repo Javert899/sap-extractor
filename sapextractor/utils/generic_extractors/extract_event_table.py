@@ -15,9 +15,8 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
     fields = [x for x in fields if x in primary_keys or x in foreign_keys or x in timestamp_resource.values()]
     fields = [x.split("event_")[1] for x in fields]
     query = "SELECT " + ",".join(fields) + " FROM " + con.table_prefix + tab_name + " WHERE MANDT = '" + mandt + "'"
-    for key in primary_keys:
-        if key in key_spec:
-            query += " AND " + key + "='" + key_spec[key] + "'"
+    for key in key_spec:
+        query += " AND " + key + "='" + key_spec[key] + "'"
     df = con.execute_read_sql(query, fields)
     df.columns = ["event_" + x for x in df.columns]
     df["event_id"] = df.apply(lambda _: str(uuid.uuid4()), axis=1)
@@ -26,7 +25,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
     allowed_cols = []
     for c in df.columns:
         unq_values = df[c].nunique()
-        if unq_values >= min_unq_values or c == "event_activity" or c == "event_timestamp" or c in primary_keys:
+        if unq_values >= min_unq_values or c == "event_activity" or c == "event_timestamp" or c in primary_keys or c == "event_TCODE" or c == "event_VBTYP_N" or c == "event_VBTYP_V" or c == "event_VBELN" or c == "event_VBELV" or c == "event_OBJECTID" or c == "event_AWKEY":
             allowed_cols.append(c)
     df = df[allowed_cols]
     df["event_CUSTOMOBJECTID"] = ""
@@ -63,8 +62,11 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
         if len(idx_keys) > 0:
             dff = df.set_index(list(idx_keys))
             for tab_name_2 in cache[el]:
-                print("linking ", tab_name, " with ", tab_name_2, " on", idx_keys)
                 not_prim_keys_in_df, join_fields_with_type, df2 = cache[el][tab_name_2]
+                for kk in idx_keys:
+                    if join_fields_with_type[kk] != fields_with_type[kk]:
+                        break
+                print("linking ", tab_name, " with ", tab_name_2, " on", idx_keys)
                 df2 = df2.set_index(list(idx_keys))
                 df2 = dff.join(df2, rsuffix="_2")
                 df2 = df2.reset_index(drop=True)

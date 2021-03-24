@@ -12,9 +12,8 @@ def extract_detail_table(cache, con, tab_name, mandt="800", key_spec=None, min_u
     fields = [x for x in fields if x in primary_keys or x in foreign_keys]
     fields = [x.split("event_")[1] for x in fields]
     query = "SELECT "+",".join(fields)+" FROM "+con.table_prefix+tab_name+" WHERE MANDT = '"+mandt+"'"
-    for key in primary_keys:
-        if key in key_spec:
-            query += " AND "+key+"='"+key_spec[key]+"'"
+    for key in key_spec:
+        query += " AND " + key + "='" + key_spec[key] + "'"
     df = con.execute_read_sql(query, fields)
     allowed_cols = []
     for c in df.columns:
@@ -29,9 +28,11 @@ def extract_detail_table(cache, con, tab_name, mandt="800", key_spec=None, min_u
     for k in not_prim_keys_in_df:
         df2 = df[list(prim_keys_in_df)+[k]].dropna(subset=[k])
         df2 = df2[df2[k] != " "]
-        list_dfs.append(df2)
-    df = pd.concat(list_dfs)
-    if prim_keys_in_df not in cache:
-        cache[prim_keys_in_df] = {}
-    cache[prim_keys_in_df][tab_name] = (not_prim_keys_in_df, fields_with_type, df)
+        if len(df2) > 0:
+            list_dfs.append(df2)
+    if list_dfs:
+        df = pd.concat(list_dfs)
+        if prim_keys_in_df not in cache:
+            cache[prim_keys_in_df] = {}
+        cache[prim_keys_in_df][tab_name] = (not_prim_keys_in_df, fields_with_type, df)
 
