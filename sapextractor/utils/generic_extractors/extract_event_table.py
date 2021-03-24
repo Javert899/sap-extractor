@@ -103,7 +103,9 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
         df5 = pd.concat(intermediate_df[t])
         df5 = df5.groupby(t).first().reset_index()
         list_dfs.append(df5)
-    df6 = pd.concat(list_dfs)
-    df6.type = "exploded"
-    df6 = exploded_mdl_to_succint_mdl.apply(df6)
-    return df6
+    if len(list_dfs) > 0:
+        df6 = pd.concat(list_dfs)
+        if len(df6) > 0:
+            df6.type = "exploded"
+            df6 = exploded_mdl_to_succint_mdl.apply(df6)
+            return df6
