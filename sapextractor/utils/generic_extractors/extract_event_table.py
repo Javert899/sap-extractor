@@ -52,7 +52,7 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
     keys_to_consider = keys_to_consider.union(foreign_keys)
     keys_to_consider = keys_to_consider.union({"event_CUSTOMOBJECTID"})
     types_to_consider = set(fields_with_type[x] for x in keys_to_consider)
-    list_dfs = []
+    intermediate_df = {}
     primary_keys = set(primary_keys)
     for el in cache:
         idx_keys = frozenset(primary_keys.intersection(el))
@@ -77,9 +77,10 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
                             df3 = df3[df3[f] != " "]
                             df3[t] = df3[f]
                             if len(df3) > 0:
-                                list_dfs.append(df3)
+                                if t not in intermediate_df:
+                                    intermediate_df[t] = []
+                                intermediate_df[t].append(df3)
     for t in types_to_consider:
-        int_df = []
         for f in inv_fields_with_type[t]:
             if f in df.columns:
                 df2 = df.dropna(subset=[f])
@@ -87,12 +88,15 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
                 df2 = df2[df2[f] != " "]
                 df2[t] = df2[f]
                 if len(df2) > 0:
-                    int_df.append(df2)
-        if int_df:
-            df3 = pd.concat(int_df)
-            df3 = df3.groupby(t).first().reset_index()
-            list_dfs.append(df3)
-    df4 = pd.concat(list_dfs)
-    df4.type = "exploded"
-    df4 = exploded_mdl_to_succint_mdl.apply(df4)
-    return df4
+                    if t not in intermediate_df:
+                        intermediate_df[t] = []
+                    intermediate_df[t].append(df2)
+    list_dfs = []
+    for t in intermediate_df:
+        df5 = pd.concat(intermediate_df[t])
+        df5 = df5.groupby(t).first().reset_index()
+        list_dfs.append(df5)
+    df6 = pd.concat(list_dfs)
+    df6.type = "exploded"
+    df6 = exploded_mdl_to_succint_mdl.apply(df6)
+    return df6
