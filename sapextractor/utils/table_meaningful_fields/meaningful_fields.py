@@ -12,9 +12,10 @@ def apply(con, tab_name):
     dom_name = extract_main_domnames.apply_static(con)
     table = extract_fields.apply_static(con, tab_name)
     table = table[table["DOMNAME"].isin(dom_name)]
-    table_datumresource = table[table["DOMNAME"].isin(["DATUM", "USNAM"])]
+    xxx = ["DATUM", "USNAM", "TCODE"]
+    table_datumresource = table[table["DOMNAME"].isin(xxx)]
     table_datumresource = table_datumresource.groupby("DOMNAME").first().reset_index()
-    table_other = table[~table["DOMNAME"].isin(["DATUM", "USNAM"])]
+    table_other = table[~table["DOMNAME"].isin(xxx)]
     table = pd.concat([table_datumresource, table_other])
     primary_keys = [x for x in table[table["KEYFLAG"] == "X"]["FIELDNAME"].unique() if x != "event_MANDT"]
     foreign_keys = [x for x in table[table["CHECKTABLE"] != " "]["FIELDNAME"].unique() if x != "event_MANDT"]
@@ -31,6 +32,6 @@ def apply(con, tab_name):
 
 
 def apply_static(con, tab_name):
-    if not tab_name in Shared.meaningful_dictio:
+    if tab_name not in Shared.meaningful_dictio:
         Shared.meaningful_dictio[tab_name] = apply(con, tab_name)
     return copy(Shared.meaningful_dictio[tab_name])
