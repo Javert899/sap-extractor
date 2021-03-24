@@ -11,10 +11,15 @@ def extract_detail_table(cache, con, tab_name, mandt="800", key_spec=None, min_u
     fields = [x for x in fields_with_type if x != "event_CUSTOMOBJECTID"]
     fields = [x for x in fields if x in primary_keys or x in foreign_keys]
     fields = [x.split("event_")[1] for x in fields]
+    if not fields:
+        return pd.DataFrame()
     query = "SELECT "+",".join(fields)+" FROM "+con.table_prefix+tab_name+" WHERE MANDT = '"+mandt+"'"
     for key in key_spec:
         query += " AND " + key + "='" + key_spec[key] + "'"
-    df = con.execute_read_sql(query, fields)
+    try:
+        df = con.execute_read_sql(query, fields)
+    except:
+        return pd.DataFrame()
     allowed_cols = []
     for c in df.columns:
         unq_values = df[c].nunique()
