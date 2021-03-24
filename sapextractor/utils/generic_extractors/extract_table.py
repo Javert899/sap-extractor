@@ -8,7 +8,7 @@ def check_is_event(con, tab):
         con, tab)
     if len(set(foreign_keys).intersection(set(primary_keys))) > 0:
         return False
-    elif "DATUM" not in timestamp_resource or "USNAM" not in timestamp_resource:
+    elif "DATUM" not in timestamp_resource or ("USNAM" not in timestamp_resource and "USNAM" not in fields_with_type):
         return False
     return True
 
