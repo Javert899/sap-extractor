@@ -53,28 +53,31 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
     keys_to_consider = keys_to_consider.union({"event_CUSTOMOBJECTID"})
     types_to_consider = set(fields_with_type[x] for x in keys_to_consider)
     list_dfs = []
-    primary_keys = tuple(primary_keys)
-    if primary_keys in cache:
-        df = df.set_index(list(primary_keys))
-        for tab_name in cache[primary_keys]:
-            not_prim_keys_in_df, join_fields_with_type, df2 = cache[primary_keys][tab_name]
-            df2 = df.join(df2, rsuffix="_2")
-            df2 = df2.reset_index(drop=True)
-            join_types_to_consider = {}
-            for x in not_prim_keys_in_df:
-                this_type = join_fields_with_type[x]
-                if this_type not in join_types_to_consider:
-                    join_types_to_consider[this_type] = set()
-                join_types_to_consider[this_type].add(x)
-            for t in join_types_to_consider:
-                for f in join_types_to_consider[t]:
-                    if f in df2.columns:
-                        df3 = df2.dropna(subset=[f])
-                        df3[f] = df3[f].astype(str)
-                        df3 = df3[df3[f] != " "]
-                        df3[t] = df3[f]
-                        if len(df3) > 0:
-                            list_dfs.append(df3)
+    primary_keys = set(primary_keys)
+    for el in cache:
+        idx_keys = frozenset(primary_keys.intersection(el))
+        if len(idx_keys) > 0:
+            dff = df.set_index(list(idx_keys))
+            for tab_name in cache[el]:
+                not_prim_keys_in_df, join_fields_with_type, df2 = cache[el][tab_name]
+                df2 = df2.set_index(list(idx_keys))
+                df2 = dff.join(df2, rsuffix="_2")
+                df2 = df2.reset_index(drop=True)
+                join_types_to_consider = {}
+                for x in not_prim_keys_in_df:
+                    this_type = join_fields_with_type[x]
+                    if this_type not in join_types_to_consider:
+                        join_types_to_consider[this_type] = set()
+                    join_types_to_consider[this_type].add(x)
+                for t in join_types_to_consider:
+                    for f in join_types_to_consider[t]:
+                        if f in df2.columns:
+                            df3 = df2.dropna(subset=[f])
+                            df3[f] = df3[f].astype(str)
+                            df3 = df3[df3[f] != " "]
+                            df3[t] = df3[f]
+                            if len(df3) > 0:
+                                list_dfs.append(df3)
     for t in types_to_consider:
         int_df = []
         for f in inv_fields_with_type[t]:
