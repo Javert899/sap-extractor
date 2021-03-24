@@ -87,7 +87,7 @@ def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
                     int_df.append(df2)
         if int_df:
             df3 = pd.concat(int_df)
-            df3 = df3.groupby(t).first().reset_index(drop=True)
+            df3 = df3.groupby(t).first().reset_index()
             list_dfs.append(df3)
     df4 = pd.concat(list_dfs)
     df4.type = "exploded"
