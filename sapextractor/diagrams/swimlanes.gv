@@ -16,6 +16,7 @@ reducingset [shape=box, label="Reducing the set of tables"];
 subgraph cluster2 {
 label="Extraction";
 tableclassification [shape=box, label="Classification of the tables"];
+preprocessing [shape=box, label="Pre-processing: Insertion of key parameters"];
 gw3 [shape=diamond, label="O"];
 extractingdoctables [shape=box, label="Extracting the document tables"];
 extractingtranstables [shape=box, label="Extracting the transaction tables"];
@@ -26,7 +27,7 @@ gw4 [shape=diamond, label="O"];
 composingobjcentrlog [shape=box, label="Composing the object-centric event log"];
 }
 subgraph cluster3 {
-label="Flattening";
+label="Post-processing";
 gw5 [shape=diamond, label=""];
 flatteningsingleobjtype [shape=box, label="Flattening on a single object type"];
 advancedflattening [shape=box, label="Advanced flattening (several object types)"];
@@ -43,7 +44,8 @@ gw1 -> gw2;
 gw2 -> extendingset;
 extendingset -> reducingset;
 reducingset -> tableclassification;
-tableclassification -> gw3;
+tableclassification -> preprocessing;
+preprocessing -> gw3;
 gw3 -> extractingdoctables;
 gw3 -> extractingtranstables;
 gw3 -> extractingdocflowtables;
