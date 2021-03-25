@@ -1,0 +1,65 @@
+digraph G {
+subgraph cluster0 {
+label="Process Identification";
+start [shape=circle, label=""];
+gw1 [shape=diamond, label="O"];
+populatedtable [shape=box, label="Identifying the most populated tables"];
+usedobjectclasses [shape=box, label="Identifying the most used object classes"];
+relevanttablepertype [shape=box, label="Pick the relevant tables for the object type"];
+gw2 [shape=diamond, label="O"];
+}
+subgraph cluster1 {
+label="Refinement of the Set of Tables";
+extendingset [shape=box, label="Extending the set of tables"];
+reducingset [shape=box, label="Reducing the set of tables"];
+}
+subgraph cluster2 {
+label="Extraction";
+tableclassification [shape=box, label="Classification of the tables"];
+gw3 [shape=diamond, label="O"];
+extractingdoctables [shape=box, label="Extracting the document tables"];
+extractingtranstables [shape=box, label="Extracting the transaction tables"];
+extractingdocflowtables [shape=box, label="Extracting the document flow tables"];
+extractingchangetables [shape=box, label="Extracting the change tables"];
+extractingdetailtables [shape=box, label="Extracting the detail tables"];
+gw4 [shape=diamond, label="O"];
+composingobjcentrlog [shape=box, label="Composing the object-centric event log"];
+}
+subgraph cluster3 {
+label="Flattening";
+gw5 [shape=diamond, label=""];
+flatteningsingleobjtype [shape=box, label="Flattening on a single object type"];
+advancedflattening [shape=box, label="Advanced flattening (several object types)"];
+gw6 [shape=diamond, label=""];
+end [shape=circle, label=""];
+}
+start -> gw1;
+gw1 -> populatedtable;
+gw1 -> usedobjectclasses;
+usedobjectclasses -> relevanttablepertype;
+populatedtable -> gw2;
+relevanttablepertype -> gw2;
+gw1 -> gw2;
+gw2 -> extendingset;
+extendingset -> reducingset;
+reducingset -> tableclassification;
+tableclassification -> gw3;
+gw3 -> extractingdoctables;
+gw3 -> extractingtranstables;
+gw3 -> extractingdocflowtables;
+gw3 -> extractingchangetables;
+gw3 -> extractingdetailtables;
+extractingdoctables -> gw4;
+extractingtranstables -> gw4;
+extractingdocflowtables -> gw4;
+extractingchangetables -> gw4;
+extractingdetailtables -> gw4;
+gw4 -> composingobjcentrlog;
+composingobjcentrlog -> gw5;
+gw5 -> flatteningsingleobjtype;
+gw5 -> advancedflattening;
+gw5 -> gw6;
+flatteningsingleobjtype -> gw6;
+advancedflattening -> gw6;
+gw6 -> end;
+}
