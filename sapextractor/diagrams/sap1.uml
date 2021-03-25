@@ -1,0 +1,12 @@
+@startuml
+"Object Class" "1" o-- "many" "Document"
+"Master Entity" "1" o-- "many" "Document"
+"Document" "1" *-- "many" "Document Item"
+"Master Entity" "1" *-- "many" "Detail Entity"
+"Document Item" "1" *-- "many" "Detail Entity"
+"Document" "1" - "many" "Document"
+"Document Item" "1" - "many" "Document Item"
+"Master Entity" <|-- "Document Table"
+"Master Entity" <|-- "Transaction Table"
+"Master Entity" <|-- "Document Flow Table"
+"Master Entity" <|-- "Change Table"
