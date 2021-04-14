@@ -5,7 +5,7 @@ def apply(con, gjahr=None, mandt="800", bukrs="1000"):
     additional_query_part = " WHERE MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
-    rbkp = con.prepare_and_execute_query("RBKP", ["BELNR", "GJAHR", "BLDAT", "BUDAT", "USNAME", "TCODE", "LIFNR"], additional_query_part=additional_query_part)
+    rbkp = con.prepare_and_execute_query("RBKP", ["BELNR", "GJAHR", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR"], additional_query_part=additional_query_part)
     rbkp["OBJECTID"] = rbkp["BELNR"] + rbkp["GJAHR"]
     rbkp.columns = ["event_"+x for x in rbkp.columns]
     rbkp["event_FROMTABLE"] = "RBKP"
@@ -15,7 +15,7 @@ def apply(con, gjahr=None, mandt="800", bukrs="1000"):
     rbkp1["event_activity"] = "Invoice Emitted"
     rbkp1 = rbkp1.dropna(subset=["event_timestamp"])
     rbkp2 = rbkp.copy()
-    rbkp2["event_timestamp"] = pd.to_datetime(rbkp1["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
+    rbkp2["event_timestamp"] = pd.to_datetime(rbkp2["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     rbkp2["event_activity"] = "Invoice Posted"
     rbkp2 = rbkp2.dropna(subset=["event_timestamp"])
     rbkp2["event_timestamp"] = rbkp2["event_timestamp"] + pd.Timedelta("3 seconds")
