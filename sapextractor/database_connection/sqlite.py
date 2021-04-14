@@ -10,8 +10,12 @@ class SqliteConnection(DatabaseConnection):
         self.path = path
         self.con = sqlite3.connect(self.path)
         self.TIMESTAMP_FORMAT = "%d.%m.%Y %H:%M:%S"
+        self.DATE_FORMAT_INTERNAL = "%Y%m%d"
+        self.HOUR_FORMAT_INTERNAL = "%H%M%S"
         self.DATE_FORMAT = None
         constants.TIMESTAMP_FORMAT = self.TIMESTAMP_FORMAT
+        constants.DATE_FORMAT_INTERNAL = self.DATE_FORMAT_INTERNAL
+        constants.HOUR_FORMAT_INTERNAL = self.HOUR_FORMAT_INTERNAL
         constants.DATE_FORMAT = self.DATE_FORMAT
         self.table_prefix = ""
         DatabaseConnection.__init__(self)
