@@ -9,8 +9,8 @@ import time
 class MicSqlDatabaseConnection(DatabaseConnection):
     def __init__(self, hostname="127.0.0.1", username="sa", password="", database="prova", table_prefix=""):
         import pymssql
-        self.TIMESTAMP_FORMAT = "%Y%m%d %H%M%S"
-        self.DATE_FORMAT = "%Y%m%d"
+        self.TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
+        self.DATE_FORMAT = "%Y-%m-%d"
         constants.TIMESTAMP_FORMAT = self.TIMESTAMP_FORMAT
         constants.DATE_FORMAT = self.DATE_FORMAT
         self.table_prefix = table_prefix
