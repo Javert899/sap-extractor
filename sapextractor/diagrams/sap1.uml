@@ -10,3 +10,5 @@
 "Master Entity" <|-- "Transaction Table"
 "Master Entity" <|-- "Document Flow Table"
 "Master Entity" <|-- "Change Table"
+"Document" "1" o-- "many" "Attribute Value"
+"Domain Name" "1" o-- "many" "Attribute Value"
