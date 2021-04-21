@@ -87,6 +87,47 @@ def getMainObjectClasses():
     from sapextractor.utils.objclass_to_tables import get
     return get.apply(c, mandt)
 
+@app.route("/newExtractorGetMainTablesPerObjectClass")
+def getMainTablesPerObjectClass():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    mandt = parameters["mandt"]
+    objectclass = parameters["objectclass"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.objclass_to_tables import convert
+    return {"obj_class_tables": list(convert.apply(c, objectclass, mandt))}
+
+@app.route("/newExtractorGetPrimaryKeys")
+def getPrimaryKeys():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    tabnames = parameters["tabnames"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.preprocessing_fields import get_fields
+    return {"primary_keys": get_fields.apply(c, tabnames)}
+
+@app.route("/newExtractorGetPrimaryKeyValue")
+def getPrimaryKeyValue():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    tabnames = parameters["tabnames"]
+    fname = parameters["fname"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.preprocessing_fields import get_field_values
+    return {"values": get_field_values.apply(c, tabnames, fname)}
+
 
 @app.route("/o2cClientTable")
 def o2cClientTable():

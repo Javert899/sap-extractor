@@ -1,6 +1,6 @@
 def apply(con, tabnames, fname):
     tabnames_where = ["TABNAME = '"+t+"'" for t in tabnames]
-    tabnames_where = "WHERE (" + "OR ".join(tabnames_where) + ")"
+    tabnames_where = "WHERE (" + " OR ".join(tabnames_where) + ")"
     tabnames_where += " AND FIELDNAME = '"+fname+"' "
     query = "SELECT TABNAME FROM "+con.table_prefix+"DD03VV "+tabnames_where
     df = con.execute_read_sql(query, ["TABNAME"])
