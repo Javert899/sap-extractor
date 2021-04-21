@@ -1,0 +1,6 @@
+@startuml
+"Master Entity" <|-- "Record Table"
+"Master Entity" <|-- "Transaction Table"
+"Master Entity" <|-- "Flow Table"
+"Master Entity" <|-- "Change Table"
+"Master Entity" "1" *-- "many" "Detail Entity"

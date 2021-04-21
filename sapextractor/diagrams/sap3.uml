@@ -1,0 +1,5 @@
+@startuml
+"Object Class" "1" o-- "many" "Document"
+"Document" "1" *-- "many" "Document Item"
+"Document" "1" - "many" "Document"
+"Document Item" "1" - "many" "Document Item"
