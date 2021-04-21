@@ -1,0 +1,1 @@
+from sapextractor.utils.main_domnames import extract_main_domnames
