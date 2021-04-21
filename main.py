@@ -128,6 +128,33 @@ def getPrimaryKeyValue():
     from sapextractor.utils.preprocessing_fields import get_field_values
     return {"values": get_field_values.apply(c, tabnames, fname)}
 
+@app.route("/newExtractorExpandTable")
+def expandTable():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    table = parameters["table"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.table_expansion import expand
+    return {"expanded_tables": sorted(list(expand.expand(c, table)))}
+
+
+@app.route("/newExtractorExpandTables")
+def expandTables():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    tabnames = parameters["tabnames"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.table_expansion import expand
+    return {"expanded_tables": sorted(list(expand.expand_set(c, tabnames)))}
+
 
 @app.route("/o2cClientTable")
 def o2cClientTable():
