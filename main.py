@@ -7,6 +7,8 @@ from flask_cors import CORS
 from sapextractor.database_connection import factory as database_factory
 import pm4py
 from pm4py.objects.dfg.filtering import dfg_filtering
+import uuid
+
 
 app = Flask(__name__)
 CORS(app, expose_headers=["x-suggested-filename"])
@@ -154,6 +156,65 @@ def expandTables():
     c = database_factory.apply(db_type, db_con_args)
     from sapextractor.utils.table_expansion import expand
     return {"expanded_tables": sorted(list(expand.expand_set(c, tabnames)))}
+
+
+@app.route("/newExtractorPerformExtraction")
+def newExtractorPerformExtraction():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+    tabnames = parameters["tabnames"]
+    key_spec = parameters["key_spec"]
+    mandt = parameters["mandt"]
+
+    c = database_factory.apply(db_type, db_con_args)
+    from sapextractor.utils.generic_extractors import extract_table
+    file_name = str(uuid.uuid4())+".parquet"
+    df = extract_table.apply_set_tables(c, tabnames, mandt=mandt)
+
+    from pm4pymdl.objects.mdl.exporter import exporter
+    exporter.apply(df, file_name)
+
+    obj_types = [x for x in df.columns if not x.startswith("event_")]
+    return {"file_name": file_name, "obj_types": obj_types}
+
+
+@app.route("/newExtractorDownloadLog")
+def newExtractorDownloadLog():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    file_name = parameters["file_name"]
+
+    resp = send_file(file_name,
+                       mimetype="text/plain",  # use appropriate type based on file
+                       as_attachment=True,
+                       conditional=False)
+    resp.headers["x-suggested-filename"] = file_name
+
+    return resp
+
+
+@app.route("/newExtractorDownloadSvg")
+def newExtractorDownloadSvg():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    file_name = parameters["file_name"]
+
+    from pm4pymdl.objects.mdl.importer import importer as mdl_importer
+    df = mdl_importer.apply(file_name)
+
+    from pm4pymdl.algo.mvp.gen_framework3 import discovery as mvp_discovery
+    model = mvp_discovery.apply(df)
+    from pm4pymdl.visualization.mvp.gen_framework3 import visualizer as mvp_visualizer
+    gviz = mvp_visualizer.apply(model, parameters={"format": "svg"})
+
+    ser = pm4py.visualization.dfg.visualizer.serialize(gviz).decode("utf-8")
+
+    return ser
 
 
 @app.route("/newExtractorCheckConnection")

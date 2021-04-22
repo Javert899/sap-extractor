@@ -62,14 +62,38 @@
 
                     </div>
                 </div>
+                <div id="third_step" style="display:">
+                     <button onclick="javascript:getPreprocessingParameters()">Pre-process</button>
+                    <div id="step3">
 
+                    </div>
+                    <div id="step3_values" style="height: 200px; overflow: scroll">
 
+                    </div>
+                </div>
+                <div id="fourth_step" style="display:">
+                    <button onclick="javascript:performExtraction()">Perform the extraction</button>
+                </div>
+                <div id="last_step" style="display:">
+                    <div id="last_step_download_log">
+                        <button onclick="javascript:downloadLog()">Download log</button>
+                    </div>
+                    <div id="view_mvp_model">
+                        <button onclick="javascript:viewMvpModel()">View MVP model</button>
+                    </div>
+                    <div id="flatten_event_log">
 
+                        <button onclick="javascript:flattenEventLog()">Flatten Event Log</button>
+                    </div>
+                </div>
             </div>
     </body>
 	<script type="text/javascript">
 	    selected_tables = {};
 	    step1_initialized = false;
+	    step2_initialized = false;
+	    extracted_filename = "";
+	    extract_obj_types = null;
 
 	    function getSelectedTables() {
 	        let ret = [];
@@ -255,6 +279,118 @@
                     updateTableSelection('2_2');
                 }
             );
+        }
+
+        function getPreprocessingParameters() {
+            let selected_ones = getSelectedTables();
+            let parameters = getBasicParameters();
+            parameters["tabnames"] = selected_ones;
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorGetPrimaryKeys?parameters="+parameters,
+                function(data) {
+                    let parent = document.getElementById("step3");
+                    while (parent.firstChild) {
+                        parent.removeChild(parent.firstChild);
+                    }
+                    for (let idx in data["primary_keys"]) {
+                        let pk = data["primary_keys"][idx];
+                        if (pk != "MANDT") {
+                            let pk_div = document.createElement("div");
+                            let pk_span = document.createElement("span");
+                            let pk_input = document.createElement("input");
+                            pk_span.innerHTML = pk;
+                            pk_input.setAttribute("type", "text");
+                            pk_input.classList.add("pkInput");
+                            pk_input.setAttribute("id", pk+"_BBBBBBBBBBBB_value");
+                            pk_button = document.createElement("button");
+                            pk_button.textContent = "See values";
+                            pk_button.onclick = function() { getAllValuesForAField(pk); };
+                            pk_div.appendChild(pk_span);
+                            pk_div.appendChild(pk_input);
+                            pk_div.appendChild(pk_button);
+                            parent.appendChild(pk_div);
+                        }
+                    }
+                }
+            );
+        }
+
+        function getAllValuesForAField(fname) {
+            let parameters = getBasicParameters();
+            let selected_ones = getSelectedTables();
+            parameters["fname"] = fname;
+            parameters["tabnames"] = selected_ones;
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorGetPrimaryKeyValue?parameters="+parameters,
+                function(data) {
+                    let parent = document.getElementById("step3_values");
+                    while (parent.firstChild) {
+                        parent.removeChild(parent.firstChild);
+                    }
+                    let values = data["values"];
+                    for (let idx in values) {
+                        let val = values[idx];
+                        let valdiv = document.createElement("div");
+                        valdiv.innerHTML = val;
+                        parent.appendChild(valdiv);
+                    }
+                }
+             );
+        }
+
+        function getPreprocessingParametersValues() {
+            let ret = {};
+            for (let idx in document.getElementsByClassName("pkInput")) {
+                try {
+                    field = document.getElementsByClassName("pkInput")[idx];
+                    field_id = field.getAttribute("id");
+                    field_value = field.value;
+                    if (field_value.length > 0) {
+                        ret[field_id] = field_value;
+                    }
+                }
+                catch (err) {
+                }
+            }
+            ret["MANDT"] = document.getElementById("mandt").value;
+            return ret;
+        }
+
+        function performExtraction() {
+            let parameters = getBasicParameters();
+            let selected_ones = getSelectedTables();
+            parameters["tabnames"] = selected_ones;
+            parameters["key_spec"] = getPreprocessingParametersValues();
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorPerformExtraction?parameters="+parameters,
+                function(data) {
+                    console.log(data);
+                    extracted_filename = data["file_name"];
+                    extract_obj_types = data["obj_types"];
+                    postprocessObjTypes();
+                }
+            );
+        }
+
+        function downloadLog() {
+             let parameters = getBasicParameters();
+             parameters["file_name"] = extracted_filename;
+             parameters = encodeParameters(parameters);
+             window.open("http://localhost:5000/newExtractorDownloadLog?parameters="+parameters);
+        }
+
+        function viewMvpModel() {
+            let parameters = getBasicParameters();
+            parameters["file_name"] = extracted_filename;
+            parameters = encodeParameters(parameters);
+            window.open("http://localhost:5000/newExtractorDownloadSvg?parameters="+parameters);
+        }
+
+        function flattenEventLog() {
+
+        }
+
+        function postprocessObjTypes() {
         }
 
         initializeStep1();
