@@ -156,6 +156,18 @@ def expandTables():
     return {"expanded_tables": sorted(list(expand.expand_set(c, tabnames)))}
 
 
+@app.route("/newExtractorCheckConnection")
+def checkConnection():
+    parameters = request.args.get("parameters")
+    parameters = __process_parameters(parameters)
+
+    db_type = parameters["db_type"] if "db_type" in parameters else "sqlite"
+    db_con_args = parameters["db_con_args"] if "db_con_args" in parameters else {"path": "sap.sqlite"}
+
+    c = database_factory.apply(db_type, db_con_args)
+    return "yes"
+
+
 @app.route("/o2cClientTable")
 def o2cClientTable():
     parameters = request.args.get("parameters")

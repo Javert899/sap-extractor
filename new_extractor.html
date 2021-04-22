@@ -1,0 +1,262 @@
+<html>
+    <head>
+        <script src="static/jquery.min.js" type="text/javascript"></script>
+        <script src="static/bootstrap.min.js" type="text/javascript"></script>
+        <script src="static/FileSaver.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="static/style.css">
+
+    </head>
+    <body style="background-color: lightblue">
+            <div class="center">
+				<div id="step_zero" style="display: none">
+					<p><b>Parameters of connection to the Oracle database:</b></p>
+					Oracle Hostname:&nbsp;&nbsp;<input type="text" id="oracle_hostname" value="127.0.0.1"></input><br />
+					Oracle Port:&nbsp;&nbsp;<input type="text" id="oracle_port" value="1521"></input><br />
+					Oracle SID:&nbsp;&nbsp;<input type="text" id="oracle_sid" value="XE"></input><br />
+					Oracle Username:&nbsp;&nbsp;<input type="text" id="oracle_username" value="system"></input><br />
+					Oracle Password:&nbsp;&nbsp;<input type="password" id="oracle_password" value="oracle"></input><br />
+                    <br /><br />
+                    Client ID: <input type="text" id="mandt" value="800"></input><br />
+                    <br />
+                    <button onclick="javascript:connect()">Connect</button>
+				</div>
+                <div id="first_step" style="display:">
+                    <p>Size of main tables:</p>
+                    <div id="main_tables">
+                        <table class="table">
+                            <thead>
+                                <th>Selected</th>
+                                <th>Table</th>
+                                <th>Number of records</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox" id="EKKO_AAAAAAAAA_selected_step1_1" onclick="changeSelection('EKKO', '1_1')" /></td>
+                                    <td>EKKO (P2P)</td>
+                                    <td id="EKKO_size"></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" id="VBAK_AAAAAAAAA_selected_step1_1" onclick="changeSelection('VBAK', '1_1')" /></td>
+                                    <td>VBAK (O2C)</td>
+                                    <td id="VBAK_size"></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" id="BKPF_AAAAAAAAA_selected_step1_1" onclick="changeSelection('BKPF', '1_1')" /></td>
+                                    <td>BKPF (AP/AR)</td>
+                                    <td id="BKPF_size"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>Main object classes:</p>
+                    <div id="main_object_classes" style="height: 150px; overflow: scroll">
+                    </div>
+                    <p>Selected tables:</p>
+                    <div id="step1_2" style="height: 200px; overflow: scroll">
+                    </div>
+                </div>
+                <div id="second_step" style="display:">
+                    <button onclick="javascript:expand()">Expand the Set of Tables</button>
+                    Current set of tables:
+                    <div id="step2"  style="height: 200px; overflow: scroll">
+
+                    </div>
+                </div>
+
+
+
+            </div>
+    </body>
+	<script type="text/javascript">
+	    selected_tables = {};
+	    step1_initialized = false;
+
+	    function getSelectedTables() {
+	        let ret = [];
+	        for (let table in selected_tables) {
+	            if (selected_tables[table]) {
+	                ret.push(table);
+	            }
+	        }
+	        return ret;
+	    }
+
+        function getBasicParameters() {
+            let parameters = {};
+            parameters["db_type"] = "oracle";
+            parameters["db_con_args"] = {};
+            parameters["db_con_args"]["hostname"] = document.getElementById("oracle_hostname").value;
+            parameters["db_con_args"]["port"] = document.getElementById("oracle_port").value;
+            parameters["db_con_args"]["sid"] = document.getElementById("oracle_sid").value;
+            parameters["db_con_args"]["username"] = document.getElementById("oracle_username").value;
+            parameters["db_con_args"]["password"] = document.getElementById("oracle_password").value;
+            parameters["mandt"] = document.getElementById("mandt").value;
+            return parameters;
+        }
+
+        function encodeParameters(obj) {
+        	obj = JSON.stringify(obj);
+			obj = btoa(obj);
+			return obj;
+        }
+
+        function connect() {
+            let parameters = getBasicParameters();
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorCheckConnection?parameters="+parameters,
+                function(data) {
+                    alert("connection was successful");
+                }
+            ).fail(function(error) { alert("connection was unsuccessful"); });
+        }
+
+        function getTableSize(tabname) {
+            let parameters = getBasicParameters();
+            parameters["table"] = tabname;
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorGetTableCount?parameters="+parameters,
+                function(data) {
+                    document.getElementById(tabname+"_size").innerHTML = data["count"];
+                }
+            );
+        }
+
+        function getMainObjectClasses() {
+            let parameters = getBasicParameters();
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorGetMainObjectClasses?parameters="+parameters,
+                function(data) {
+                    let dataarray = [];
+                    for (let obj_clas_name in data) {
+                        dataarray.push([obj_clas_name, data[obj_clas_name]]);
+                    }
+                    dataarray.sort(function(a, b) { return b[1]-a[1] });
+                    for (let idx in dataarray) {
+                        let couple = dataarray[idx];
+                        let objclasdiv = document.createElement("div");
+                        objclasdiv.innerHTML = couple[0]+" ("+couple[1]+")";
+                        objclasdiv.onclick = function() {
+                            addTablesForObjectClass(couple[0]);
+                        }
+                        document.getElementById("main_object_classes").appendChild(objclasdiv);
+                    }
+                }
+            );
+        }
+
+        function initializeStep1() {
+            if (step1_initialized == false) {
+                 getTableSize("EKKO");
+                 getTableSize("VBAK");
+                 getTableSize("BKPF");
+                 getMainObjectClasses();
+                 step1_initialized = true;
+             }
+        }
+
+        function addTablesForObjectClass(objectclass) {
+            let parameters = getBasicParameters();
+            parameters["objectclass"] = objectclass;
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorGetMainTablesPerObjectClass?parameters="+parameters,
+                function(data) {
+                    for (let idx in data["obj_class_tables"]) {
+                        let table = data["obj_class_tables"][idx];
+                        if (selected_tables[table] == null) {
+                            selected_tables[table] = true;
+                        }
+                        else if (!selected_tables[table]) {
+                             selected_tables[table] = true;
+                        }
+                        updateTableSelection('1_obj');
+                    }
+                }
+            );
+        }
+
+        function changeSelection(table, from_step) {
+            if (selected_tables[table] == null) {
+                selected_tables[table] = false;
+            }
+            selected_tables[table] = !selected_tables[table];
+            updateTableSelection(from_step);
+        }
+
+        function updateTableSelection(from_step) {
+            for (let tab in selected_tables) {
+                updateTableSelectionStep1_1(tab, selected_tables[tab], from_step);
+                updateTableSelectionStep1_2(tab, selected_tables[tab], from_step);
+                updateTableSelectionStep2(tab, selected_tables[tab], from_step);
+            }
+        }
+
+        function updateTableSelectionStep1_1(tab, is_selected, from_step) {
+            if (from_step != '1_1') {
+                let checkbox = document.getElementById(tab+"_AAAAAAAAA_selected_step1_1");
+                if (checkbox != null) {
+                    checkbox.checked = is_selected;
+                }
+            }
+        }
+
+        function updateTableSelectionStep1_2(tab, is_selected, from_step) {
+              if (from_step != '1_2') {
+                   let checkbox = document.getElementById(tab+"_AAAAAAAAA_selected_step1_2");
+                   if (checkbox == null) {
+                        checkboxdiv = document.createElement("div");
+                        checkboxdiv.setAttribute("id", tab+"_AAAAAAAAA_div_1_2");
+                        checkbox = document.createElement("input");
+                        checkbox.setAttribute("type", "checkbox");
+                        checkbox.setAttribute("id", tab+"_AAAAAAAAA_selected_step1_2");
+                        checkbox.onclick = function() { changeSelection(tab, '1_2'); };
+                        checkboxspan = document.createElement("span");
+                        checkboxspan.innerHTML = tab;
+                        checkboxdiv.appendChild(checkbox);
+                        checkboxdiv.appendChild(checkboxspan);
+                        document.getElementById("step1_2").appendChild(checkboxdiv);
+                   }
+                   checkbox.checked = is_selected;
+              }
+        }
+
+        function updateTableSelectionStep2(tab, is_selected, from_step) {
+            if (from_step != '2') {
+                let checkbox = document.getElementById(tab+"_AAAAAAAAA_selected_step2");
+                if (checkbox == null) {
+                        checkboxdiv = document.createElement("div");
+                        checkboxdiv.setAttribute("id", tab+"_AAAAAAAAA_div_2");
+                        checkbox = document.createElement("input");
+                        checkbox.setAttribute("type", "checkbox");
+                        checkbox.setAttribute("id", tab+"_AAAAAAAAA_selected_step2");
+                        checkbox.onclick = function() { changeSelection(tab, '2'); };
+                        checkboxspan = document.createElement("span");
+                        checkboxspan.innerHTML = tab;
+                        checkboxdiv.appendChild(checkbox);
+                        checkboxdiv.appendChild(checkboxspan);
+                        document.getElementById("step2").appendChild(checkboxdiv);
+                }
+                checkbox.checked = is_selected;
+            }
+        }
+
+        function expand() {
+            let selected_ones = getSelectedTables();
+            let parameters = getBasicParameters();
+            parameters["tabnames"] = selected_ones;
+            parameters = encodeParameters(parameters);
+            $.get("http://localhost:5000/newExtractorExpandTables?parameters="+parameters,
+                function(data) {
+                    for (let idx in data["expanded_tables"]) {
+                        table = data["expanded_tables"][idx];
+                        if (selected_tables[table] == null) {
+                            selected_tables[table] = false;
+                        }
+                    }
+                    updateTableSelection('2_2');
+                }
+            );
+        }
+
+        initializeStep1();
+    </script>
+</html>
