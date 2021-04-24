@@ -6,6 +6,7 @@ __pycache__/
 *.parquet
 *.*ocel
 test*.py
+.idea/*
 
 # C extensions
 *.so
