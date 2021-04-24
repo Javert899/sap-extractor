@@ -8,7 +8,9 @@
     </head>
     <body style="background-color: lightblue">
             <div class="center">
-				<div id="step_zero" style="display: none">
+				<div id="step_zero" class="steps" style="display:">
+                    <h1>Step 0 - Database Connection</h1>
+                    <h4>Please insert in this page the parameters of connection to the database.</h4>
 					<p><b>Parameters of connection to the Oracle database:</b></p>
 					Oracle Hostname:&nbsp;&nbsp;<input type="text" id="oracle_hostname" value="127.0.0.1"></input><br />
 					Oracle Port:&nbsp;&nbsp;<input type="text" id="oracle_port" value="1521"></input><br />
@@ -20,7 +22,11 @@
                     <br />
                     <button onclick="javascript:connect()">Connect</button>
 				</div>
-                <div id="first_step" style="display:">
+                <div id="first_step" class="steps" style="display: none">
+                    <h1>Step 1 - Process Identification</h1>
+                    <h4>In this page, you could identify a minimal set of tables for a given process in SAP.
+                    This can be done either by selecting one of the mainstream tables (based on the number of records)
+                    or selecting the tables related to an object type.</h4>
                     <p>Size of main tables:</p>
                     <div id="main_tables">
                         <table class="table">
@@ -34,6 +40,11 @@
                                     <td><input type="checkbox" id="EKKO_AAAAAAAAA_selected_step1_1" onclick="changeSelection('EKKO', '1_1')" /></td>
                                     <td>EKKO (P2P)</td>
                                     <td id="EKKO_size"></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" id="RBKP_AAAAAAAAA_selected_step1_1" onclick="changeSelection('RBKP', '1_1')" /></td>
+                                    <td>RBKP (P2P - invoicing)</td>
+                                    <td id="RBKP_size"></td>
                                 </tr>
                                 <tr>
                                     <td><input type="checkbox" id="VBAK_AAAAAAAAA_selected_step1_1" onclick="changeSelection('VBAK', '1_1')" /></td>
@@ -54,15 +65,25 @@
                     <p>Selected tables:</p>
                     <div id="step1_2" style="height: 200px; overflow: scroll">
                     </div>
+                    <button onclick="javascript:gotopage('second_step')">Go to Step 2</button>
                 </div>
-                <div id="second_step" style="display:">
+                <div id="second_step" class="steps" style="display: none">
+                    <h1>Step 2 - Refinment of Tables</h1>
+                    <h4>In this step, is possible to iteratively expand the set of tables, in order to include
+                    a more significant set of tables in the extraction. Please click the expansion button
+                    to expand the set of tables.</h4>
                     <button onclick="javascript:expand()">Expand the Set of Tables</button>
                     Current set of tables:
                     <div id="step2"  style="height: 200px; overflow: scroll">
 
                     </div>
+                    <button onclick="javascript:gotopage('first_step')">Go to Step 1</button>
+                    <button onclick="javascript:gotopage('third_step')">Go to Step 3</button>
                 </div>
-                <div id="third_step" style="display:">
+                <div id="third_step" class="steps" style="display: none">
+                    <h1>Step 3 - Pre-processing</h1>
+                    <h4>SAP is a multi-tenant system collecting information about different companies
+                    and company codes. If you want to filter the extraction, please insert here the key parameters.</h4>
                      <button onclick="javascript:getPreprocessingParameters()">Pre-process</button>
                     <div id="step3">
 
@@ -70,11 +91,19 @@
                     <div id="step3_values" style="height: 200px; overflow: scroll">
 
                     </div>
+                    <button onclick="javascript:gotopage('second_step')">Go to Step 2</button>
+                    <button onclick="javascript:gotopage('fourth_step')">Go to Step 4</button>
                 </div>
-                <div id="fourth_step" style="display:">
+                <div id="fourth_step" class="steps" style="display: none">
+                    <h1>Step 4 - Extraction</h1>
+                    <h4>After the choice of the tables, and the possible pre-processing, we are ready for the extraction!
+                    Please click the extraction button</h4>
                     <button onclick="javascript:performExtraction()">Perform the extraction</button>
                 </div>
-                <div id="last_step" style="display:">
+                <div id="last_step" class="steps" style="display: none">
+                    <h1>Step 5 - Postprocessing</h1>
+                    <h4>At this point, the log has been extracted. Please select one of the option in order to
+                    exploit the information that has been extracted.</h4>
                     <div id="last_step_download_log">
                         <button onclick="javascript:downloadLog()">Download log</button>
                     </div>
@@ -91,7 +120,6 @@
 	<script type="text/javascript">
 	    selected_tables = {};
 	    step1_initialized = false;
-	    step2_initialized = false;
 	    extracted_filename = "";
 	    extract_obj_types = null;
 
@@ -129,7 +157,7 @@
             parameters = encodeParameters(parameters);
             $.get("http://localhost:5000/newExtractorCheckConnection?parameters="+parameters,
                 function(data) {
-                    alert("connection was successful");
+                    gotopage('first_step');
                 }
             ).fail(function(error) { alert("connection was unsuccessful"); });
         }
@@ -171,6 +199,7 @@
         function initializeStep1() {
             if (step1_initialized == false) {
                  getTableSize("EKKO");
+                 getTableSize("RBKP");
                  getTableSize("VBAK");
                  getTableSize("BKPF");
                  getMainObjectClasses();
@@ -368,6 +397,7 @@
                     extracted_filename = data["file_name"];
                     extract_obj_types = data["obj_types"];
                     postprocessObjTypes();
+                    gotopage('last_step');
                 }
             );
         }
@@ -391,6 +421,19 @@
         }
 
         function postprocessObjTypes() {
+        }
+
+        function gotopage(page) {
+              for (let idx in document.getElementsByClassName("steps")) {
+                    try {
+                         this_div = document.getElementsByClassName("steps")[idx];
+                         this_div.style.display = 'none';
+                    }
+                    catch (err) {
+                    }
+              }
+              this_div = document.getElementById(page);
+              this_div.style.display = '';
         }
 
         initializeStep1();
