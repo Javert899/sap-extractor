@@ -2,6 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.sqlite*
+*.parquet
+*.*ocel
+test*.py
 
 # C extensions
 *.so
