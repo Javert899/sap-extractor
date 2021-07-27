@@ -41,6 +41,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
             allowed_cols.append(c)
     df = df[allowed_cols]
     df["event_CUSTOMOBJECTID"] = ""
+    df["event_CUSTOMPROVTABLE"] = tab_name
     for idx, key in enumerate(primary_keys):
         if idx > 0:
             df["event_CUSTOMOBJECTID"] = df["event_CUSTOMOBJECTID"] + df[key]
