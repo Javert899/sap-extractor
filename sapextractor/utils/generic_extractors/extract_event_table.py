@@ -43,7 +43,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
     df["event_CUSTOMOBJECTID"] = ""
     for idx, key in enumerate(primary_keys):
         if idx > 0:
-            df["event_CUSTOMOBJECTID"] = "," + df[key]
+            df["event_CUSTOMOBJECTID"] = df["event_CUSTOMOBJECTID"] + df[key]
         else:
             df["event_CUSTOMOBJECTID"] = df[key]
     return df
