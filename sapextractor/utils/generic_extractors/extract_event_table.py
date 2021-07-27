@@ -10,7 +10,7 @@ import traceback
 def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=10):
     if key_spec is None:
         key_spec = {}
-    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable, fname_rollname = meaningful_fields.apply_static(
         con, tab_name)
     fields = [x for x in fields_with_type if x != "event_CUSTOMOBJECTID"]
     fields = [x for x in fields if x in primary_keys or x in foreign_keys or x in timestamp_resource.values()]
@@ -45,7 +45,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
 
 
 def apply(cache, con, tab_name, mandt="800", key_spec=None, min_unq_values=100):
-    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable, fname_rollname = meaningful_fields.apply_static(
         con, tab_name)
     fields_with_type["event_CUSTOMOBJECTID"] = "AWKEY"
 

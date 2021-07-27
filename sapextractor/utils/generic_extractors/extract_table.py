@@ -3,50 +3,67 @@ from sapextractor.utils.generic_extractors import extract_event_table, extract_d
 import pandas as pd
 
 
-def check_is_event(con, tab, all_primary_keys, all_foreign_keys):
-    this_pk = all_primary_keys[tab]
+def check_is_event(con, tab, all_primary_keys, all_foreign_keys, all_fields_with_type):
+    if tab == "RSEG":
+        return False
+    this_pk = set(all_primary_keys[tab])
+    this_type = all_fields_with_type[tab]
     for tab2 in all_primary_keys:
         if tab2 != tab:
-            other_pk = all_primary_keys[tab2]
-            if this_pk.issubset(other_pk) and not other_pk.issubset(this_pk):
-                return False
+            other_pk = set(all_primary_keys[tab2])
+            other_type = all_fields_with_type[tab2]
+            if not this_pk.issubset(other_pk) and other_pk.issubset(this_pk):
+                is_break = False
+                for t in other_pk:
+                    if this_type[t] != other_type[t]:
+                        is_break = True
+                        break
+                if not is_break:
+                    return False
     return True
 
 
-def apply(cache, con, tab_name, all_primary_keys, all_foreign_keys, mandt="800", key_spec=None, min_unq_values=100):
-    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+def apply(cache, con, tab_name, all_primary_keys, all_foreign_keys, all_fields_with_type, mandt="800", key_spec=None, min_unq_values=100):
+    primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable, fname_rollname = meaningful_fields.apply_static(
         con, tab_name)
-    if not check_is_event(con, tab_name, all_primary_keys, all_foreign_keys):
+    if not check_is_event(con, tab_name, all_primary_keys, all_foreign_keys, all_fields_with_type):
         # detail table
         print(tab_name+" is detail")
-        extract_detail_table.extract_detail_table(cache, con, tab_name, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
+        #extract_detail_table.extract_detail_table(cache, con, tab_name, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
     else:
         # event table
         print(tab_name+" is event")
-        df = extract_event_table.apply(cache, con, tab_name, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
-        return df
+        #df = extract_event_table.apply(cache, con, tab_name, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
+        #return df
+        return pd.DataFrame()
 
 
 def apply_set_tables(con, tables, mandt="800", key_spec=None, min_unq_values=100):
     all_primary_keys = {}
     all_foreign_keys = {}
+    all_fields_with_type = {}
     for tab in tables:
-        primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable = meaningful_fields.apply_static(
+        primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable, fname_rollname = meaningful_fields.apply_static(
             con, tab)
         all_primary_keys[tab] = primary_keys
         all_foreign_keys[tab] = foreign_keys
+        all_fields_with_type[tab] = fname_rollname
     cache = {}
     detail_tables = []
     for tab in tables:
-        if not check_is_event(con, tab, all_primary_keys, all_foreign_keys):
+        if not check_is_event(con, tab, all_primary_keys, all_foreign_keys, all_fields_with_type):
             # detail table
             detail_tables.append(tab)
-            apply(cache, con, tab, all_primary_keys, all_foreign_keys, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
+            apply(cache, con, tab, all_primary_keys, all_foreign_keys, all_fields_with_type, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
     # explore other tables
     all_tables = []
     for tab in tables:
         if tab not in detail_tables:
-            df = apply(cache, con, tab, all_primary_keys, all_foreign_keys, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
+            df = apply(cache, con, tab, all_primary_keys, all_foreign_keys, all_fields_with_type, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
+            primary_keys, foreign_keys, timestamp_resource, fields_with_type, fname_checktable, fname_rollname = meaningful_fields.apply_static(
+                con, tab)
+            aaa = {x.split("event_")[-1]: x.split("event_")[-1]+"-"+y for x, y in fname_rollname.items()}
+            df = df.rename(columns=aaa)
             if df is not None and len(df) > 0:
                 all_tables.append(df)
     if len(all_tables) > 0:
