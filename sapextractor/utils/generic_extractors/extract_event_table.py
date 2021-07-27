@@ -4,6 +4,7 @@ import pandas as pd
 from pm4pymdl.algo.mvp.utils import exploded_mdl_to_succint_mdl
 
 from sapextractor.utils.table_meaningful_fields import meaningful_fields
+from sapextractor.utils.tstct import extract_tstct
 import traceback
 
 
@@ -27,7 +28,11 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
         return pd.DataFrame()
     df.columns = ["event_" + x for x in df.columns]
     df["event_id"] = df.apply(lambda _: str(uuid.uuid4()), axis=1)
-    df["event_activity"] = "create document (" + tab_name + ")"
+    if "event_TCODE" in df:
+        transactions = extract_tstct.apply_static(con, list(set(df["event_TCODE"].unique())))
+        df["event_activity"] = df["event_TCODE"].map(transactions)
+    else:
+        df["event_activity"] = "Create document (" + tab_name + ")"
     df["event_timestamp"] = df[timestamp_resource["DATUM"]]
     allowed_cols = []
     for c in df.columns:
