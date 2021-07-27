@@ -123,6 +123,9 @@ class OracleConnection(DatabaseConnection):
         dataframe.columns = columns
         return dataframe
 
+    def yyyy_mm_dd(self, yyyy, mm, dd):
+        return yyyy+mm+dd
+
 
 def apply(hostname="127.0.0.1", port="1521", sid="xe", username="system", password="oracle"):
     return OracleConnection(hostname=hostname, port=port, sid=sid, username=username, password=password)

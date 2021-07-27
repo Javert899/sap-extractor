@@ -3,7 +3,7 @@ import pandas as pd
 
 def apply(con, mandt="800", bukrs="1000", gjahr=None):
     additional_query_part = " WHERE MANDT ='"+mandt+"'"
-    additional_query_part += " AND AEDAT >= "+str(gjahr)+"-01-01 AND AEDAT <= "+str(gjahr)+"-12-31"
+    additional_query_part += " AND AEDAT >= "+con.yyyy_mm_dd(str(gjahr), "01", "01") + " AND AEDAT <= "+con.yyyy_mm_dd(str(gjahr), "12", "31")
     ekko = con.prepare_and_execute_query("EKKO", ["EBELN", "ERNAM", "AEDAT", "LIFNR", "ZTERM"], additional_query_part=additional_query_part)
     ekko["OBJECTID"] = ekko["EBELN"]
     ekko.columns = ["event_"+x for x in ekko.columns]
