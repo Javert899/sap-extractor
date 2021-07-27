@@ -6,8 +6,10 @@ from sapextractor.utils.fields_corresp import extract_dd03t
 from sapextractor.utils.change_tables import mapping
 
 
-def read_cdhdr(con, objectclas=None, mandt="800"):
+def read_cdhdr(con, objectclas=None, mandt="800", ap=""):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "' AND MANDANT = '"+mandt+"'" if objectclas is not None else "WHERE MANDANT = '"+mandt+"'"
+    if ap:
+        additional_query_part += " AND OBJECTID IN ("+ap+")"
     df = con.prepare_and_execute_query("CDHDR", ["CHANGENR", "USERNAME", "UDATE", "UTIME", "TCODE"],
                                        additional_query_part=additional_query_part)
     df.columns = ["event_" + x for x in df.columns]
@@ -20,10 +22,12 @@ def read_cdhdr(con, objectclas=None, mandt="800"):
     return df
 
 
-def read_cdpos(con, objectclas=None, tabname=None, mandt="800"):
+def read_cdpos(con, objectclas=None, tabname=None, mandt="800", ap=""):
     additional_query_part = " WHERE OBJECTCLAS = '" + objectclas + "' AND MANDANT = '"+mandt+"'" if objectclas is not None else "WHERE MANDANT = '"+mandt+"'"
     if tabname is not None and additional_query_part:
         additional_query_part += " AND TABNAME = '" + tabname + "'"
+    if ap:
+        additional_query_part += " AND OBJECTID IN ("+ap+")"
     df = con.prepare_and_execute_query("CDPOS", ["CHANGENR", "OBJECTID", "TABNAME", "FNAME", "VALUE_NEW", "VALUE_OLD", "CHNGIND"],
                                        additional_query_part=additional_query_part)
     return df
@@ -46,9 +50,9 @@ def give_field_desc(con, cdpos_dict):
     return cdpos_dict
 
 
-def apply(con, objectclas=None, tabname=None, mandt="800"):
-    cdhdr = read_cdhdr(con, objectclas=objectclas, mandt=mandt)
-    cdpos = read_cdpos(con, objectclas=objectclas, tabname=tabname, mandt=mandt)
+def apply(con, objectclas=None, tabname=None, mandt="800", additional_query_part=""):
+    cdhdr = read_cdhdr(con, objectclas=objectclas, mandt=mandt, ap=additional_query_part)
+    cdpos = read_cdpos(con, objectclas=objectclas, tabname=tabname, mandt=mandt, ap=additional_query_part)
     grouped_cdhdr = cdhdr.groupby("event_CHANGENR")
     change_dictio = {}
     for name, group in grouped_cdhdr:

@@ -6,7 +6,7 @@ import pandas as pd
 from sapextractor.utils.change_tables import extract_change
 
 
-def extract_changes_p2p(con, dataframe, mandt="800", bukrs="1000"):
+def extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt="800", bukrs="1000"):
     if len(dataframe) > 0:
         case_vbeln = dataframe.dropna(subset=["OBJECTID"])[["case:concept:name", "OBJECTID"]].to_dict("records")
     else:
@@ -19,8 +19,8 @@ def extract_changes_p2p(con, dataframe, mandt="800", bukrs="1000"):
             case_vbeln_dict[objectid] = set()
         case_vbeln_dict[objectid].add(caseid)
     ret = []
-    for tup in [("EINKBELEG", None), ("INCOMINGINVOICE", None)]:
-        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1], mandt=mandt)
+    for tup in [("EINKBELEG", None, "SELECT EBELN FROM "+ekko_query.split("FROM ")[1]), ("INCOMINGINVOICE", None, "SELECT CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+rbkp_query.split("FROM ")[1])]:
+        changes = extract_change.apply(con, objectclas=tup[0], tabname=tup[1], mandt=mandt, additional_query_part=tup[2])
         changes = {x: y for x, y in changes.items() if x in case_vbeln_dict}
         for x, y in changes.items():
             y = y[[xx for xx in y.columns if xx.startswith("event_")]]
@@ -56,8 +56,8 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         cols["event_timestamp"] = "time:timestamp"
         cols["event_USERNAME"] = "org:resource"
         dataframe = dataframe.rename(columns=cols)
-        if False:
-            changes = extract_changes_p2p(con, dataframe, mandt, bukrs)
+        if True:
+            changes = extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt, bukrs)
             dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
             dataframe = dataframe.reset_index(drop=True)
             changes = changes.loc[:,~changes.columns.duplicated()]
