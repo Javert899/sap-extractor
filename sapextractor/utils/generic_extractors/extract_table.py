@@ -29,7 +29,7 @@ def apply(cache, con, tab_name, all_primary_keys, all_foreign_keys, all_fields_w
         con, tab_name)
     if not check_is_event(con, tab_name, all_primary_keys, all_foreign_keys, all_fields_with_type):
         # detail table
-        #print(tab_name+" is detail")
+        print(tab_name+" is detail")
         extract_detail_table.extract_detail_table(cache, con, tab_name, mandt=mandt, key_spec=key_spec, min_unq_values=min_unq_values)
     else:
         # event table
