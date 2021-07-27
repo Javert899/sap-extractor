@@ -11,7 +11,7 @@ class Shared:
 def apply(con, tab_name):
     dom_name = extract_main_domnames.apply_static(con)
     table = extract_fields.apply_static(con, tab_name)
-    table = table[table["DOMNAME"].isin(dom_name)]
+    table = table[(table["DOMNAME"].isin(dom_name)) | (table["FIELDNAME"] == "AWKEY")]
     xxx = ["DATUM", "USNAM", "TCODE"]
     table_datumresource = table[table["DOMNAME"].isin(xxx)]
     table_datumresource = table_datumresource.groupby("DOMNAME").first().reset_index()
