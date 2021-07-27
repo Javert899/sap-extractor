@@ -54,12 +54,13 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         cols["event_timestamp"] = "time:timestamp"
         cols["event_USERNAME"] = "org:resource"
         dataframe = dataframe.rename(columns=cols)
-        changes = extract_changes_p2p(con, dataframe, mandt, bukrs)
-        dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
-        dataframe = dataframe.reset_index(drop=True)
-        changes = changes.loc[:,~changes.columns.duplicated()]
-        changes = changes.reset_index(drop=True)
-        dataframe = pd.concat([dataframe, changes])
+        if False:
+            changes = extract_changes_p2p(con, dataframe, mandt, bukrs)
+            dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
+            dataframe = dataframe.reset_index(drop=True)
+            changes = changes.loc[:,~changes.columns.duplicated()]
+            changes = changes.reset_index(drop=True)
+            dataframe = pd.concat([dataframe, changes])
         dataframe = dataframe.sort_values("time:timestamp")
         dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
         dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)

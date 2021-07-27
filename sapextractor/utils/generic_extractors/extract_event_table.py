@@ -4,6 +4,7 @@ import pandas as pd
 from pm4pymdl.algo.mvp.utils import exploded_mdl_to_succint_mdl
 
 from sapextractor.utils.table_meaningful_fields import meaningful_fields
+import traceback
 
 
 def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=10):
@@ -22,6 +23,7 @@ def basic_extraction(con, tab_name, mandt="800", key_spec=None, min_unq_values=1
     try:
         df = con.execute_read_sql(query, fields)
     except:
+        traceback.print_exc()
         return pd.DataFrame()
     df.columns = ["event_" + x for x in df.columns]
     df["event_id"] = df.apply(lambda _: str(uuid.uuid4()), axis=1)

@@ -20,11 +20,11 @@ def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", b
     G = nx.DiGraph()
     nodes_types = {}
     nodes_connections = {}
-    eban, eban_nodes_types = eban_processing.apply(con, mandt=mandt, bukrs=bukrs)
+    eban, eban_nodes_types = eban_processing.apply(con, mandt=mandt, bukrs=bukrs, gjahr=gjahr)
     for n in eban_nodes_types:
         G.add_node(n)
     nodes_types.update(eban_nodes_types)
-    ekko, ekko_nodes_types = ekko_processing.apply(con, mandt=mandt, bukrs=bukrs)
+    ekko, ekko_nodes_types = ekko_processing.apply(con, mandt=mandt, bukrs=bukrs, gjahr=gjahr)
     for n in ekko_nodes_types:
         G.add_node(n)
     nodes_types.update(ekko_nodes_types)
