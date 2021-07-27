@@ -16,7 +16,7 @@ def add_edges_to_graph(edges, nodes_connections, G):
     return nodes_connections, G
 
 
-def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", bukrs="1000"):
+def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", bukrs="1000", return_ekko_query=False):
     G = nx.DiGraph()
     nodes_types = {}
     nodes_connections = {}
@@ -24,14 +24,14 @@ def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", b
     for n in eban_nodes_types:
         G.add_node(n)
     nodes_types.update(eban_nodes_types)
-    ekko, ekko_nodes_types = ekko_processing.apply(con, mandt=mandt, bukrs=bukrs, gjahr=gjahr)
+    ekko, ekko_nodes_types, ekko_query = ekko_processing.apply(con, mandt=mandt, bukrs=bukrs, gjahr=gjahr)
     for n in ekko_nodes_types:
         G.add_node(n)
     nodes_types.update(ekko_nodes_types)
     eban_ekko_connection = ekpo_processing.eban_ekko_connection(con, mandt=mandt, bukrs=bukrs)
     nodes_connections, G = add_edges_to_graph(eban_ekko_connection, nodes_connections, G)
 
-    rbkp, rbkp_nodes_types = rbkp_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
+    rbkp, rbkp_nodes_types, rbkp_query = rbkp_processing.apply(con, gjahr=gjahr, mandt=mandt, bukrs=bukrs)
     for n in rbkp_nodes_types:
         G.add_node(n)
     nodes_types.update(rbkp_nodes_types)
@@ -67,4 +67,6 @@ def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", b
             min_extr_date = parser.parse(min_extr_date)
             dataframe = dataframe[dataframe["event_timestamp"] >= min_extr_date]
 
+    if return_ekko_query:
+        return dataframe, G, nodes_types, ekko_query, rbkp_query
     return dataframe, G, nodes_types

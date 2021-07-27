@@ -71,10 +71,12 @@ class SqliteConnection(DatabaseConnection):
         columns = find_corr.apply(columns, table_columns)
         return "SELECT "+",".join(columns)+" FROM "+table_name
 
-    def prepare_and_execute_query(self, table_name, columns, additional_query_part=""):
+    def prepare_and_execute_query(self, table_name, columns, additional_query_part="", return_query=False):
         query = self.prepare_query(table_name, columns) + additional_query_part
         dataframe = self.execute_read_sql(query, columns)
         dataframe.columns = columns
+        if return_query:
+            return dataframe, query
         return dataframe
 
 

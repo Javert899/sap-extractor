@@ -4,7 +4,7 @@ import pandas as pd
 def apply(con, mandt="800", bukrs="1000", gjahr=None):
     additional_query_part = " WHERE MANDT ='"+mandt+"'"
     additional_query_part += " AND AEDAT >= "+con.yyyy_mm_dd(str(gjahr), "01", "01") + " AND AEDAT <= "+con.yyyy_mm_dd(str(gjahr), "12", "31")
-    ekko = con.prepare_and_execute_query("EKKO", ["EBELN", "ERNAM", "AEDAT", "LIFNR", "ZTERM"], additional_query_part=additional_query_part)
+    ekko, ekko_query = con.prepare_and_execute_query("EKKO", ["EBELN", "ERNAM", "AEDAT", "LIFNR", "ZTERM"], additional_query_part=additional_query_part, return_query=True)
     ekko["OBJECTID"] = ekko["EBELN"]
     ekko.columns = ["event_"+x for x in ekko.columns]
     ekko = ekko.rename(columns={"event_ERNAM": "event_USERNAME", "event_AEDAT": "event_timestamp"})
@@ -16,4 +16,4 @@ def apply(con, mandt="800", bukrs="1000", gjahr=None):
     ekko["event_node"] = "EKKO_"+ekko["event_EBELN"]
     ekko = ekko.dropna(subset=["event_node", "event_timestamp"], how="any")
     ekko_nodes_types = {x: "EKKO" for x in ekko["event_node"].unique()}
-    return ekko, ekko_nodes_types
+    return ekko, ekko_nodes_types, ekko_query

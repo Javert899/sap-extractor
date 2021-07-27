@@ -3,8 +3,6 @@ import pandas as pd
 
 def apply(con, mandt="800", bukrs="1000", gjahr=None):
     additional_query_part = " WHERE MANDT = '"+mandt+"'"
-    #additional_query_part += " AND BEDAT >= "+str(gjahr)+"-01-01 AND BEDAT <= "+str(gjahr)+"-12-31"
-    #additional_query_part += " AND BEDAT >= 2010.01.01 AND BEDAT <= 2020-12-31"
     additional_query_part += " AND ERDAT >= "+con.yyyy_mm_dd(str(gjahr), "01", "01") + " AND ERDAT <= "+con.yyyy_mm_dd(str(gjahr), "12", "31")
     eban = con.prepare_and_execute_query("EBAN", ["BANFN", "ERNAM", "ERDAT"], additional_query_part=additional_query_part)
     eban["OBJECTID"] = eban["BANFN"]
@@ -12,7 +10,6 @@ def apply(con, mandt="800", bukrs="1000", gjahr=None):
     eban = eban.rename(columns={"event_ERNAM": "event_USERNAME", "event_ERDAT": "event_timestamp"})
     eban = eban.sort_values("event_timestamp")
     eban = eban.groupby("event_BANFN").first().reset_index()
-    print(eban)
     eban["event_timestamp"] = pd.to_datetime(eban["event_timestamp"], format=con.DATE_FORMAT)
     eban["event_activity"] = "Create Purchase Requisition"
     eban["event_FROMTABLE"] = "EBAN"
