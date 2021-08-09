@@ -18,3 +18,27 @@ def expand_set(con, tab_set):
     for tab in tab_set:
         new_set = new_set.union(expand(con, tab))
     return new_set
+
+
+def extract_expansion_graph(con, tab_set):
+    tab_set = list(tab_set)
+    query = ["SELECT CHECKTABLE, TABNAME FROM "+con.table_prefix+"DD03VV WHERE ("]
+    i = 0
+    while i < len(tab_set):
+        if i > 0:
+            query.append(" OR ")
+        query.append("TABNAME = '"+tab_set[i]+"'")
+        i = i + 1
+    query.append(") AND (")
+    i = 0
+    while i < len(tab_set):
+        if i > 0:
+            query.append(" OR ")
+        query.append("CHECKTABLE = '"+tab_set[i]+"'")
+        i = i + 1
+    query.append(")")
+    query = "".join(query)
+    df = con.execute_read_sql(query, ["TABNAME", "CHECKTABLE"])
+    stream = df.to_dict("r")
+    edges = list([x["TABNAME"], x["CHECKTABLE"]] for x in stream)
+    return edges
