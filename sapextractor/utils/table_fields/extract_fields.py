@@ -25,7 +25,7 @@ def classify_table(con, tab_name, all_tables=None):
         all_tables = dict()
     primary_keys = {}
     for x in all_tables:
-        fields2 = apply_static(x, tab_name=tab_name).to_dict("r")
+        fields2 = apply_static(con, tab_name=x).to_dict("r")
         pk = set()
         for el in fields2:
             if el["KEYFLAG"] == "X":
@@ -40,4 +40,9 @@ def classify_table(con, tab_name, all_tables=None):
     for key in fields_dict:
         if "VBTYP" in key:
             return "Flow"
-    return "Unknown"
+    for x in primary_keys:
+        if x != tab_name:
+            if primary_keys[tab_name].issuperset(primary_keys[x]):
+                if not primary_keys[x].issuperset(primary_keys[tab_name]):
+                    return "Detail"
+    return "Record"

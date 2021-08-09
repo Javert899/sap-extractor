@@ -166,6 +166,7 @@ def expandTables():
     for x in tables:
         extract_fields.apply_static(c, x)
     ret = {"expanded_tables": sorted(list(tables)), "types": {x: extract_fields.classify_table(c, x, tables) for x in tables}}
+    print(ret)
     return ret
 
 
