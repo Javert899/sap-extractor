@@ -1,7 +1,7 @@
 from sapextractor.utils.dbstattora import extract_count
 
 
-def expand(con, tab, min_occ=100):
+def expand(con, tab, min_occ=1000):
     df = con.execute_read_sql("SELECT CHECKTABLE FROM "+con.table_prefix+"DD03VV WHERE TABNAME = '"+tab+"' AND TABCLASS = 'TRANSP'", ["CHECKTABLE"])
     df = df[df["CHECKTABLE"] != " "]
     set1 = set(df["CHECKTABLE"].unique())
@@ -40,5 +40,5 @@ def extract_expansion_graph(con, tab_set):
     query = "".join(query)
     df = con.execute_read_sql(query, ["TABNAME", "CHECKTABLE"])
     stream = df.to_dict("r")
-    edges = list([x["TABNAME"], x["CHECKTABLE"]] for x in stream)
+    edges = list(set((x["TABNAME"], x["CHECKTABLE"]) for x in stream))
     return edges

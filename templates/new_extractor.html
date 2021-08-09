@@ -3,6 +3,7 @@
         <script src="static/jquery.min.js" type="text/javascript"></script>
         <script src="static/bootstrap.min.js" type="text/javascript"></script>
         <script src="static/FileSaver.min.js" type="text/javascript"></script>
+        <script src="static/viz.js" type="text/javascript"></script>
         <link rel="stylesheet" href="static/style.css">
 
     </head>
@@ -79,6 +80,8 @@
                     </div>
                     <button onclick="javascript:gotopage('first_step')">Go to Step 1</button>
                     <button onclick="javascript:gotopage('third_step')">Go to Step 3</button>
+					<div id="graphvizGraphRepresentation">
+					</div>
                 </div>
                 <div id="third_step" class="steps" style="display: none">
                     <h1>Step 3 - Pre-processing</h1>
@@ -122,6 +125,12 @@
 	    step1_initialized = false;
 	    extracted_filename = "";
 	    extract_obj_types = null;
+		graph_count = {};
+		graph_types = {};
+		graph_edges = [];
+		graph_nodes = [];
+		graph_initial_tabnames = [];
+		graph_graphviz = "";
 
 	    function getSelectedTables() {
 	        let ret = [];
@@ -299,16 +308,75 @@
             parameters = encodeParameters(parameters);
             $.get("http://localhost:5000/newExtractorExpandTables?parameters="+parameters,
                 function(data) {
+					graph_nodes = null;
+					graph_count = null;
+					graph_types = null;
+					graph_edges = null;
+					graph_initial_tabnames = null;
+					graph_nodes = data["expanded_tables"];
+					graph_count = data["tables_count"];
+					graph_types = data["types"];
+					graph_edges = data["edges"];
+					graph_initial_tabnames = data["initial_tabnames"];
                     for (let idx in data["expanded_tables"]) {
                         table = data["expanded_tables"][idx];
                         if (selected_tables[table] == null) {
                             selected_tables[table] = false;
                         }
                     }
+					formGraphviz();
                     updateTableSelection('2_2');
                 }
             );
         }
+		
+		function uuidv4() {
+		  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		  });
+		}
+		
+		function nodeUuid() {
+			let uuid = uuidv4();
+			return "n"+uuid.replace(/-/g, "");
+		}
+		
+		function formGraphviz() {
+			let arr = [];
+			arr.push("digraph G {");
+			let nodes_map = {};
+			for (let n of graph_nodes) {
+				let this_uuid = nodeUuid();
+				nodes_map[n] = this_uuid;
+				let fillColor = "white";
+				let level = "1"
+				if (graph_initial_tabnames.includes(n)) {
+					fillColor = "red";
+					level = "0";
+				}
+				else if (graph_types[n] == "Record") {
+					fillColor = "yellow";
+				}
+				else if (graph_types[n] == "Transaction") {
+					fillColor = "pink";
+				}
+				else if (graph_types[n] == "Flow") {
+					fillColor = "violet";
+				}
+				else if (graph_types[n] == "Detail") {
+					fillColor = "green";
+				}
+				arr.push(this_uuid+" [label=\""+n+" (lev="+level+")\n"+graph_count[n]+"\", style=\"filled\", fillcolor=\""+fillColor+"\"]");
+			}
+			for (let e of graph_edges) {
+				arr.push(nodes_map[e[0]] + " -> " + nodes_map[e[1]]);
+			}
+			arr.push("}");
+			graph_graphviz = arr.join("\n");
+			let svgXml = Viz(graph_graphviz, { format: "svg"});
+			document.getElementById("graphvizGraphRepresentation").innerHTML = svgXml;
+		}
 
         function getPreprocessingParameters() {
             let selected_ones = getSelectedTables();
