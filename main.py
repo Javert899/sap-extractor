@@ -162,10 +162,15 @@ def expandTables():
     c = database_factory.apply(db_type, db_con_args)
     from sapextractor.utils.table_expansion import expand
     from sapextractor.utils.table_fields import extract_fields
+    from sapextractor.utils.dbstattora import extract_count
+    dbstattora = extract_count.apply_static(c)
     tables = expand.expand_set(c, tabnames)
+    tables_count = {}
     for x in tables:
         extract_fields.apply_static(c, x)
-    ret = {"expanded_tables": sorted(list(tables)), "types": {x: extract_fields.classify_table(c, x, tables) for x in tables}}
+        tables_count[x] = dbstattora[x] if x in dbstattora else 1
+
+    ret = {"expanded_tables": sorted(list(tables)), "types": {x: extract_fields.classify_table(c, x, tables) for x in tables}, "tables_count": tables_count}
     print(ret)
     return ret
 
