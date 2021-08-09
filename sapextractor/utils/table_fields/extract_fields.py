@@ -6,9 +6,9 @@ class Shared:
 
 
 def apply(con, tab_name):
+    query = "SELECT FIELDNAME, DOMNAME, KEYFLAG, CHECKTABLE, ROLLNAME FROM "+con.table_prefix+"DD03VV WHERE TABNAME = '"+tab_name+"' ORDER BY POSITION"
     df = con.execute_read_sql(
-        "SELECT FIELDNAME, DOMNAME, KEYFLAG, CHECKTABLE, ROLLNAME FROM "+con.table_prefix+"DD03VV WHERE TABNAME = '"+tab_name+"' ORDER BY POSITION",
-        ["FIELDNAME", "DOMNAME", "KEYFLAG", "CHECKTABLE", "ROLLNAME"])
+        query, ["FIELDNAME", "DOMNAME", "KEYFLAG", "CHECKTABLE", "ROLLNAME"])
     df = df[df["DOMNAME"] != " "]
     df["FIELDNAME"] = "event_" + df["FIELDNAME"]
     return df
