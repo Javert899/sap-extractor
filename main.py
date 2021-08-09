@@ -172,6 +172,10 @@ def expandTables():
 
     edges = expand.extract_expansion_graph(c, tables)
 
+    for x in tables:
+        extract_fields.apply_static(c, x)
+        tables_count[x] = dbstattora[x] if x in dbstattora else 1
+
     ret = {"expanded_tables": sorted(list(tables)), "types": {x: extract_fields.classify_table(c, x, tables) for x in tables}, "tables_count": tables_count, "initial_tabnames": tabnames, "edges": edges}
     print(ret)
     return ret

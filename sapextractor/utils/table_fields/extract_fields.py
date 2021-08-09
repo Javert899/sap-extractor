@@ -10,7 +10,10 @@ def apply(con, tab_name):
     df = con.execute_read_sql(
         query, ["FIELDNAME", "DOMNAME", "KEYFLAG", "CHECKTABLE", "ROLLNAME"])
     df = df[df["DOMNAME"] != " "]
-    df["FIELDNAME"] = "event_" + df["FIELDNAME"]
+    try:
+        df["FIELDNAME"] = "event_" + df["FIELDNAME"]
+    except:
+        pass
     return df
 
 

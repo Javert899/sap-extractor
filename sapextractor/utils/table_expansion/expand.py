@@ -20,8 +20,8 @@ def expand_set(con, tab_set):
     return new_set
 
 
-def extract_expansion_graph(con, tab_set):
-    tab_set = list(tab_set)
+def extract_expansion_graph(con, tab_set0):
+    tab_set = list(tab_set0)
     query = ["SELECT CHECKTABLE, TABNAME FROM "+con.table_prefix+"DD03VV WHERE ("]
     i = 0
     while i < len(tab_set):
@@ -41,4 +41,20 @@ def extract_expansion_graph(con, tab_set):
     df = con.execute_read_sql(query, ["TABNAME", "CHECKTABLE"])
     stream = df.to_dict("r")
     edges = list(set((x["TABNAME"], x["CHECKTABLE"]) for x in stream))
+    query = ["SELECT TABNAME, REFTABLE FROM "+con.table_prefix+"DD03L WHERE ("]
+    i = 0
+    while i < len(tab_set):
+        if i > 0:
+            query.append(" OR ")
+        query.append("TABNAME = '"+tab_set[i]+"'")
+        i = i + 1
+    query.append(") AND REFTABLE != ' '")
+    query = "".join(query)
+    df = con.execute_read_sql(query, ["TABNAME", "REFTABLE"])
+    stream = df.to_dict("r")
+    for el in stream:
+        if not el["REFTABLE"] in tab_set:
+            tab_set0.add(el["REFTABLE"])
+        if not (el["REFTABLE"], el["TABNAME"]) in edges:
+            edges.append((el["REFTABLE"], el["TABNAME"]))
     return edges
