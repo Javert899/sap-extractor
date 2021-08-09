@@ -62,6 +62,12 @@ def welcome():
     return response
 
 
+@app.route('/new_extractor.html')
+def index():
+    response = make_response(render_template('new_extractor.html'))
+    return response
+
+
 @app.route("/newExtractorGetTableCount")
 def getTableCount():
     parameters = request.args.get("parameters")
