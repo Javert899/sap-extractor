@@ -1,11 +1,17 @@
-def expand(con, tab):
+from sapextractor.utils.dbstattora import extract_count
+
+
+def expand(con, tab, min_occ=100):
     df = con.execute_read_sql("SELECT CHECKTABLE FROM "+con.table_prefix+"DD03VV WHERE TABNAME = '"+tab+"' AND TABCLASS = 'TRANSP'", ["CHECKTABLE"])
     df = df[df["CHECKTABLE"] != " "]
     set1 = set(df["CHECKTABLE"].unique())
     df = con.execute_read_sql("SELECT TABNAME FROM "+con.table_prefix+"DD03VV WHERE CHECKTABLE = '"+tab+"' AND TABCLASS = 'TRANSP'", ["TABNAME"])
     set2 = set(df["TABNAME"].unique())
     set3 = set1.union(set2)
+    counts = extract_count.apply_static(con)
+    set3 = {x for x in set3 if x in counts and counts[x] > min_occ}
     return set3
+
 
 def expand_set(con, tab_set):
     new_set = set(tab_set)

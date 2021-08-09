@@ -63,7 +63,7 @@ def welcome():
 
 
 @app.route('/new_extractor.html')
-def index():
+def new_extractor():
     response = make_response(render_template('new_extractor.html'))
     return response
 

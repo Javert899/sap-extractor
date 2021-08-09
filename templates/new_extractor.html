@@ -424,6 +424,9 @@
         }
 
         function gotopage(page) {
+				if (page == "first_step") {
+					initializeStep1();
+				}
               for (let idx in document.getElementsByClassName("steps")) {
                     try {
                          this_div = document.getElementsByClassName("steps")[idx];
@@ -435,7 +438,5 @@
               this_div = document.getElementById(page);
               this_div.style.display = '';
         }
-
-        initializeStep1();
     </script>
 </html>
