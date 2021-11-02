@@ -39,10 +39,12 @@ def extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt="800", buk
     else:
         ret = pd.DataFrame()
 
+    print("obtained dataframe")
+    
     return ret
 
 
-def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
+def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True):
     dataframe, G, nodes_types, ekko_query, rbkp_query = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, return_ekko_query=True)
     print(ekko_query)
     print(rbkp_query)
@@ -56,7 +58,7 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         cols["event_timestamp"] = "time:timestamp"
         cols["event_USERNAME"] = "org:resource"
         dataframe = dataframe.rename(columns=cols)
-        if True:
+        if extract_changes:
             changes = extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt, bukrs)
             dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
             dataframe = dataframe.reset_index(drop=True)

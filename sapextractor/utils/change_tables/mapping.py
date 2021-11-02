@@ -70,35 +70,11 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Delivery Uncompletion: Partially processed", 1
     elif fname == "UVVLS" and value_new == "C":
         return "Delivery Uncompletion: Completely processed", 1
-    elif fname == "FKDAT":
-        try:
-            value_new = parser.parse(value_new).timestamp()
-        except:
-            value_new = 0
-        try:
-            value_old = parser.parse(value_old).timestamp()
-        except:
-            value_old = 0
-        if value_old == 0:
-            return "Set Billing Date", 2
-        elif value_new == 0:
-            return "Remove Billing Date", 2
-        elif value_new <= value_old:
-            return "Anticipate Billing Date", 1
-        else:
-            return "Postpone Billing Date", 1
     elif fname == "FAKSK":
         if value_new is None:
             return "Remove Billing Block", 2
         else:
             return "Set Billing Block", 2
-    elif fname == "SKFBP":
-        value_new = float(value_new)
-        value_old = float(value_old)
-        if value_new <= value_old:
-            return "Decrease Cash Discount", 1
-        else:
-            return "Increase Cash Discount", 1
     elif fname == "UVALL" and value_new == "A":
         return "Order Uncompletion: Not yet processed", 1
     elif fname == "UVALL" and value_new == "B":
@@ -175,23 +151,6 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Change Terms of Payment Key", 1
     elif tabname == "EBAN" and fname == "EKORG":
         return "Change Purchasing Organization", 1
-    elif fname == "WADAT_IST":
-        try:
-            value_new = parser.parse(value_new).timestamp()
-        except:
-            value_new = 0
-        try:
-            value_old = parser.parse(value_old).timestamp()
-        except:
-            value_old = 0
-        if value_old == 0:
-            return "Set Actual Goods Movement Date", 2
-        elif value_new == 0:
-            return "Remove Actual Goods Movement Date", 2
-        elif value_new <= value_old:
-            return "Anticipate Actual Goods Movement Date", 1
-        else:
-            return "Postpone Actual Goods Movement Date", 1
     elif fname == "KEY" and tabname == "FPLT" and chngind == "I":
         return "Insert Billing Plan", 2
     elif fname == "KEY" and tabname == "FPLT" and chngind == "D":
@@ -236,4 +195,3 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         if return_however:
             return "Changed "+fnames[fname], 0
     return None, None
-

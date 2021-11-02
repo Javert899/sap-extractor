@@ -8,8 +8,9 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
     ekbe["OBJECTID"] = ekbe["EBELN"] + ekbe["EBELP"]
     ekbe.columns = ["event_"+x for x in ekbe.columns]
-    ekbe["event_CPUDTTM"] = ekbe["event_CPUDT"] + " " + ekbe["event_CPUTM"]
-    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_CPUDT"] + " " + ekbe["event_CPUTM"], errors="coerce", format=con.DATE_FORMAT_INTERNAL + " " + con.HOUR_FORMAT_INTERNAL)
+    #ekbe["event_CPUDTTM"] = ekbe["event_CPUDT"] + " " + ekbe["event_CPUTM"]
+    #ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_CPUDT"].dt.strftime(con.DATE_FORMAT_INTERNAL) + " " + ekbe["event_CPUTM"], errors="coerce", format=con.DATE_FORMAT_INTERNAL + " " + con.HOUR_FORMAT_INTERNAL)
+    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     ekbe = ekbe.dropna(subset=["event_timestamp"])
     ekbe["event_FROMTABLE"] = "EKBE"
     ekbe["event_node"] = "EKBEGR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]

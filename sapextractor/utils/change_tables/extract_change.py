@@ -14,7 +14,8 @@ def read_cdhdr(con, objectclas=None, mandt="800", ap=""):
                                        additional_query_part=additional_query_part)
     df.columns = ["event_" + x for x in df.columns]
     if len(df) > 0:
-        df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
+        #df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
+        df["event_timestamp"] = pd.to_datetime(df["event_UDATE"])
         df = df.sort_values("event_timestamp")
     transactions = set(df["event_TCODE"].unique())
     tstct = extract_tstct.apply_static(con, transactions=transactions)
@@ -36,7 +37,8 @@ def read_cdpos(con, objectclas=None, tabname=None, mandt="800", ap=""):
 def give_field_desc(con, cdpos_dict):
     #fnames = extract_dd03t.apply(con)
     fnames = {}
-    for c in cdpos_dict:
+    for index, c in enumerate(cdpos_dict):
+        print("give_field_desc ",index, len(cdpos_dict))
         fname = c["FNAME"]
         tabname = c["TABNAME"]
         value_new = c["VALUE_NEW"]
@@ -53,15 +55,22 @@ def give_field_desc(con, cdpos_dict):
 def apply(con, objectclas=None, tabname=None, mandt="800", additional_query_part=""):
     cdhdr = read_cdhdr(con, objectclas=objectclas, mandt=mandt, ap=additional_query_part)
     cdpos = read_cdpos(con, objectclas=objectclas, tabname=tabname, mandt=mandt, ap=additional_query_part)
+    print("processing changes")
+    print("len(cdhdr) = ", len(cdhdr))
+    print("len(cdpos) = ", len(cdpos))
     grouped_cdhdr = cdhdr.groupby("event_CHANGENR")
     change_dictio = {}
     for name, group in grouped_cdhdr:
         change_dictio[name] = group
     del grouped_cdhdr
+    print("getting records from cdpos")
     cdpos = cdpos.to_dict('records')
+    print("got records from cdpos")
     cdpos = give_field_desc(con, cdpos)
+    print("got field desc")
     ret = {}
-    for el in cdpos:
+    for index, el in enumerate(cdpos):
+        print("cdpos enum ", index, len(cdpos))
         changenr = el["CHANGENR"]
         objectid = el["OBJECTID"]
         tabname = el["TABNAME"]
@@ -82,6 +91,7 @@ def apply(con, objectclas=None, tabname=None, mandt="800", additional_query_part
             ret[objectid].append(df)
     for objectid in ret:
         ret[objectid] = pd.concat(ret[objectid])
+    print("processed changes")
     return ret
 
 
