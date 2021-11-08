@@ -4,6 +4,7 @@ from sapextractor.utils.dates import timestamp_column_from_dt_tm
 from sapextractor.utils.tstct import extract_tstct
 from sapextractor.utils.fields_corresp import extract_dd03t
 from sapextractor.utils.change_tables import mapping
+from copy import copy
 
 
 def read_cdhdr(con, objectclas=None, mandt="800", ap=""):
@@ -58,11 +59,12 @@ def apply(con, objectclas=None, tabname=None, mandt="800", additional_query_part
     print("processing changes")
     print("len(cdhdr) = ", len(cdhdr))
     print("len(cdpos) = ", len(cdpos))
-    grouped_cdhdr = cdhdr.groupby("event_CHANGENR")
+    """grouped_cdhdr = cdhdr.groupby("event_CHANGENR")
     change_dictio = {}
     for name, group in grouped_cdhdr:
-        change_dictio[name] = group
-    del grouped_cdhdr
+        change_dictio[name] = group"""
+    change_dictio = cdhdr.to_dict("r")
+    change_dictio = {x["event_CHANGENR"]: x for x in change_dictio}
     print("getting records from cdpos")
     cdpos = cdpos.to_dict('records')
     print("got records from cdpos")
@@ -81,16 +83,11 @@ def apply(con, objectclas=None, tabname=None, mandt="800", additional_query_part
         if changenr in change_dictio:
             if objectid not in ret:
                 ret[objectid] = []
-            df = change_dictio[changenr].copy()
-            df["event_AWKEY"] = objectid
-            df["event_TABNAME"] = tabname
-            df["event_FNAME"] = fname
-            df["event_VALUE_NEW"] = value_new
-            df["event_CHANGEDESC"] = changedesc
-            df["event_CHNGIND"] = chngind
-            ret[objectid].append(df)
+            row = copy(change_dictio[changenr])
+            row.update({"event_AWKEY": objectid, "event_TABNAME": tabname, "event_FNAME": fname, "event_VALUE_NEW": value_new, "event_CHANGEDESC": changedesc, "event_CHNGIND": chngind})
+            ret[objectid].append(row)
     for objectid in ret:
-        ret[objectid] = pd.concat(ret[objectid])
+        ret[objectid] = pd.DataFrame(ret[objectid])
     print("processed changes")
     return ret
 
