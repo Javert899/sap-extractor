@@ -151,6 +151,24 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Change Terms of Payment Key", 1
     elif tabname == "EBAN" and fname == "EKORG":
         return "Change Purchasing Organization", 1
+    elif fname == "PROCSTAT":
+        return "Change in Process Status", 1
+    elif fname == "BVTYP":
+        return "Change in Partner Bank Type", 1
+    elif fname == "RBSTAT":
+        return "Change Invoice Document Status", 1
+    elif fname == "SPGRM":
+        return "Change Blocking Reason", 1
+    elif fname == "WMWST1":
+        return "Change Tax Amount", 1
+    elif fname == "ZTERM":
+        return "Change Terms of Payment", 1
+    elif fname == "PRCTR":
+        return "Change Profit Center", 1
+    elif fname == "SHKZG":
+        return "Change Debit/Credit Indicator", 1
+    elif fname == "STAPO":
+        return "Indicated Deletion of an Item", 1
     elif fname == "KEY" and tabname == "FPLT" and chngind == "I":
         return "Insert Billing Plan", 2
     elif fname == "KEY" and tabname == "FPLT" and chngind == "D":
