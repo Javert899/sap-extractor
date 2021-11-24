@@ -15,8 +15,8 @@ def read_cdhdr(con, objectclas=None, mandt="800", ap=""):
                                        additional_query_part=additional_query_part)
     df.columns = ["event_" + x for x in df.columns]
     if len(df) > 0:
-        #df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
-        df["event_timestamp"] = pd.to_datetime(df["event_UDATE"])
+        df = timestamp_column_from_dt_tm.apply(df, "event_UDATE", "event_UTIME", "event_timestamp")
+        #df["event_timestamp"] = pd.to_datetime(df["event_UDATE"])
         df = df.sort_values("event_timestamp")
     transactions = set(df["event_TCODE"].unique())
     tstct = extract_tstct.apply_static(con, transactions=transactions)

@@ -1,4 +1,5 @@
 import pandas as pd
+from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
 
 def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
@@ -8,9 +9,10 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
     ekbe["OBJECTID"] = ekbe["EBELN"] + ekbe["EBELP"]
     ekbe.columns = ["event_"+x for x in ekbe.columns]
+    ekbe = timestamp_column_from_dt_tm.apply(ekbe, "event_CPUDT", "event_CPUTM", "event_timestamp")
     #ekbe["event_CPUDTTM"] = ekbe["event_CPUDT"] + " " + ekbe["event_CPUTM"]
     #ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_CPUDT"].dt.strftime(con.DATE_FORMAT_INTERNAL) + " " + ekbe["event_CPUTM"], errors="coerce", format=con.DATE_FORMAT_INTERNAL + " " + con.HOUR_FORMAT_INTERNAL)
-    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
+    #ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     ekbe = ekbe.dropna(subset=["event_timestamp"])
     ekbe["event_FROMTABLE"] = "EKBE"
     ekbe["event_node"] = "EKBEGR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]
@@ -24,10 +26,11 @@ def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
     additional_query_part = " WHERE VGABE = '2' AND MANDT ='"+mandt+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
-    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR"], additional_query_part=additional_query_part)
+    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
     ekbe["OBJECTID"] = ekbe["BELNR"] + ekbe["GJAHR"]
     ekbe.columns = ["event_"+x for x in ekbe.columns]
-    ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
+    ekbe = timestamp_column_from_dt_tm.apply(ekbe, "event_CPUDT", "event_CPUTM", "event_timestamp")
+    #ekbe["event_timestamp"] = pd.to_datetime(ekbe["event_BUDAT"], errors="coerce", format=con.DATE_FORMAT)
     ekbe = ekbe.dropna(subset=["event_timestamp"])
     ekbe["event_FROMTABLE"] = "EKBE"
     ekbe["event_node"] = "EKBEIR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]

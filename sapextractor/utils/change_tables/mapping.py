@@ -191,6 +191,12 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Remove PO Account", 2
     elif fname == "KEY" and tabname == "RBTX" and chngind == "I":
         return "Insert Taxation", 2
+    elif fname == "KEY" and chngind == "I":
+        return "Insert Row in "+tabname, 2
+    elif fname == "KEY" and chngind == "D":
+        return "Deleted Row in "+tabname, 2
+    elif fname == "KEY" and chngind == "U":
+        return "Updated Row in "+tabname, 2
     else:
         if return_however:
             return "Changed "+fnames[fname], 0
