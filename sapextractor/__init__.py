@@ -34,8 +34,8 @@ def get_p2p_classic_event_log(con, ref_type="EKKO", gjahr="2014", min_extr_date=
     return algo.p2p.p2p_1d_log.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
 
 
-def get_p2p_classic_dataframe(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
-    return algo.p2p.p2p_1d_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
+def get_p2p_classic_dataframe(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True):
+    return algo.p2p.p2p_1d_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extract_changes=extract_changes)
 
 
 def get_p2p_obj_centr_log(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
