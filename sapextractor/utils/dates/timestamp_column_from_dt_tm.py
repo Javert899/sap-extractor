@@ -19,7 +19,9 @@ def apply(dataframe, dt_column, tm_column, target_column):
         print(dataframe[tm_column])
         traceback.print_exc()
 
-    dataframe[dt_column] = dataframe[dt_column].apply(lambda x: x.timestamp())
+
+    dataframe[dt_column] = dataframe[dt_column].apply(
+        lambda x: datetime(year=x.year, month=x.month, day=x.day).timestamp())
     dataframe[tm_column] = dataframe[tm_column].apply(lambda x: x.timestamp())
 
     dataframe[tm_column] = dataframe[tm_column] + 2208988800
