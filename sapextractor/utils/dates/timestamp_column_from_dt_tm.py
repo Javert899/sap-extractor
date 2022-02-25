@@ -14,6 +14,7 @@ def apply(dataframe, dt_column, tm_column, target_column):
         dataframe[tm_column] = pd.to_datetime(dataframe[tm_column], format=constants.HOUR_FORMAT_INTERNAL, errors='coerce')
         dataframe = dataframe.dropna(subset=[tm_column])
 
+    print(dataframe)
     if len(dataframe) > 0:
         dataframe[dt_column] = dataframe[dt_column].apply(
             lambda x: datetime(year=x.year, month=x.month, day=x.day).timestamp())
