@@ -41,12 +41,12 @@
 			<div>
 				Process to extract:
 				<select id="available_processes" name="available_processes" onchange="changeProcess()">
-					<option value="o2c" selected="selected">Order-to-Cash</option>
+					<option value="o2c">Order-to-Cash</option>
 					<option value="ap_ar">Accounts Payable/Receivable</option>
-					<option value="p2p">Procure-to-Pay</option>
+					<option value="p2p" selected="selected">Procure-to-Pay</option>
 				</select>
 				<br />
-				<div id="o2c" style="display:">
+				<div id="o2c" style="display: none">
 					<p><b>Order-to-Cash</b></p>
 					<table border="0" style="width: 100%">
 						<tr>
@@ -239,7 +239,7 @@
 						</div>
 					</div>
 				</div>
-				<div id="p2p" style="display: none">
+				<div id="p2p" style="display: ">
 					<p><b>Procure-to-Pay</b></p>
 					<table border="0" style="width: 100%">
 						<tr>
@@ -250,12 +250,12 @@
 							<td style="width: 60%">
 								Extraction Type:
 								<select id="p2p_ext_type" name="p2p_ext_type" onchange="p2pExtChange()">
-									<option value="p2p_1d_dataframe">CSV log</option>
-									<option value="p2p_1d_log" selected="selected">XES log</option>
+									<option value="p2p_1d_dataframe" selected="selected">CSV log</option>
+									<option value="p2p_1d_log">XES log</option>
 									<option value="p2p_ocel">Object-Centric Log</option>
 								</select>
 								<br />
-								<div id="p2p_1d_dataframe" style="display: none">
+								<div id="p2p_1d_dataframe" style="display: ">
 									<p>Insert the parameters for the CSV extraction:</p>
 									Central table for the extraction: <input type="text" id="p2p_csv_central_table" value="EKKO"></input> <br />
 									Minimum extraction date: <input type="text" id="p2p_csv_min_ext_date" value="2014-01-01 00:00:00" /> <br />
@@ -267,7 +267,7 @@
 									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
 									<button onclick="javascript:extract()">Extract the Event Log</button>
 								</div>
-								<div id="p2p_1d_log" style="display: ">
+								<div id="p2p_1d_log" style="display: none">
 									<p>Insert the parameters for the XES extraction:</p>
 									Central table for the extraction: <input type="text" id="p2p_xes_central_table" value="EKKO"></input> <br />
 									Minimum extraction date: <input type="text" id="p2p_xes_min_ext_date" value="2014-01-01 00:00:00" /> <br />
@@ -288,6 +288,16 @@
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:extract()">Extract the Event Log</button>
+								</div>
+								<div id="p2p_extra" style="display: ">
+									EKKO extra query: <input type="text" id="ekko_extra_query"></input><br />
+									EKPO extra query: <input type="text" id="ekpo_extra_query"></input><br />
+									RBKP extra query: <input type="text" id="rbkp_extra_query"></input><br />
+									RSEG extra query: <input type="text" id="rseg_extra_query"></input><br />
+									EKBE extra query: <input type="text" id="ekbe_extra_query"></input><br />
+									BKPF extra query: <input type="text" id="bkpf_extra_query"></input><br />
+									BSAK extra query: <input type="text" id="bsak_extra_query"></input><br />
+									EBAN extra query: <input type="text" id="eban_extra_query"></input><br />
 								</div>
 							</td>
 						</tr>
@@ -772,7 +782,6 @@
 			if (o2cSelectedChangeActivities != null) {
 				ret["allowed_act_changes"] = o2cSelectedChangeActivities;
 			}
-			console.log(ret);
 			return ret;
 		}
 		
@@ -887,16 +896,30 @@
 		}
 		
 		function getP2Pparameters(ext_type) {
+			let ret = {};
 			if (ext_type == "p2p_1d_dataframe") {
-				return getP2PparametersCSV(ext_type);
+				ret = getP2PparametersCSV(ext_type);
 			}
 			else if (ext_type == "p2p_1d_log") {
-				return getP2PparametersXES(ext_type);
+				ret = getP2PparametersXES(ext_type);
 			}
 			else if (ext_type == "p2p_ocel") {
-				return getP2PparametersOCEL(ext_type);
+				ret = getP2PparametersOCEL(ext_type);
 			}
+			ret["extra_els_query"] = {};
+			ret["extra_els_query"]["EKKO"] = document.getElementById("ekko_extra_query").value;
+			ret["extra_els_query"]["EKPO"] = document.getElementById("ekpo_extra_query").value;
+			ret["extra_els_query"]["RBKP"] = document.getElementById("rbkp_extra_query").value;
+			ret["extra_els_query"]["RSEG"] = document.getElementById("rseg_extra_query").value;
+			ret["extra_els_query"]["EKBE"] = document.getElementById("ekbe_extra_query").value;
+			ret["extra_els_query"]["BKPF"] = document.getElementById("bkpf_extra_query").value;
+			ret["extra_els_query"]["BSAK"] = document.getElementById("bsak_extra_query").value;
+			ret["extra_els_query"]["EBAN"] = document.getElementById("eban_extra_query").value;
+
+			return ret;
 		}
+		
+		
 		
 		function getP2PparametersCSV(ext_type) {
 			let ext_args = {};
