@@ -6,7 +6,8 @@ import traceback
 
 def apply(dataframe, dt_column, tm_column, target_column):
     if "str" in str(dataframe[dt_column].dtype) or "obj" in str(dataframe[dt_column].dtype):
-        dataframe[dt_column] = pd.to_datetime(dataframe[dt_column], format=constants.DATE_FORMAT_INTERNAL, errors='coerce')
+        #dataframe[dt_column] = pd.to_datetime(dataframe[dt_column], format=constants.DATE_FORMAT_INTERNAL, errors='coerce')
+        dataframe[dt_column] = pd.to_datetime(dataframe[dt_column], errors='coerce')
         dataframe = dataframe.dropna(subset=[dt_column])
 
     if "str" in str(dataframe[tm_column].dtype) or "obj" in str(dataframe[tm_column].dtype):
