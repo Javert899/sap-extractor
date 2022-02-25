@@ -33,8 +33,8 @@ def get_changes(con, dataframe, mandt="800", bukrs="1000"):
     return ret
 
 
-def apply(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
-    dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
+def apply(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extra_els_query=None):
+    dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extra_els_query=extra_els_query)
     if len(dataframe) > 0:
         changes = get_changes(con, dataframe, mandt=mandt, bukrs=bukrs)
         dataframe = pd.concat([dataframe, changes])

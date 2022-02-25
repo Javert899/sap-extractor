@@ -1,10 +1,12 @@
 import pandas as pd
 
 
-def apply(con, gjahr=None, mandt="800", bukrs="1000"):
+def apply(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=None):
     additional_query_part = " WHERE MANDT = '"+mandt+"' AND BUKRS = '"+bukrs+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
+    if "RBKP" in extra_els_query:
+        additional_query_part += " " + extra_els_query["RBKP"]
     rbkp, rbkp_query = con.prepare_and_execute_query("RBKP", ["BELNR", "GJAHR", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR"], additional_query_part=additional_query_part, return_query=True)
     rbkp_nodes_types = {}
     if len(rbkp) > 0:

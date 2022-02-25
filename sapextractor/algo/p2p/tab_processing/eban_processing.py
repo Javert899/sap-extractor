@@ -1,9 +1,11 @@
 import pandas as pd
 
 
-def apply(con, mandt="800", bukrs="1000", gjahr=None):
+def apply(con, mandt="800", bukrs="1000", gjahr=None, extra_els_query=None):
     additional_query_part = " WHERE MANDT = '"+mandt+"'"
     additional_query_part += " AND BADAT >= '"+con.yyyy_mm_dd(str(gjahr), "01", "01") + "' AND BADAT <= '"+con.yyyy_mm_dd(str(gjahr), "12", "31")+"'"
+    if "EBAN" in extra_els_query:
+        additional_query_part += " " + extra_els_query["EBAN"]
     eban = con.prepare_and_execute_query("EBAN", ["BANFN", "ERNAM", "BADAT"], additional_query_part=additional_query_part)
     eban_nodes_types = {}
     if len(eban) > 0:

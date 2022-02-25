@@ -2,10 +2,12 @@ import pandas as pd
 from sapextractor.utils.dates import timestamp_column_from_dt_tm
 
 
-def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
+def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=None):
     additional_query_part = " WHERE VGABE = '1' AND MANDT = '"+mandt+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
+    if "EKBE" in extra_els_query:
+        additional_query_part += " " + extra_els_query["EKBE"]
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
     ekbe_nodes_types = {}
     if len(ekbe) > 0:
@@ -25,10 +27,12 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
     return ekbe, ekbe_nodes_types
 
 
-def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000"):
+def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=None):
     additional_query_part = " WHERE VGABE = '2' AND MANDT ='"+mandt+"'"
     if gjahr is not None:
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
+    if "EKBE" in extra_els_query:
+        additional_query_part += " " + extra_els_query["EKBE"]
     ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
     ekbe_nodes_types = {}
     if len(ekbe) > 0:

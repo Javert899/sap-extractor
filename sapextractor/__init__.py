@@ -30,16 +30,16 @@ def get_o2c_obj_centr_log(con, keep_first=True, min_extr_date="2020-01-01 00:00:
     return algo.o2c.obj_centr_log.apply(con, keep_first=keep_first, min_extr_date=min_extr_date, gjahr=gjahr, enable_changes=enable_changes, enable_payments=enable_payments, allowed_act_doc_types=allowed_activities, mandt=mandt)
 
 
-def get_p2p_classic_event_log(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
-    return algo.p2p.p2p_1d_log.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
+def get_p2p_classic_event_log(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extra_els_query=None):
+    return algo.p2p.p2p_1d_log.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extra_els_query=extra_els_query)
 
 
-def get_p2p_classic_dataframe(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True):
-    return algo.p2p.p2p_1d_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extract_changes=extract_changes)
+def get_p2p_classic_dataframe(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True, extra_els_query=None):
+    return algo.p2p.p2p_1d_dataframe.apply(con, ref_type=ref_type, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extract_changes=extract_changes, extra_els_query=extra_els_query)
 
 
-def get_p2p_obj_centr_log(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000"):
-    return algo.p2p.obj_centr_log.apply(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs)
+def get_p2p_obj_centr_log(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extra_els_query=None):
+    return algo.p2p.obj_centr_log.apply(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extra_els_query=extra_els_query)
 
 
 def get_ap_ar_single_doc_transactions_dataframe(con, gjahr="1997", mandt="800", bukrs="1000"):
