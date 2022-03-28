@@ -151,6 +151,32 @@ def perform_mapping(tabname, fname, value_old, value_new, chngind, fnames, retur
         return "Change Terms of Payment Key", 1
     elif tabname == "EBAN" and fname == "EKORG":
         return "Change Purchasing Organization", 1
+    elif fname == "XRUEB":
+        return "Previous Period Posting", 1
+    elif fname == "SUBMI":
+        return "Collective Number Information", 1
+    elif fname == "MWSKZ":
+        return "Tax code information", 1
+    elif fname == "MEMORYTYPE":
+        return "Category of Incompleteness", 1
+    elif fname == "MEMORY":
+        return "Completeness Status", 1
+    elif fname == "LABNR":
+        return "Order Acknowledgement", 1
+    elif fname == "MENGE":
+        return "Changed Quantity", 1
+    elif fname == "KTWRT":
+        return "Target Val. Information", 1
+    elif fname == "KDATE":
+        return "Validity Period End", 1
+    elif fname == "FRGSX":
+        return "Release Strategy Information", 1
+    elif fname == "EREKZ":
+        return "Final Invoice information", 1
+    elif fname == "BKLAS":
+        return "Valuation Class information", 1
+    elif fname == "WRBTR":
+        return "Changed Amount", 1
     elif fname == "PROCSTAT":
         return "Change in Process Status", 1
     elif fname == "BVTYP":
