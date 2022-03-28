@@ -67,6 +67,10 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
             dataframe = pd.concat([dataframe, changes])
         dataframe = dataframe.sort_values("time:timestamp")
         dataframe = dataframe.loc[:,~dataframe.columns.duplicated()]
+        # drop duplicates
+        print("before dropping", len(dataframe))
+        dataframe = dataframe.drop_duplicates()
+        print("after dropping", len(dataframe))
         dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
     return dataframe
 
