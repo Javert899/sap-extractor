@@ -8,7 +8,7 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=No
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     if "EKBE" in extra_els_query:
         additional_query_part += " " + extra_els_query["EKBE"]
-    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
+    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM", "ERNAM"], additional_query_part=additional_query_part)
     ekbe_nodes_types = {}
     if len(ekbe) > 0:
         ekbe["OBJECTID"] = ekbe["EBELN"] + ekbe["EBELP"]

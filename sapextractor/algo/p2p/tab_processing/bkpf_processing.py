@@ -16,7 +16,7 @@ def extract_docs_from_bkpf(con, gjahr=None, mandt="800", bukrs="1000", extra_els
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     if "BKPF" in extra_els_query:
         additional_query_part += " " + extra_els_query["BKPF"]
-    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "BLART", "BLDAT", "AWKEY"], additional_query_part=additional_query_part)
+    bkpf = con.prepare_and_execute_query("BKPF", ["BELNR", "GJAHR", "BLART", "BLDAT", "AWKEY", "USNAM"], additional_query_part=additional_query_part)
     bkpf["BLDAT"] = pd.to_datetime(bkpf["BLDAT"], errors="coerce", format=con.DATE_FORMAT) + pd.Timedelta("6 seconds")
     bkpf = bkpf.dropna(subset=["BLDAT"])
     bkpf = bkpf.to_dict("r")
