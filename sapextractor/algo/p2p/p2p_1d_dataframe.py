@@ -98,6 +98,7 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         dataframe["concept:name"] = dataframe["NEW_ACTIVITY_COLUMN"]
         del dataframe["NEW_ACTIVITY_COLUMN"]
         dataframe = dataframe.groupby(grouping_columns).first().reset_index()
+        dataframe = dataframe.sort_values(["case:concept:name", "time:timestamp", "concept:name"])
     return dataframe
 
 
