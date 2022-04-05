@@ -356,7 +356,7 @@ def download_event_log():
     log_type = __get_log_type_from_ext_type(ext_type)
 
     if log_type == 0:
-        extension = ".ocelxml"
+        extension = ".jsonocel"
         temp_file = tempfile.NamedTemporaryFile(suffix=extension)
         temp_file.close()
         from pm4pymdl.objects.ocel.exporter import exporter as ocel_exporter
