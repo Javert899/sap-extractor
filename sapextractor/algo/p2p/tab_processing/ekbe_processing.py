@@ -23,6 +23,7 @@ def goods_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=No
             ekbe["event_node"] = "EKBEGR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]
             ekbe["event_activity"] = "Goods Receipt"
             ekbe["event_timestamp"] = ekbe["event_timestamp"] + pd.Timedelta("1 second")
+            ekbe["event_USERNAME"] = ekbe["event_ERNAM"]
             ekbe_nodes_types = {x: "EKBEGR" for x in ekbe["event_node"].unique()}
     return ekbe, ekbe_nodes_types
 
@@ -33,7 +34,7 @@ def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=
         additional_query_part += " AND GJAHR = '"+gjahr+"'"
     if "EKBE" in extra_els_query:
         additional_query_part += " " + extra_els_query["EKBE"]
-    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM"], additional_query_part=additional_query_part)
+    ekbe = con.prepare_and_execute_query("EKBE", ["EBELN", "EBELP", "BELNR", "BUZEI", "BUDAT", "GJAHR", "CPUDT", "CPUTM", "ERNAM"], additional_query_part=additional_query_part)
     ekbe_nodes_types = {}
     if len(ekbe) > 0:
         ekbe["OBJECTID"] = ekbe["BELNR"] + ekbe["GJAHR"]
@@ -46,6 +47,7 @@ def invoice_receipt(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=
             ekbe["event_node"] = "EKBEIR_"+ekbe["event_BELNR"]+ekbe["event_GJAHR"]
             ekbe["event_activity"] = "Invoice Receipt"
             ekbe["event_timestamp"] = ekbe["event_timestamp"] + pd.Timedelta("2 seconds")
+            ekbe["event_USERNAME"] = ekbe["event_ERNAM"]
             ekbe_nodes_types = {x: "EKBEIR" for x in ekbe["event_node"].unique()}
     return ekbe, ekbe_nodes_types
 

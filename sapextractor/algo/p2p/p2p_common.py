@@ -2,6 +2,7 @@ from sapextractor.algo.p2p.tab_processing import eban_processing, ekko_processin
 import networkx as nx
 import pandas as pd
 from dateutil import parser
+from sapextractor.utils.usr02 import extract_usr02
 
 
 def add_edges_to_graph(edges, nodes_connections, G):
@@ -69,6 +70,10 @@ def extract_tables_and_graph(con, gjahr=None, min_extr_date=None, mandt="800", b
         if min_extr_date is not None:
             min_extr_date = parser.parse(min_extr_date)
             dataframe = dataframe[dataframe["event_timestamp"] >= min_extr_date]
+
+    dictio_ustyp, dictio_class = extract_usr02.apply(con)
+    dataframe["event_USERNAME_USTYP"] = dataframe["event_USERNAME"].map(dictio_ustyp)
+    dataframe["event_USERNAME_CLASS"] = dataframe["event_USERNAME"].map(dictio_class)
 
     if return_ekko_query:
         return dataframe, G, nodes_types, ekko_query, rbkp_query

@@ -24,5 +24,6 @@ def apply(con, gjahr=None, mandt="800", bukrs="1000", extra_els_query=None):
         rbkp2 = rbkp2.dropna(subset=["event_timestamp"])
         rbkp2["event_timestamp"] = rbkp2["event_timestamp"] + pd.Timedelta("3 seconds")
         rbkp = pd.concat([rbkp1, rbkp2])
+        rbkp["event_USERNAME"] = rbkp["event_USNAM"]
         rbkp_nodes_types = {x: "RBKP" for x in rbkp["event_node"].unique()}
     return rbkp, rbkp_nodes_types, rbkp_query
