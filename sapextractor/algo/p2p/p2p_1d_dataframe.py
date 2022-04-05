@@ -4,6 +4,7 @@ from sapextractor.utils.filters import case_filter
 from sapextractor.utils import constants
 import pandas as pd
 from sapextractor.utils.change_tables import extract_change
+from sapextractor.utils.usr02 import extract_usr02
 
 
 def extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt="800", bukrs="1000"):
@@ -83,6 +84,10 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         dataframe = dataframe.drop_duplicates()
         print("after dropping", len(dataframe))
         dataframe = case_filter.filter_on_case_size(dataframe, "case:concept:name", min_case_size=1, max_case_size=constants.MAX_CASE_SIZE)
+        dataframe["org:resource"] = dataframe["org:resource"].fillna(dataframe["USERNAME"])
+        dictio_ustyp, dictio_class = extract_usr02.apply(con)
+        dataframe["USERNAME_USTYP"] = dataframe["org:resource"].map(dictio_ustyp)
+        dataframe["USERNAME_CLASS"] = dataframe["org:resource"].map(dictio_class)
     return dataframe
 
 
