@@ -7,7 +7,7 @@ class Shared:
 
 
 def apply(con):
-    stream = con.execute_read_sql("SELECT BNAME, USTYP, CLASS FROM SAPSR3.USR02", ["BNAME", "USTYP", "CLASS"]).to_dict("records")
+    stream = con.prepare_and_execute_query("USR02", ["BNAME", "USTYP", "CLASS"]).to_dict("records")
     dictio_ustyp = {}
     dictio_class = {}
     for el in stream:
