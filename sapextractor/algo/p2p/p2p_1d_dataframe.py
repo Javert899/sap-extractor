@@ -88,6 +88,16 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         dictio_ustyp, dictio_class = extract_usr02.apply(con)
         dataframe["USERNAME_USTYP"] = dataframe["org:resource"].map(dictio_ustyp)
         dataframe["USERNAME_CLASS"] = dataframe["org:resource"].map(dictio_class)
+        # postprocessing
+        grouping_columns = ["case:concept:name", "time:timestamp", "org:resource", "FROMTABLE"]
+        dct = dataframe.groupby(grouping_columns)["concept:name"].apply(set).to_dict()
+        for k in dct:
+            dct[k] = ",".join(sorted(list(dct[k])))
+        dataframe["NEW_ACTIVITY_COLUMN"] = dataframe[grouping_columns].apply(tuple, axis=1).map(dct)
+        dataframe["NEW_ACTIVITY_COLUMN"] = dataframe["NEW_ACTIVITY_COLUMN"].fillna(dataframe["concept:name"])
+        dataframe["concept:name"] = dataframe["NEW_ACTIVITY_COLUMN"]
+        del dataframe["NEW_ACTIVITY_COLUMN"]
+        dataframe = dataframe.groupby(grouping_columns).first().reset_index()
     return dataframe
 
 
