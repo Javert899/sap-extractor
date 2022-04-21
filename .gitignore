@@ -135,5 +135,6 @@ dmypy.json
 
 *svg*
 
-*connection_parameters.json
 sapextractor/incremental_p2p/tables_count.json
+sapextractor/incremental_p2p/*.txt
+sapextractor/incremental_p2p/*.csv

@@ -125,6 +125,13 @@ if __name__ == "__main__":
 
     total_query, total_columns = form_total_query()
 
+    F = open("query_content_general.txt", "w")
+    F.write(total_query)
+    F.close()
+    F = open("query_columns_general.txt", "w")
+    F.write(" ".join(total_columns))
+    F.close()
+
     from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
     c = get_connection()
 
