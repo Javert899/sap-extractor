@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, "../..")
 
 import json
-from sapextractor.incremental.DB_CONNECTION import get_connection
+from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
 parameters = json.load(open("parameters.json", "r"))
 tables = ["EKKO"]

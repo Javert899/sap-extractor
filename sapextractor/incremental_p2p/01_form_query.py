@@ -48,7 +48,7 @@ if __name__ == "__main__":
     ekpo_query, ekpo_columns = form_ekpo_query()
     eban_query, eban_columns = form_eban_query()
 
-    from sapextractor.incremental.DB_CONNECTION import get_connection
+    from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
     c = get_connection()
 
     c.execute_read_sql(eban_query, eban_columns)
