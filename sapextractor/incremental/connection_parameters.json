@@ -1,0 +1,9 @@
+{
+  "connection": "mic_sql",
+  "parameters": {
+    "hostname": "127.0.0.1",
+    "username": "admin",
+    "password": "admin",
+    "database": "trial"
+  }
+}
