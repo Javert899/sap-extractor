@@ -65,7 +65,7 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_total_query(ekpo_name="a", eban_name="b", rseg_name="c"):
+def form_total_general_query(ekpo_name="a", eban_name="b", rseg_name="c"):
     fields = []
 
     ekpo_query, ekpo_columns = form_ekpo_query()
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     eban_query, eban_columns = form_eban_query()
     rseg_query, rseg_columns = form_rseg_query()
 
-    total_query, total_columns = form_total_query()
+    total_query, total_columns = form_total_general_query()
 
     F = open("query_content_general.txt", "w")
     F.write(total_query)
