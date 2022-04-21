@@ -9,6 +9,8 @@ parameters = json.load(open("parameters.json", "r"))
 connection_parameters = json.load(open("connection_parameters.json", "r"))
 tables_count = json.load(open("tables_count.json", "r")) if os.path.exists("tables_count.json") else {}
 
+import sqlparse
+
 
 def get_table_count(table):
     if table in tables_count:
@@ -34,7 +36,7 @@ def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
     ret.append(") "+ekko_name)
     ret.append("ON "+ekpo_name+".MANDT = "+ekko_name+".MANDT AND "+ekpo_name+".EBELN = "+ekko_name+".EBELN")
     columns = ["EKPO_ROW_NUMBER", "MANDT", "EBELN", "EBELP", "EBELNEBELP", "BANFN", "BNFPO", "ERNAM", "AEDAT", "LIFNR", "ZTERM"]
-    return " ".join(ret), columns
+    return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
 def form_eban_query(eban_name="eban"):
@@ -42,7 +44,7 @@ def form_eban_query(eban_name="eban"):
     ret.append(parameters["prefix"]+"EBAN")
     ret.append("WHERE "+row_number()+" >= "+get_table_count("EBAN"))
     columns = ["EBAN_ROW_NUMBER", "MANDT", "BANFN", "BNFPO", "BANFNBNFPO", "ERNAM", "BADAT"]
-    return " ".join(ret), columns
+    return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
 def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
@@ -60,7 +62,7 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
     ret.append(rseg_name+".GJAHR = "+rbkp_name+".GJAHR AND")
     ret.append(rseg_name+".BELNR = "+rbkp_name+".BELNR")
     columns = ["RSEG_ROW_NUMBER", "MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR"]
-    return " ".join(ret), columns
+    return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
 def form_total_query(ekpo_name="a", eban_name="b", rseg_name="c"):
@@ -113,7 +115,7 @@ def form_total_query(ekpo_name="a", eban_name="b", rseg_name="c"):
     ret.append("AND "+ekpo_name+".EBELN = "+rseg_name+".EBELN")
     ret.append("AND "+ekpo_name+".EBELP = "+rseg_name+".EBELP")
 
-    return " ".join(ret), fields
+    return sqlparse.format(" ".join(ret), reindent=True), fields
 
 
 if __name__ == "__main__":

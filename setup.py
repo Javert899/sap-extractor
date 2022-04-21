@@ -34,6 +34,7 @@ setup(
         "cx_Oracle",
         "plantuml",
         "frozendict",
-        "pymssql"
+        "pymssql",
+        "sqlparse"
     ]
 )

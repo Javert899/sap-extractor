@@ -5,3 +5,4 @@ cx_Oracle
 plantuml
 frozendict
 pymssql
+sqlparse

@@ -1,3 +1,4 @@
 {
-  "prefix": "SAPSR3."
+  "prefix": "SAPSR3.",
+  "date_column_format": "%Y%m%d"
 }
