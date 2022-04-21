@@ -25,11 +25,13 @@ def row_number():
         return "ROW_NUMBER()"
 
 
-def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
+def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo", apply_rownum=True):
     ret = ["SELECT "+ekpo_name+".EKPO_ROW_NUMBER AS EKPO_ROW_NUMBER, "+ekpo_name+".MANDT AS MANDT, "+ekpo_name+".EBELN AS EBELN, "+ekpo_name+".EBELP AS EBELP, "+ekpo_name+".EBELNEBELP AS EBELNEBELP, "+ekpo_name+".BANFN, "+ekpo_name+".BNFPO, "+ekko_name+".ERNAM AS ERNAM, "+ekko_name+".AEDAT AS AEDAT, "+ekko_name+".LIFNR AS LIFNR, "+ekko_name+".ZTERM AS ZTERM FROM"]
     ret.append("(SELECT "+row_number()+" AS EKPO_ROW_NUMBER, MANDT, EBELN, EBELP, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM")
     ret.append(parameters["prefix"]+"EKPO")
-    ret.append("WHERE "+row_number()+" >= "+get_table_count("EKPO")+") "+ekpo_name+" JOIN (")
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("EKPO")+")")
+    ret.append(ekpo_name+" JOIN (")
     ret.append("SELECT MANDT, EBELN, ERNAM, AEDAT, LIFNR, ZTERM FROM")
     ret.append(parameters["prefix"]+"EKKO")
     #ret.append("WHERE "+row_number()+" >= "+get_table_count("EKKO"))
@@ -39,20 +41,22 @@ def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_eban_query(eban_name="eban"):
+def form_eban_query(eban_name="eban", apply_rownum=True):
     ret = ["SELECT "+row_number()+" AS EBAN_ROW_NUMBER, MANDT, BANFN, BNFPO, CONCAT(BANFN, BNFPO) AS BANFNBNFPO, ERNAM, BADAT FROM"]
-    ret.append(parameters["prefix"]+"EBAN")
+    if apply_rownum:
+        ret.append(parameters["prefix"]+"EBAN")
     ret.append("WHERE "+row_number()+" >= "+get_table_count("EBAN"))
     columns = ["EBAN_ROW_NUMBER", "MANDT", "BANFN", "BNFPO", "BANFNBNFPO", "ERNAM", "BADAT"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
+def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
     ret = ["SELECT "+rseg_name+".RSEG_ROW_NUMBER AS RSEG_ROW_NUMBER, "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELP AS EBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR"]
     ret.append("FROM (")
     ret.append("SELECT "+row_number()+" AS RSEG_ROW_NUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, EBELP FROM")
     ret.append(parameters["prefix"]+"RSEG")
-    ret.append("WHERE "+row_number()+" >= "+get_table_count("RSEG"))
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("RSEG"))
     ret.append(") "+rseg_name+" JOIN (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BLDAT, BUDAT, USNAM, TCODE, LIFNR FROM")
     ret.append(parameters["prefix"]+"RBKP")
@@ -65,57 +69,43 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_total_general_query(ekpo_name="a", eban_name="b", rseg_name="c"):
+def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
     fields = []
 
-    ekpo_query, ekpo_columns = form_ekpo_query()
     eban_query, eban_columns = form_eban_query()
-    rseg_query, rseg_columns = form_rseg_query()
 
-    fields.append(ekpo_name+".EKPO_ROW_NUMBER")
-    fields.append(ekpo_name+".MANDT")
-    fields.append(ekpo_name+".EBELN")
-    fields.append(ekpo_name+".EBELNEBELP")
-    fields.append(ekpo_name+".ERNAM")
-    fields.append(ekpo_name+".AEDAT")
-    fields.append(ekpo_name+".LIFNR")
-    fields.append(ekpo_name+".ZTERM")
     fields.append(eban_name+".EBAN_ROW_NUMBER")
+    fields.append(eban_name+".MANDT")
     fields.append(eban_name+".BANFN")
     fields.append(eban_name+".BNFPO")
     fields.append(eban_name+".BANFNBNFPO")
     fields.append(eban_name+".ERNAM")
     fields.append(eban_name+".BADAT")
-    fields.append(rseg_name+".RSEG_ROW_NUMBER")
-    fields.append(rseg_name+".BUKRS")
-    fields.append(rseg_name+".GJAHR")
-    fields.append(rseg_name+".BELNR")
-    fields.append(rseg_name+".BUZEI")
-    fields.append(rseg_name+".BLDAT")
-    fields.append(rseg_name+".BUDAT")
-    fields.append(rseg_name+".USNAM")
-    fields.append(rseg_name+".TCODE")
-    fields.append(rseg_name+".LIFNR")
+    fields.append(ekpo_name+".EBELN")
+    fields.append(ekpo_name+".EBELNEBELP")
 
     ret = ["SELECT "]
     ret.append(", ".join(fields))
     ret.append(" FROM (")
-    ret.append(ekpo_query)
-    ret.append(") "+ekpo_name)
-    ret.append("FULL OUTER JOIN (")
     ret.append(eban_query)
-    ret.append(") "+eban_name)
-    ret.append("ON "+ekpo_name+".MANDT = "+eban_name+".MANDT")
-    ret.append("AND "+ekpo_name+".BANFN = "+eban_name+".BANFN")
-    ret.append("AND "+ekpo_name+".BNFPO = "+eban_name+".BNFPO")
-    ret.append("FULL OUTER JOIN (")
-    ret.append(rseg_query)
-    ret.append(") "+rseg_name)
-    ret.append("ON "+ekpo_name+".MANDT = "+rseg_name+".MANDT")
-    ret.append("AND "+ekpo_name+".EBELN = "+rseg_name+".EBELN")
-    ret.append("AND "+ekpo_name+".EBELP = "+rseg_name+".EBELP")
+    ret.append(") "+eban_name+" LEFT JOIN (")
+    ret.append("SELECT MANDT, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM "+parameters["prefix"]+"EKPO")
+    ret.append(") "+ekpo_name)
+    ret.append("ON "+eban_name+".MANDT = "+ekpo_name+".MANDT")
+    ret.append("AND "+eban_name+".BANFN = "+ekpo_name+".BANFN")
+    ret.append("AND "+eban_name+".BNFPO = "+ekpo_name+".BNFPO")
 
     return sqlparse.format(" ".join(ret), reindent=True), fields
+
+
+def write_result(name, query, columns):
+    F = open("query_content_" + name + ".txt", "w")
+    F.write(query)
+    F.close()
+
+    F = open("query_columns_" + name + ".txt", "w")
+    F.write(" ".join(columns))
+    F.close()
 
 
 if __name__ == "__main__":
@@ -123,7 +113,18 @@ if __name__ == "__main__":
     eban_query, eban_columns = form_eban_query()
     rseg_query, rseg_columns = form_rseg_query()
 
-    total_query, total_columns = form_total_general_query()
+    pr_query, pr_columns = final_query_purchase_requisitions()
+    write_result("pr", pr_query, pr_columns)
+
+    from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
+    c = get_connection()
+
+    dataframe = c.execute_read_sql(pr_query, pr_columns)
+    print(dataframe)
+    print(dataframe.columns)
+    dataframe.to_csv("prova.csv", index=False)
+
+    """total_query, total_columns = form_total_general_query()
 
     F = open("query_content_general.txt", "w")
     F.write(total_query)
@@ -138,4 +139,4 @@ if __name__ == "__main__":
     dataframe = c.execute_read_sql(total_query, total_columns)
     print(dataframe)
     print(dataframe.columns)
-    dataframe.to_csv("prova.csv", index=False)
+    dataframe.to_csv("prova.csv", index=False)"""
