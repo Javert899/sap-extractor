@@ -143,8 +143,7 @@ def write_result(name, query, columns):
 
 if __name__ == "__main__":
     ekpo_query, ekpo_columns = form_ekpo_query()
-    eban_query, eban_columns = form_eban_query()
-    rseg_query, rseg_columns = form_rseg_query()
+    write_result("po", ekpo_query, ekpo_columns)
 
     pr_query, pr_columns = final_query_purchase_requisitions()
     write_result("pr", pr_query, pr_columns)
