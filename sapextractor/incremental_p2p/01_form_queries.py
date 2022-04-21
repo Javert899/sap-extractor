@@ -131,6 +131,48 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     return sqlparse.format(" ".join(ret), reindent=True), fields
 
 
+def changes_ekko():
+    columns = ["MANDT", "EBELN", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
+
+    ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS EBELN, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("JOIN")
+    ret.append("(SELECT MANDT, EBELN FROM "+parameters["prefix"]+"EKKO) b")
+    ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.EBELN JOIN")
+    ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
+    ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
+def changes_rbkp():
+    columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
+
+    ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("JOIN")
+    ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
+    ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")
+    ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
+    ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
+def changes_bkpf():
+    columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
+
+    ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("JOIN")
+    ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"BKPF) b")
+    ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")
+    ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
+    ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
 def write_result(name, query, columns):
     F = open("query_content_" + name + ".txt", "w")
     F.write(query)
@@ -150,6 +192,24 @@ if __name__ == "__main__":
 
     inv_query, inv_columns = final_query_invoice_processing()
     write_result("invp", inv_query, inv_columns)
+
+    ekko_chng_query, ekko_chng_columns = changes_ekko()
+    write_result("chngsekko", ekko_chng_query, ekko_chng_columns)
+
+    rbkp_chng_query, rbkp_chng_columns = changes_rbkp()
+    write_result("chngsrbkp", rbkp_chng_query, rbkp_chng_columns)
+
+    bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
+    write_result("chngsrbkp", bkpf_chng_query, bkpf_chng_columns)
+
+    from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
+
+    c = get_connection()
+
+    dataframe = c.execute_read_sql(ekko_chng_query, ekko_chng_columns)
+    print(dataframe)
+    print(dataframe.columns)
+    dataframe.to_csv("prova.csv", index=False)
 
     """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
     c = get_connection()
