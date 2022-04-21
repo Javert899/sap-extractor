@@ -264,6 +264,7 @@
 									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
 									Include resource: <input type="checkbox" id="p2p_csv_include_resource" checked /> <br />
 									Enable grouping: <input type="checkbox" id="p2p_csv_enable_grouping" checked /> <br />
+									Adapt PO order time from change table: <input type="checkbox" id="p2p_csv_enable_po_time_from_changes" checked /> <br />
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
@@ -278,6 +279,7 @@
 									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
 									Include resource: <input type="checkbox" id="p2p_xes_include_resource" checked /> <br />
 									Enable grouping: <input type="checkbox" id="p2p_xes_enable_grouping" checked /> <br />
+									Adapt PO order time from change table: <input type="checkbox" id="p2p_xes_enable_po_time_from_changes" checked /> <br />
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
@@ -935,6 +937,7 @@
 			ext_args["bukrs"] = document.getElementById("p2p_csv_company_code").value;
 			ext_args["include_resource"] = document.getElementById("p2p_csv_include_resource").checked;
 			ext_args["enable_grouping"] = document.getElementById("p2p_csv_enable_grouping").checked;
+			ext_args["enable_po_time_from_changes"] = document.getElementById("p2p_csv_enable_po_time_from_changes").checked;
 			return ext_args;
 		}
 		
@@ -947,6 +950,7 @@
 			ext_args["bukrs"] = document.getElementById("p2p_xes_company_code").value;
 			ext_args["include_resource"] = document.getElementById("p2p_xes_include_resource").checked;
 			ext_args["enable_grouping"] = document.getElementById("p2p_xes_enable_grouping").checked;
+			ext_args["enable_po_time_from_changes"] = document.getElementById("p2p_xes_enable_po_time_from_changes").checked;
 			return ext_args;
 		}
 		
