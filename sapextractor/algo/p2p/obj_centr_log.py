@@ -33,13 +33,21 @@ def get_changes(con, dataframe, mandt="800", bukrs="1000"):
     return ret
 
 
-def apply(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extra_els_query=None):
+def apply(con, gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extra_els_query=None, include_resource=True):
     dataframe, G, nodes_types = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, extra_els_query=extra_els_query)
     if len(dataframe) > 0:
         changes = get_changes(con, dataframe, mandt=mandt, bukrs=bukrs)
         dataframe = pd.concat([dataframe, changes])
         dataframe["event_id"] = dataframe.index.astype(str)
         dataframe = dataframe.sort_values("event_timestamp")
+    if not include_resource:
+        if "event_USNAM" in dataframe.columns:
+            del dataframe["event_USNAM"]
+        if "event_ERNAM" in dataframe.columns:
+            del dataframe["event_ERNAM"]
+        if "event_USERNAME" in dataframe.columns:
+            del dataframe["event_USERNAME"]
+    print(dataframe.columns)
     dataframe.type = "succint"
     return dataframe
 

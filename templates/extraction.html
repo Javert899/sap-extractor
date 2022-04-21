@@ -262,6 +262,8 @@
 									Fiscal year: <input type="text" id="p2p_csv_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_csv_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_csv_company_code" value="1000" /> <br />
+									Include resource: <input type="checkbox" id="p2p_csv_include_resource" checked /> <br />
+									Enable grouping: <input type="checkbox" id="p2p_csv_enable_grouping" checked /> <br />
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
@@ -274,6 +276,8 @@
 									Fiscal year: <input type="text" id="p2p_xes_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_xes_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_xes_company_code" value="1000" /> <br />
+									Include resource: <input type="checkbox" id="p2p_xes_include_resource" checked /> <br />
+									Enable grouping: <input type="checkbox" id="p2p_xes_enable_grouping" checked /> <br />
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:showProcessMap()">Show the Process Map</button>
@@ -285,6 +289,7 @@
 									Fiscal year: <input type="text" id="p2p_ocel_fiscal_year" value="2014" /> <br />
 									Client: <input type="text" id="p2p_ocel_client" value="800" /> <br />
 									Company code: <input type="text" id="p2p_ocel_company_code" value="1000" /> <br />
+									Include resource: <input type="checkbox" id="p2p_ocel_include_resource" checked /> <br />
 									<button onclick="javascript:showP2PErExplanation()">Show the explanation of the ER diagram</button><br />
 									<b>Helper utilities:</b><button onclick="javascript:p2pClient()">Show Statistics</button><br />
 									<b>Extraction utilities:</b><button onclick="javascript:extract()">Extract the Event Log</button>
@@ -928,6 +933,8 @@
 			ext_args["gjahr"] = document.getElementById("p2p_csv_fiscal_year").value;
 			ext_args["mandt"] = document.getElementById("p2p_csv_client").value;
 			ext_args["bukrs"] = document.getElementById("p2p_csv_company_code").value;
+			ext_args["include_resource"] = document.getElementById("p2p_csv_include_resource").checked;
+			ext_args["enable_grouping"] = document.getElementById("p2p_csv_enable_grouping").checked;
 			return ext_args;
 		}
 		
@@ -938,6 +945,8 @@
 			ext_args["gjahr"] = document.getElementById("p2p_xes_fiscal_year").value;
 			ext_args["mandt"] = document.getElementById("p2p_xes_client").value;
 			ext_args["bukrs"] = document.getElementById("p2p_xes_company_code").value;
+			ext_args["include_resource"] = document.getElementById("p2p_xes_include_resource").checked;
+			ext_args["enable_grouping"] = document.getElementById("p2p_xes_enable_grouping").checked;
 			return ext_args;
 		}
 		
@@ -947,6 +956,7 @@
 			ext_args["gjahr"] = document.getElementById("p2p_ocel_fiscal_year").value;
 			ext_args["mandt"] = document.getElementById("p2p_ocel_client").value;
 			ext_args["bukrs"] = document.getElementById("p2p_ocel_company_code").value;
+			ext_args["include_resource"] = document.getElementById("p2p_ocel_include_resource").checked;
 			return ext_args;
 		}
 	</script>

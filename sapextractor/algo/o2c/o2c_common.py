@@ -37,16 +37,18 @@ def apply(con, keep_first=True, min_extr_date="2020-01-01 00:00:00", mandt="800"
     # RFMNG, MEINS, RFWRT, WAERS, MATNR, BWART
     try:
         vbfa = con.prepare_and_execute_query("VBFA", ["ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V", "RFMNG",
-                                                      "MEINS", "RFWRT", "WAERS", "MATNR", "BWART", "VRKME", "FKTYP"], additional_query_part=" WHERE MANDT = '"+mandt+"'")
+                                                      "MEINS", "RFWRT", "WAERS", "MATNR", "BWART", "VRKME", "FKTYP", "POSNN", "POSNV"], additional_query_part=" WHERE MANDT = '"+mandt+"'")
     except:
         vbfa = con.prepare_and_execute_query("VBFA", ["ERDAT", "ERZET", "VBELN", "VBELV", "VBTYP_N", "VBTYP_V"], additional_query_part=" WHERE MANDT = '"+mandt+"'")
     timestamp_column_from_dt_tm.apply(vbfa, "ERDAT", "ERZET", "event_timestamp")
-    min_extr_date = parser.parse(min_extr_date)
-    vbfa = vbfa[vbfa["event_timestamp"] > min_extr_date]
     doc_types = set(vbfa["VBTYP_N"].unique()).union(set(vbfa["VBTYP_V"].unique()))
     vbtyp = extract_vbtyp.apply_static(con, doc_types=doc_types)
     vbfa["VBTYP_N"] = vbfa["VBTYP_N"].map(vbtyp)
     vbfa["VBTYP_V"] = vbfa["VBTYP_V"].map(vbtyp)
+    vbfa.to_csv("prova.csv", index=False)
+    print("DONEEEEEE")
+    min_extr_date = parser.parse(min_extr_date)
+    vbfa = vbfa[vbfa["event_timestamp"] > min_extr_date]
     vbfa = vbfa_closure(con, vbfa, min_extr_date, mandt=mandt)
     vbfa = vbfa[vbfa["event_timestamp"] >= min_extr_date]
     vbfa = vbfa.reset_index()

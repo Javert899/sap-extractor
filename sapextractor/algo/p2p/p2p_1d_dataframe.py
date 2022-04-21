@@ -45,7 +45,7 @@ def extract_changes_p2p(con, dataframe, ekko_query, rbkp_query, mandt="800", buk
     return ret
 
 
-def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True, extra_els_query=None, enable_po_time_from_changes=True):
+def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00", mandt="800", bukrs="1000", extract_changes=True, extra_els_query=None, enable_po_time_from_changes=True, include_resource=True, enable_grouping=True):
     dataframe, G, nodes_types, ekko_query, rbkp_query = p2p_common.extract_tables_and_graph(con, gjahr=gjahr, min_extr_date=min_extr_date, mandt=mandt, bukrs=bukrs, return_ekko_query=True, extra_els_query=extra_els_query)
     print(ekko_query)
     print(rbkp_query)
@@ -89,16 +89,32 @@ def apply(con, ref_type="EKKO", gjahr="2014", min_extr_date="2014-01-01 00:00:00
         dataframe["USERNAME_USTYP"] = dataframe["org:resource"].map(dictio_ustyp)
         dataframe["USERNAME_CLASS"] = dataframe["org:resource"].map(dictio_class)
         # postprocessing
-        grouping_columns = ["case:concept:name", "time:timestamp", "org:resource", "FROMTABLE"]
-        dct = dataframe.groupby(grouping_columns)["concept:name"].apply(set).to_dict()
-        for k in dct:
-            dct[k] = ",".join(sorted(list(dct[k])))
-        dataframe["NEW_ACTIVITY_COLUMN"] = dataframe[grouping_columns].apply(tuple, axis=1).map(dct)
-        dataframe["NEW_ACTIVITY_COLUMN"] = dataframe["NEW_ACTIVITY_COLUMN"].fillna(dataframe["concept:name"])
-        dataframe["concept:name"] = dataframe["NEW_ACTIVITY_COLUMN"]
-        del dataframe["NEW_ACTIVITY_COLUMN"]
-        dataframe = dataframe.groupby(grouping_columns).first().reset_index()
-        dataframe = dataframe.sort_values(["case:concept:name", "time:timestamp", "concept:name"])
+        if enable_grouping:
+            grouping_columns = ["case:concept:name", "time:timestamp", "org:resource", "FROMTABLE"]
+            dct = dataframe.groupby(grouping_columns)["concept:name"].apply(set).to_dict()
+            for k in dct:
+                dct[k] = ",".join(sorted(list(dct[k])))
+            dataframe["NEW_ACTIVITY_COLUMN"] = dataframe[grouping_columns].apply(tuple, axis=1).map(dct)
+            dataframe["NEW_ACTIVITY_COLUMN"] = dataframe["NEW_ACTIVITY_COLUMN"].fillna(dataframe["concept:name"])
+            dataframe["concept:name"] = dataframe["NEW_ACTIVITY_COLUMN"]
+            del dataframe["NEW_ACTIVITY_COLUMN"]
+            dataframe = dataframe.groupby(grouping_columns).first().reset_index()
+            dataframe = dataframe.sort_values(["case:concept:name", "time:timestamp", "concept:name"])
+
+            print("after grouping", len(dataframe))
+
+    if not include_resource:
+        if "USNAM" in dataframe.columns:
+            del dataframe["USNAM"]
+        if "ERNAM" in dataframe.columns:
+            del dataframe["ERNAM"]
+        if "USERNAME" in dataframe.columns:
+            del dataframe["USERNAME"]
+        if "org:resource" in dataframe.columns:
+            del dataframe["org:resource"]
+
+    print(dataframe.columns)
+
     return dataframe
 
 
