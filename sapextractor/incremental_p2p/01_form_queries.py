@@ -69,6 +69,53 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
+def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_bseg_name="invoicebseg", payment_bkpf_name="paymentbkpf", payment_bseg_name="paymentbseg", apply_rownum=True):
+    ret = []
+    #ret.append("SELECT Count(*) FROM (")
+    ret.append("SELECT PAYMENTBSEGROWNUMBER, " + payment_bseg_name + ".MANDT AS MANDT, " + payment_bseg_name + ".BUKRS AS BUKRS, " + payment_bseg_name + ".GJAHR AS GJAHR, ACCDOCBELNRGJAHR, ACCDOCBELNRBUZEIGJAHR, INVOICEBELNRGJAHR, INVOICEBELNRBUZEIGJAHR, PAYMENTBSEGBSCHL, PAYMENTBLDAT, PAYMENTBUDAT, PAYMENTBLART, PAYMENTUSNAM")
+    ret.append("FROM (")
+    ret.append("SELECT "+row_number()+" AS PAYMENTBSEGROWNUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI AS PAYMENTBSEGBUZEI, CONCAT(BELNR, GJAHR) AS ACCDOCBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS ACCDOCBELNRBUZEIGJAHR, BSCHL AS PAYMENTBSEGBSCHL FROM")
+    ret.append(parameters["prefix"]+"BSEG")
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("BSEG"))
+    ret.append(") " + payment_bseg_name)
+    ret.append("JOIN (")
+    ret.append("SELECT "+row_number()+" AS INVOICEBSEGROWNUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI AS INVOICEBSEGBUZEI, AUGBL, AUGGJ, AUGDT FROM")
+    ret.append(parameters["prefix"]+"BSAK")
+    ret.append(") " + invoice_bseg_name + " ON " + payment_bseg_name + ".MANDT = " + invoice_bseg_name + ".MANDT")
+    ret.append("AND " + payment_bseg_name + ".BUKRS = " + invoice_bseg_name + ".BUKRS")
+    ret.append("AND " + payment_bseg_name + ".GJAHR = " + invoice_bseg_name + ".AUGGJ")
+    ret.append("AND " + payment_bseg_name + ".BELNR = " + invoice_bseg_name + ".AUGBL")
+    ret.append("JOIN (")
+    ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BLDAT AS PAYMENTBLDAT, BUDAT AS PAYMENTBUDAT, BLART AS PAYMENTBLART, USNAM AS PAYMENTUSNAM FROM")
+    ret.append(parameters["prefix"]+"BKPF")
+    ret.append(") " + payment_bkpf_name + " ON " + payment_bseg_name + ".MANDT = " + payment_bkpf_name + ".MANDT")
+    ret.append("AND " + payment_bseg_name + ".BUKRS = " + payment_bkpf_name + ".BUKRS")
+    ret.append("AND " + payment_bseg_name + ".GJAHR = " + payment_bkpf_name + ".GJAHR")
+    ret.append("AND " + payment_bseg_name + ".BELNR = " + payment_bkpf_name + ".BELNR")
+    ret.append("JOIN (")
+    ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, AWKEY FROM")
+    ret.append(parameters["prefix"]+"BKPF")
+    ret.append(") " + invoice_bkpf_name + " ON " + invoice_bseg_name + ".MANDT = " + invoice_bkpf_name + ".MANDT")
+    ret.append("AND " + invoice_bseg_name + ".BUKRS = " + invoice_bkpf_name + ".BUKRS")
+    ret.append("AND " + invoice_bseg_name + ".GJAHR = " + invoice_bkpf_name + ".GJAHR")
+    ret.append("AND " + invoice_bseg_name + ".BELNR = " + invoice_bkpf_name + ".BELNR")
+    ret.append("JOIN (")
+    ret.append("SELECT MANDT, BUKRS, CONCAT(BELNR, GJAHR) AS INVOICEBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS INVOICEBELNRBUZEIGJAHR, BUZEI AS RSEGBUZEI FROM")
+    ret.append(parameters["prefix"]+"RSEG")
+    ret.append(") " + rseg_name +" ON " + invoice_bkpf_name + ".MANDT = " + rseg_name + ".MANDT")
+    ret.append("AND " + rseg_name +".BUKRS = " + invoice_bkpf_name + ".BUKRS")
+    ret.append("AND " + rseg_name +".INVOICEBELNRGJAHR = " + invoice_bkpf_name + ".AWKEY")
+    ret.append("AND LTRIM(" + rseg_name +".RSEGBUZEI, '0') = LTRIM(" + invoice_bseg_name + ".INVOICEBSEGBUZEI, '0')")
+
+    columns = ["PAYMENTBSEGROWNUMBER", "MANDT", "BUKRS", "GJAHR", "ACCDOCBELNRGJAHR", "ACCDOCBELNRBUZEIGJAHR", "INVOICEBELNRGJAHR", "INVOICEBELNRBUZEIGJAHR", "PAYMENTBSEGBSCHL", "PAYMENTBLDAT", "PAYMENTBUDAT", "PAYMENTBLART", "PAYMENTUSNAM"]
+
+    #ret.append(")")
+    #columns = ["COUNT"]
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
 def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
     fields = []
 
@@ -193,6 +240,9 @@ if __name__ == "__main__":
     inv_query, inv_columns = final_query_invoice_processing()
     write_result("invp", inv_query, inv_columns)
 
+    bkpf_query, bkpf_columns = form_bkpf_query()
+    write_result("bkpf", bkpf_query, bkpf_columns)
+
     ekko_chng_query, ekko_chng_columns = changes_ekko()
     write_result("chngsekko", ekko_chng_query, ekko_chng_columns)
 
@@ -206,7 +256,7 @@ if __name__ == "__main__":
 
     c = get_connection()
 
-    dataframe = c.execute_read_sql(ekko_chng_query, ekko_chng_columns)
+    dataframe = c.execute_read_sql(bkpf_query, bkpf_columns)
     print(dataframe)
     print(dataframe.columns)
     dataframe.to_csv("prova.csv", index=False)
