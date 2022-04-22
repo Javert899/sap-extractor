@@ -261,7 +261,7 @@ if __name__ == "__main__":
     write_result("chngsrbkp", rbkp_chng_query, rbkp_chng_columns)
 
     bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
-    write_result("chngsrbkp", bkpf_chng_query, bkpf_chng_columns)
+    write_result("chngsbkpf", bkpf_chng_query, bkpf_chng_columns)
 
     """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
