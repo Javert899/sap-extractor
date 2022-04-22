@@ -17,8 +17,8 @@ def connect_oracle(hostname="127.0.0.1", port="1521", sid="xe", username="system
 
 
 def connect_mssql(hostname="127.0.0.1", username="sa", password="", database="prova", table_prefix=""):
-    import database_connection.mic_sql
-    return database_connection.mic_sql.apply(hostname=hostname, username=username, password=password, database=database, table_prefix=table_prefix)
+    from sapextractor.database_connection import mic_sql
+    return mic_sql.apply(hostname=hostname, username=username, password=password, database=database, table_prefix=table_prefix)
 
 
 def get_o2c_classic_event_log(con, ref_type="Invoice", keep_first=True, min_extr_date="2020-01-01 00:00:00", gjahr="2020", enable_changes=True, enable_payments=True, allowed_activities=None, mandt="800"):

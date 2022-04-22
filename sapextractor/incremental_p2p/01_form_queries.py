@@ -51,9 +51,9 @@ def form_eban_query(eban_name="eban", apply_rownum=True):
 
 
 def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
-    ret = ["SELECT "+rseg_name+".RSEG_ROW_NUMBER AS RSEG_ROW_NUMBER, "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR"]
+    ret = ["SELECT "+rseg_name+".RSEG_ROW_NUMBER AS RSEG_ROW_NUMBER, "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR, BELNRGJAHR, BELNRBUZEIGJAHR"]
     ret.append("FROM (")
-    ret.append("SELECT "+row_number()+" AS RSEG_ROW_NUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP FROM")
+    ret.append("SELECT "+row_number()+" AS RSEG_ROW_NUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, CONCAT(BELNR, GJAHR) AS BELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS BELNRBUZEIGJAHR FROM")
     ret.append(parameters["prefix"]+"RSEG")
     if apply_rownum:
         ret.append("WHERE "+row_number()+" >= "+get_table_count("RSEG"))
@@ -65,7 +65,7 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
     ret.append(rseg_name+".BUKRS = "+rbkp_name+".BUKRS AND")
     ret.append(rseg_name+".GJAHR = "+rbkp_name+".GJAHR AND")
     ret.append(rseg_name+".BELNR = "+rbkp_name+".BELNR")
-    columns = ["RSEG_ROW_NUMBER", "MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR"]
+    columns = ["RSEG_ROW_NUMBER", "MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR", "BELNRGJAHR", "BELNRBUZEIGJAHR"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
