@@ -261,36 +261,11 @@ if __name__ == "__main__":
     bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
     write_result("chngsrbkp", bkpf_chng_query, bkpf_chng_columns)
 
-    from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
+    """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
     c = get_connection()
 
     dataframe = c.execute_read_sql(bkpf_query, bkpf_columns)
-    print(dataframe)
-    print(dataframe.columns)
-    dataframe.to_csv("prova.csv", index=False)
-
-    """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
-    c = get_connection()
-
-    dataframe = c.execute_read_sql(pr_query, pr_columns)
-    print(dataframe)
-    print(dataframe.columns)
-    dataframe.to_csv("prova.csv", index=False)"""
-
-    """total_query, total_columns = form_total_general_query()
-
-    F = open("query_content_general.txt", "w")
-    F.write(total_query)
-    F.close()
-    F = open("query_columns_general.txt", "w")
-    F.write(" ".join(total_columns))
-    F.close()
-
-    from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
-    c = get_connection()
-
-    dataframe = c.execute_read_sql(total_query, total_columns)
     print(dataframe)
     print(dataframe.columns)
     dataframe.to_csv("prova.csv", index=False)"""

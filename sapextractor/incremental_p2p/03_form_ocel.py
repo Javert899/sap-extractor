@@ -24,8 +24,8 @@ def read_dataframe_po():
     dataframe["AEDAT"] = pd.to_datetime(dataframe["AEDAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["AEDAT"])
     dataframe["EID"] = "EKKOROW_" + dataframe["EKPO_ROW_NUMBER"]
-    dataframe["EBELN"] = "EBELN_" + dataframe["EBELN"]
-    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["EBELNEBELP"]
+    dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["EBELN"]
+    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
     dictio_ebelns = dataframe.groupby("EID")["EBELN"].apply(set).to_dict()
     dictio_ebelnebelps = dataframe.groupby("EID")["EBELNEBELP"].apply(set).to_dict()
     ordering = 2
@@ -59,10 +59,10 @@ def read_dataframe_pr():
     dataframe["BADAT"] = pd.to_datetime(dataframe["BADAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["BADAT"])
     dataframe["EID"] = "EBANROW_" + dataframe["EBAN_ROW_NUMBER"]
-    dataframe["EBELN"] = "EBELN_" + dataframe["EBELN"]
-    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["EBELNEBELP"]
-    dataframe["BANFN"] = "BANFN_" + dataframe["BANFN"]
-    dataframe["BANFNBNFPO"] = "BANFNBNFPO_" + dataframe["BANFNBNFPO"]
+    dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
+    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
+    dataframe["BANFN"] = "BANFN_" + dataframe["MANDT"] + "_" +dataframe["BANFN"]
+    dataframe["BANFNBNFPO"] = "BANFNBNFPO_" + dataframe["MANDT"] + "_" +dataframe["BANFNBNFPO"]
     dictio_ebelns = dataframe.dropna(subset=["EBELN"]).groupby("EID")["EBELN"].apply(set).to_dict()
     dictio_ebelnebelps = dataframe.dropna(subset=["EBELNEBELP"]).groupby("EID")["EBELNEBELP"].apply(set).to_dict()
     dictio_banfns = dataframe.groupby("EID")["BANFN"].apply(set).to_dict()
