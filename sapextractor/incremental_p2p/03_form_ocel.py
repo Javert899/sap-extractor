@@ -106,10 +106,17 @@ if __name__ == "__main__":
     events = pd.DataFrame(events)
     objects = pd.DataFrame(objects)
     relations = pd.DataFrame(relations)
-    events = events.sort_values(["ocel:timestamp", "ordering"])
-    relations = relations.sort_values(["ocel:timestamp", "ordering"])
+    if len(events) > 0:
+        events = events.sort_values(["ocel:timestamp", "ordering"])
+    if len(relations) > 0:
+        relations = relations.sort_values(["ocel:timestamp", "ordering"])
     print(events)
     print(relations)
+
+    if len(events) == 0:
+        events = pd.DataFrame({"ocel:eid": [], "ocel:activity": [], "ocel:timestamp": []})
+        objects = pd.DataFrame({"ocel:oid": [], "ocel:type": []})
+        relations = pd.DataFrame({"ocel:eid": [], "ocel:activity": [], "ocel:timestamp": [], "ocel:oid": [], "ocel:type": []})
 
     ocel = OCEL()
     ocel.events = events

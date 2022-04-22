@@ -14,7 +14,7 @@ import sqlparse
 
 def get_table_count(table):
     if table in tables_count:
-        return str(tables_count[table])
+        return str(tables_count[table] + 1)
     return "0"
 
 
@@ -43,9 +43,9 @@ def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo", apply_rownum=True):
 
 def form_eban_query(eban_name="eban", apply_rownum=True):
     ret = ["SELECT "+row_number()+" AS EBAN_ROW_NUMBER, MANDT, BANFN, BNFPO, CONCAT(BANFN, BNFPO) AS BANFNBNFPO, ERNAM, BADAT FROM"]
+    ret.append(parameters["prefix"] + "EBAN")
     if apply_rownum:
-        ret.append(parameters["prefix"]+"EBAN")
-    ret.append("WHERE "+row_number()+" >= "+get_table_count("EBAN"))
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("EBAN"))
     columns = ["EBAN_ROW_NUMBER", "MANDT", "BANFN", "BNFPO", "BANFNBNFPO", "ERNAM", "BADAT"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
@@ -178,11 +178,14 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     return sqlparse.format(" ".join(ret), reindent=True), fields
 
 
-def changes_ekko():
+def changes_ekko(apply_rownum=True):
     columns = ["MANDT", "EBELN", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS EBELN, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
-    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
+    ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, EBELN FROM "+parameters["prefix"]+"EKKO) b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.EBELN JOIN")
@@ -192,11 +195,14 @@ def changes_ekko():
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def changes_rbkp():
+def changes_rbkp(apply_rownum=True):
     columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
-    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
+    ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")
@@ -206,11 +212,14 @@ def changes_rbkp():
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def changes_bkpf():
+def changes_bkpf(apply_rownum=True):
     columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
-    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS) a")
+    ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
+    if apply_rownum:
+        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
+    ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"BKPF) b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")

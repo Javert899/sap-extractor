@@ -6,7 +6,7 @@ import json
 from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
 parameters = json.load(open("parameters.json", "r"))
-tables = ["EKKO", "EKPO", "RBKP", "RSEG", "EKBE", "BKPF", "BSEG", "CDHDR", "CDPOS"]
+tables = ["EKKO", "EKPO", "RBKP", "RSEG", "EKBE", "BKPF", "BSEG", "CDHDR", "CDPOS", "EBAN"]
 
 c = get_connection()
 
