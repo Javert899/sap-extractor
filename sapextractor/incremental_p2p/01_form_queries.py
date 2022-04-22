@@ -161,6 +161,8 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     fields.append(rseg_name+".USNAM")
     fields.append(rseg_name+".TCODE")
     fields.append(rseg_name+".LIFNR")
+    fields.append(rseg_name+".BELNRGJAHR")
+    fields.append(rseg_name+".BELNRBUZEIGJAHR")
     fields.append(ekpo_name+".EBELN")
     fields.append(ekpo_name+".EBELNEBELP")
 
