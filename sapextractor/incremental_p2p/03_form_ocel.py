@@ -99,9 +99,56 @@ def read_dataframe_pr():
             relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
 
 
+def read_dataframe_invp():
+    dataframe = pd.read_csv("dataframe_invp.csv", dtype=str)
+    dataframe.columns = [x.split(".")[1] for x in dataframe.columns]
+    dataframe["BUDAT"] = pd.to_datetime(dataframe["BUDAT"], format=parameters["date_column_format"], errors="coerce")
+    dataframe = dataframe.dropna(subset=["BUDAT"])
+    dataframe["EID"] = "EBANROW_" + dataframe["RSEG_ROW_NUMBER"]
+    dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
+    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
+    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRGJAHR"]
+    dataframe["BELNRBUZEIGJAHR"] = "BELNRBUZEIGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRBUZEIGJAHR"]
+    dictio_ebelns = dataframe.dropna(subset=["EBELN"]).groupby("EID")["EBELN"].apply(set).to_dict()
+    dictio_ebelnebelps = dataframe.dropna(subset=["EBELNEBELP"]).groupby("EID")["EBELNEBELP"].apply(set).to_dict()
+    dictio_belnrgjahr = dataframe.groupby("EID")["BELNRGJAHR"].apply(set).to_dict()
+    dictio_belnrbuzeigjahr = dataframe.groupby("EID")["BELNRBUZEIGJAHR"].apply(set).to_dict()
+    ordering = 4
+
+    dataframe = dataframe.groupby("EID").first().reset_index()
+    for index, row in dataframe.iterrows():
+        activity = "Create Invoice Item"
+        timestamp = row["BUDAT"]
+        eid = row["EID"]
+
+        this_objects = {}
+        if eid in dictio_ebelns:
+            for ob in dictio_ebelns[eid]:
+                obtype = ob.split("_")[0]
+                this_objects[ob] = obtype
+            for ob in dictio_ebelnebelps[eid]:
+                obtype = ob.split("_")[0]
+                this_objects[ob] = obtype
+        for ob in dictio_belnrgjahr[eid]:
+            obtype = ob.split("_")[0]
+            this_objects[ob] = obtype
+        for ob in dictio_belnrbuzeigjahr[eid]:
+            obtype = ob.split("_")[0]
+            this_objects[ob] = obtype
+
+        events.append({"ocel:eid": eid, "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:omap": list(this_objects), "ordering": ordering})
+
+        for ob in this_objects:
+            if ob not in added_objects:
+                added_objects.add(ob)
+                objects.append({"ocel:oid": ob, "ocel:type": this_objects[ob]})
+            relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
+
+
 if __name__ == "__main__":
     read_dataframe_pr()
     read_dataframe_po()
+    read_dataframe_invp()
 
     events = pd.DataFrame(events)
     objects = pd.DataFrame(objects)
