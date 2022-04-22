@@ -20,7 +20,7 @@ def count_tables():
     dictio = {}
     for table in tables:
         dictio[table] = count_table(table)
-    json.dump(dictio, open("tables_count.json", "w"))
+    json.dump(dictio, open("tables_count.json", "w"), indent=2)
 
 
 if __name__ == "__main__":

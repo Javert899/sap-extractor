@@ -13,6 +13,8 @@ from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
 c = get_connection()
 
+t0 = time.time()
+
 for file in os.listdir("."):
     if file.startswith("query_content_"):
         name = file.split(".txt")[0].split("query_content_")[1]
@@ -30,8 +32,8 @@ for file in os.listdir("."):
         num_rows[name] = len(dataframe)
 
         print(dataframe)
-        print({"ex_time": ex_time, "num_rows": num_rows})
+        print({"ex_time": ex_time, "num_rows": num_rows, "total_time": bb - t0})
 
-        json.dump({"ex_time": ex_time, "num_rows": num_rows}, open("output_measurement.json", "w"))
+        json.dump({"ex_time": ex_time, "num_rows": num_rows, "total_time": bb - t0}, open("output_measurement.json", "w"), indent=2)
 
         dataframe.to_csv("dataframe_"+name+".csv", index=False)
