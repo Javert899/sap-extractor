@@ -23,7 +23,7 @@ def read_dataframe_po():
     dataframe = pd.read_csv("dataframe_po.csv", dtype=str)
     dataframe["AEDAT"] = pd.to_datetime(dataframe["AEDAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["AEDAT"])
-    dataframe["EID"] = "EKKOROW_" + dataframe["EKPO_ROW_NUMBER"]
+    dataframe["EID"] = "EKKOROW_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["EBELN"]
     dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
     dictio_ebelns = dataframe.groupby("EID")["EBELN"].apply(set).to_dict()
@@ -58,7 +58,7 @@ def read_dataframe_pr():
     dataframe.columns = [x.split(".")[1] for x in dataframe.columns]
     dataframe["BADAT"] = pd.to_datetime(dataframe["BADAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["BADAT"])
-    dataframe["EID"] = "EBANROW_" + dataframe["EBAN_ROW_NUMBER"]
+    dataframe["EID"] = "EBANROW_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
     dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
     dataframe["BANFN"] = "BANFN_" + dataframe["MANDT"] + "_" +dataframe["BANFN"]
@@ -104,7 +104,7 @@ def read_dataframe_invp():
     dataframe.columns = [x.split(".")[1] for x in dataframe.columns]
     dataframe["BUDAT"] = pd.to_datetime(dataframe["BUDAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["BUDAT"])
-    dataframe["EID"] = "EBANROW_" + dataframe["RSEG_ROW_NUMBER"]
+    dataframe["EID"] = "EBANROW_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
     dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
     dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRGJAHR"]

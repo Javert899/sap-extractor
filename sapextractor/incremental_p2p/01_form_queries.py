@@ -22,7 +22,7 @@ def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
     ret = ["SELECT "+ekpo_name+".MANDT AS MANDT, "+ekpo_name+".EBELN AS EBELN, "+ekpo_name+".EBELP AS EBELP, "+ekpo_name+".EBELNEBELP AS EBELNEBELP, "+ekpo_name+".BANFN, "+ekpo_name+".BNFPO, "+ekko_name+".ERNAM AS ERNAM, "+ekko_name+".AEDAT AS AEDAT, "+ekko_name+".LIFNR AS LIFNR, "+ekko_name+".ZTERM AS ZTERM FROM"]
     ret.append("(SELECT MANDT, EBELN, EBELP, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM")
     ret.append(parameters["prefix"]+"EKPO")
-    ret.append(ekpo_name+" JOIN (")
+    ret.append(") " + ekpo_name+" JOIN (")
     ret.append("SELECT MANDT, EBELN, ERNAM, AEDAT, LIFNR, ZTERM FROM")
     ret.append(parameters["prefix"]+"EKKO")
     ret.append(") "+ekko_name)
