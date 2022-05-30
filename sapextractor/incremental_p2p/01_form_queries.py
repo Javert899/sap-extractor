@@ -18,45 +18,31 @@ def get_table_count(table):
     return "0"
 
 
-def row_number():
-    if connection_parameters["connection"] == "oracle":
-        return "ROWNUM"
-    else:
-        return "ROW_NUMBER()"
-
-
-def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo", apply_rownum=True):
-    ret = ["SELECT "+ekpo_name+".EKPO_ROW_NUMBER AS EKPO_ROW_NUMBER, "+ekpo_name+".MANDT AS MANDT, "+ekpo_name+".EBELN AS EBELN, "+ekpo_name+".EBELP AS EBELP, "+ekpo_name+".EBELNEBELP AS EBELNEBELP, "+ekpo_name+".BANFN, "+ekpo_name+".BNFPO, "+ekko_name+".ERNAM AS ERNAM, "+ekko_name+".AEDAT AS AEDAT, "+ekko_name+".LIFNR AS LIFNR, "+ekko_name+".ZTERM AS ZTERM FROM"]
-    ret.append("(SELECT "+row_number()+" AS EKPO_ROW_NUMBER, MANDT, EBELN, EBELP, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM")
+def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
+    ret = ["SELECT "+ekpo_name+".MANDT AS MANDT, "+ekpo_name+".EBELN AS EBELN, "+ekpo_name+".EBELP AS EBELP, "+ekpo_name+".EBELNEBELP AS EBELNEBELP, "+ekpo_name+".BANFN, "+ekpo_name+".BNFPO, "+ekko_name+".ERNAM AS ERNAM, "+ekko_name+".AEDAT AS AEDAT, "+ekko_name+".LIFNR AS LIFNR, "+ekko_name+".ZTERM AS ZTERM FROM"]
+    ret.append("(SELECT MANDT, EBELN, EBELP, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM")
     ret.append(parameters["prefix"]+"EKPO")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("EKPO")+")")
     ret.append(ekpo_name+" JOIN (")
     ret.append("SELECT MANDT, EBELN, ERNAM, AEDAT, LIFNR, ZTERM FROM")
     ret.append(parameters["prefix"]+"EKKO")
-    #ret.append("WHERE "+row_number()+" >= "+get_table_count("EKKO"))
     ret.append(") "+ekko_name)
     ret.append("ON "+ekpo_name+".MANDT = "+ekko_name+".MANDT AND "+ekpo_name+".EBELN = "+ekko_name+".EBELN")
-    columns = ["EKPO_ROW_NUMBER", "MANDT", "EBELN", "EBELP", "EBELNEBELP", "BANFN", "BNFPO", "ERNAM", "AEDAT", "LIFNR", "ZTERM"]
+    columns = ["MANDT", "EBELN", "EBELP", "EBELNEBELP", "BANFN", "BNFPO", "ERNAM", "AEDAT", "LIFNR", "ZTERM"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_eban_query(eban_name="eban", apply_rownum=True):
-    ret = ["SELECT "+row_number()+" AS EBAN_ROW_NUMBER, MANDT, BANFN, BNFPO, CONCAT(BANFN, BNFPO) AS BANFNBNFPO, ERNAM, BADAT FROM"]
+def form_eban_query(eban_name="eban"):
+    ret = ["SELECT MANDT, BANFN, BNFPO, CONCAT(BANFN, BNFPO) AS BANFNBNFPO, ERNAM, BADAT FROM"]
     ret.append(parameters["prefix"] + "EBAN")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("EBAN"))
-    columns = ["EBAN_ROW_NUMBER", "MANDT", "BANFN", "BNFPO", "BANFNBNFPO", "ERNAM", "BADAT"]
+    columns = ["MANDT", "BANFN", "BNFPO", "BANFNBNFPO", "ERNAM", "BADAT"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
-    ret = ["SELECT "+rseg_name+".RSEG_ROW_NUMBER AS RSEG_ROW_NUMBER, "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR, BELNRGJAHR, BELNRBUZEIGJAHR"]
+def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
+    ret = ["SELECT "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR, BELNRGJAHR, BELNRBUZEIGJAHR"]
     ret.append("FROM (")
-    ret.append("SELECT "+row_number()+" AS RSEG_ROW_NUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, CONCAT(BELNR, GJAHR) AS BELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS BELNRBUZEIGJAHR FROM")
+    ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, CONCAT(BELNR, GJAHR) AS BELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS BELNRBUZEIGJAHR FROM")
     ret.append(parameters["prefix"]+"RSEG")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("RSEG"))
     ret.append(") "+rseg_name+" JOIN (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BLDAT, BUDAT, USNAM, TCODE, LIFNR FROM")
     ret.append(parameters["prefix"]+"RBKP")
@@ -65,22 +51,19 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp", apply_rownum=True):
     ret.append(rseg_name+".BUKRS = "+rbkp_name+".BUKRS AND")
     ret.append(rseg_name+".GJAHR = "+rbkp_name+".GJAHR AND")
     ret.append(rseg_name+".BELNR = "+rbkp_name+".BELNR")
-    columns = ["RSEG_ROW_NUMBER", "MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR", "BELNRGJAHR", "BELNRBUZEIGJAHR"]
+    columns = ["MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR", "BELNRGJAHR", "BELNRBUZEIGJAHR"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_bseg_name="invoicebseg", payment_bkpf_name="paymentbkpf", payment_bseg_name="paymentbseg", apply_rownum=True):
+def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_bseg_name="invoicebseg", payment_bkpf_name="paymentbkpf", payment_bseg_name="paymentbseg"):
     ret = []
-    #ret.append("SELECT Count(*) FROM (")
-    ret.append("SELECT PAYMENTBSEGROWNUMBER, " + payment_bseg_name + ".MANDT AS MANDT, " + payment_bseg_name + ".BUKRS AS BUKRS, " + payment_bseg_name + ".GJAHR AS GJAHR, ACCDOCBELNRGJAHR, ACCDOCBELNRBUZEIGJAHR, INVOICEBELNRGJAHR, INVOICEBELNRBUZEIGJAHR, PAYMENTBSEGBSCHL, PAYMENTBLDAT, PAYMENTBUDAT, PAYMENTBLART, PAYMENTUSNAM")
+    ret.append("SELECT " + payment_bseg_name + ".MANDT AS MANDT, " + payment_bseg_name + ".BUKRS AS BUKRS, " + payment_bseg_name + ".GJAHR AS GJAHR, ACCDOCBELNRGJAHR, ACCDOCBELNRBUZEIGJAHR, INVOICEBELNRGJAHR, INVOICEBELNRBUZEIGJAHR, PAYMENTBSEGBSCHL, PAYMENTBLDAT, PAYMENTBUDAT, PAYMENTBLART, PAYMENTUSNAM")
     ret.append("FROM (")
-    ret.append("SELECT "+row_number()+" AS PAYMENTBSEGROWNUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI AS PAYMENTBSEGBUZEI, CONCAT(BELNR, GJAHR) AS ACCDOCBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS ACCDOCBELNRBUZEIGJAHR, BSCHL AS PAYMENTBSEGBSCHL FROM")
+    ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI AS PAYMENTBSEGBUZEI, CONCAT(BELNR, GJAHR) AS ACCDOCBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS ACCDOCBELNRBUZEIGJAHR, BSCHL AS PAYMENTBSEGBSCHL FROM")
     ret.append(parameters["prefix"]+"BSEG")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("BSEG"))
     ret.append(") " + payment_bseg_name)
     ret.append("JOIN (")
-    ret.append("SELECT "+row_number()+" AS INVOICEBSEGROWNUMBER, MANDT, BUKRS, GJAHR, BELNR, BUZEI AS INVOICEBSEGBUZEI, AUGBL, AUGGJ, AUGDT FROM")
+    ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI AS INVOICEBSEGBUZEI, AUGBL, AUGGJ, AUGDT FROM")
     ret.append(parameters["prefix"]+"BSAK")
     ret.append(") " + invoice_bseg_name + " ON " + payment_bseg_name + ".MANDT = " + invoice_bseg_name + ".MANDT")
     ret.append("AND " + payment_bseg_name + ".BUKRS = " + invoice_bseg_name + ".BUKRS")
@@ -106,9 +89,8 @@ def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_b
     ret.append(") " + rseg_name +" ON " + invoice_bkpf_name + ".MANDT = " + rseg_name + ".MANDT")
     ret.append("AND " + rseg_name +".BUKRS = " + invoice_bkpf_name + ".BUKRS")
     ret.append("AND " + rseg_name +".INVOICEBELNRGJAHR = " + invoice_bkpf_name + ".AWKEY")
-    ret.append("AND LTRIM(" + rseg_name +".RSEGBUZEI, '0') = LTRIM(" + invoice_bseg_name + ".INVOICEBSEGBUZEI, '0')")
 
-    columns = ["PAYMENTBSEGROWNUMBER", "MANDT", "BUKRS", "GJAHR", "ACCDOCBELNRGJAHR", "ACCDOCBELNRBUZEIGJAHR", "INVOICEBELNRGJAHR", "INVOICEBELNRBUZEIGJAHR", "PAYMENTBSEGBSCHL", "PAYMENTBLDAT", "PAYMENTBUDAT", "PAYMENTBLART", "PAYMENTUSNAM"]
+    columns = ["MANDT", "BUKRS", "GJAHR", "ACCDOCBELNRGJAHR", "ACCDOCBELNRBUZEIGJAHR", "INVOICEBELNRGJAHR", "INVOICEBELNRBUZEIGJAHR", "PAYMENTBSEGBSCHL", "PAYMENTBLDAT", "PAYMENTBUDAT", "PAYMENTBLART", "PAYMENTUSNAM"]
 
     #ret.append(")")
     #columns = ["COUNT"]
@@ -121,7 +103,6 @@ def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
 
     eban_query, eban_columns = form_eban_query()
 
-    fields.append(eban_name+".EBAN_ROW_NUMBER")
     fields.append(eban_name+".MANDT")
     fields.append(eban_name+".BANFN")
     fields.append(eban_name+".BNFPO")
@@ -150,7 +131,6 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
 
     rseg_query, rseg_columns = form_rseg_query()
 
-    fields.append(rseg_name+".RSEG_ROW_NUMBER")
     fields.append(rseg_name+".MANDT")
     fields.append(rseg_name+".BUKRS")
     fields.append(rseg_name+".GJAHR")
@@ -180,13 +160,11 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     return sqlparse.format(" ".join(ret), reindent=True), fields
 
 
-def changes_ekko(apply_rownum=True):
+def changes_ekko():
     columns = ["MANDT", "EBELN", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS EBELN, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
     ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, EBELN FROM "+parameters["prefix"]+"EKKO) b")
@@ -197,13 +175,11 @@ def changes_ekko(apply_rownum=True):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def changes_rbkp(apply_rownum=True):
+def changes_rbkp():
     columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
     ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
@@ -214,13 +190,11 @@ def changes_rbkp(apply_rownum=True):
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
-def changes_bkpf(apply_rownum=True):
+def changes_bkpf():
     columns = ["MANDT", "BELNRGJAHR", "CHANGENR", "TABNAME", "FNAME", "CHNGIND", "VALUE_NEW", "VALUE_OLD"]
 
     ret = ["SELECT a.MANDANT AS MANDT, a.OBJECTID AS BELNRGJAHR, a.CHANGENR AS CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM"]
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
-    if apply_rownum:
-        ret.append("WHERE "+row_number()+" >= "+get_table_count("CDPOS"))
     ret.append(") a")
     ret.append("JOIN")
     ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"BKPF) b")
