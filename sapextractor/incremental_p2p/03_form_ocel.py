@@ -169,6 +169,62 @@ def read_dataframe_changes_ekko():
             relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
 
 
+def read_dataframe_goods_receipts():
+    dataframe = pd.read_csv("dataframe_ekbegoods.csv", dtype=str)
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
+    dataframe["BUDAT"] = pd.to_datetime(dataframe["BUDAT"], errors="coerce")
+    dataframe = dataframe.dropna(subset=["BUDAT"])
+    dataframe["EID"] = "EKBE_GR_" + dataframe.index.astype(str)
+    dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["EBELN"]
+    dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" + dataframe["EBELN"] + dataframe["EBELP"]
+
+    ordering = 2.75
+
+    for index, row in dataframe.iterrows():
+        activity = "Goods Receipt"
+        timestamp = row["BUDAT"]
+        eid = row["EID"]
+
+        this_objects = {row["EBELN"]: "EBELN", row["EBELNEBELP"]: "EBELNEBELP"}
+
+        events.append({"ocel:eid": eid, "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:omap": list(this_objects), "ordering": ordering})
+
+        for ob in this_objects:
+            if ob not in added_objects:
+                added_objects.add(ob)
+                objects.append({"ocel:oid": ob, "ocel:type": this_objects[ob]})
+
+            relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
+
+
+def read_dataframe_invoice_receipts():
+    dataframe = pd.read_csv("dataframe_ekbeinvreceipts.csv", dtype=str)
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
+    dataframe["BUDAT"] = pd.to_datetime(dataframe["BUDAT"], errors="coerce")
+    dataframe = dataframe.dropna(subset=["BUDAT"])
+    dataframe["EID"] = "EKBE_GR_" + dataframe.index.astype(str)
+    dataframe["BELNRGJAHR"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["BELNR"] + dataframe["GJAHR"]
+    dataframe["BELNRBUZEIGJAHR"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["BELNR"] + dataframe["BUZEI"] + dataframe["GJAHR"]
+
+    ordering = 2.95
+
+    for index, row in dataframe.iterrows():
+        activity = "Invoice Receipt"
+        timestamp = row["BUDAT"]
+        eid = row["EID"]
+
+        this_objects = {row["BELNRGJAHR"]: "BELNRGJAHR", row["BELNRBUZEIGJAHR"]: "BELNRBUZEIGJAHR"}
+
+        events.append({"ocel:eid": eid, "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:omap": list(this_objects), "ordering": ordering})
+
+        for ob in this_objects:
+            if ob not in added_objects:
+                added_objects.add(ob)
+                objects.append({"ocel:oid": ob, "ocel:type": this_objects[ob]})
+
+            relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
+
+
 def read_dataframe_changes_rbkp():
     dataframe = pd.read_csv("dataframe_chngsrbkp.csv", dtype=str)
     dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
@@ -203,6 +259,8 @@ if __name__ == "__main__":
     read_dataframe_invp()
     read_dataframe_changes_ekko()
     read_dataframe_changes_rbkp()
+    read_dataframe_goods_receipts()
+    read_dataframe_invoice_receipts()
 
     events = pd.DataFrame(events)
     objects = pd.DataFrame(objects)
