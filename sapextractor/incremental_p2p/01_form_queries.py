@@ -111,11 +111,11 @@ def form_query_goods_receipt(ekbe_name="EKBE"):
 
 def form_query_invoice_receipt(ekbe_name="EKBE"):
     ret = []
-    ret.append("SELECT MANDT, BELNR, BUZEI, BUDAT, ERNAM FROM ")
+    ret.append("SELECT MANDT, BELNR, BUZEI, BUDAT, ERNAM, GJAHR FROM ")
     ret.append(parameters["prefix"]+"EKBE "+ekbe_name)
     ret.append("WHERE VGABE = '2'")
 
-    columns = ["MANDT", "BELNR", "BUZEI", "BUDAT", "ERNAM"]
+    columns = ["MANDT", "BELNR", "BUZEI", "BUDAT", "ERNAM", "GJAHR"]
 
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
@@ -262,8 +262,8 @@ if __name__ == "__main__":
     ekbe_gr_query, ekbe_gr_columns = form_query_goods_receipt()
     write_result("ekbegoods", ekbe_gr_query, ekbe_gr_columns)
 
-    """ekbe_ir_query, ekbe_ir_columns = form_query_invoice_receipt()
-    write_result("ekbeinvreceipts", ekbe_ir_query, ekbe_ir_columns)"""
+    ekbe_ir_query, ekbe_ir_columns = form_query_invoice_receipt()
+    write_result("ekbeinvreceipts", ekbe_ir_query, ekbe_ir_columns)
 
 
     """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
