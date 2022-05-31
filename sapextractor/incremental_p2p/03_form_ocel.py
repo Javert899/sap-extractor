@@ -105,8 +105,8 @@ def read_dataframe_invp():
     dataframe["EID"] = "EBANROW_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
     dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
-    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] +dataframe["BELNRGJAHR"]
-    dataframe["BELNRBUZEIGJAHR"] = "BELNRBUZEIGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRBUZEIGJAHR"]
+    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + +dataframe["BELNRGJAHR"]
+    dataframe["BELNRBUZEIGJAHR"] = "BELNRBUZEIGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BELNRBUZEIGJAHR"]
     dictio_ebelns = dataframe.dropna(subset=["EBELN"]).groupby("EID")["EBELN"].apply(set).to_dict()
     dictio_ebelnebelps = dataframe.dropna(subset=["EBELNEBELP"]).groupby("EID")["EBELNEBELP"].apply(set).to_dict()
     dictio_belnrgjahr = dataframe.groupby("EID")["BELNRGJAHR"].apply(set).to_dict()

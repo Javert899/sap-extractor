@@ -39,7 +39,7 @@ def form_eban_query(eban_name="eban"):
 
 
 def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
-    ret = ["SELECT "+rseg_name+".MANDT AS MANDT, "+rseg_name+".BUKRS AS BUKRS, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR, BELNRGJAHR, BELNRBUZEIGJAHR"]
+    ret = ["SELECT "+rseg_name+".MANDT AS MANDT, "+rseg_name+".GJAHR AS GJAHR, "+rseg_name+".BELNR AS BELNR, "+rseg_name+".BUZEI AS BUZEI, "+rseg_name+".EBELN AS EBELN, "+rseg_name+".EBELNEBELP AS EBELNEBELP, "+rbkp_name+".BLDAT AS BLDAT, "+rbkp_name+".BUDAT AS BUDAT, "+rbkp_name+".USNAM AS USNAM, "+rbkp_name+".TCODE AS TCODE, "+rbkp_name+".LIFNR AS LIFNR, BELNRGJAHR, BELNRBUZEIGJAHR"]
     ret.append("FROM (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, CONCAT(BELNR, GJAHR) AS BELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS BELNRBUZEIGJAHR FROM")
     ret.append(parameters["prefix"]+"RSEG")
@@ -51,13 +51,13 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
     ret.append(rseg_name+".BUKRS = "+rbkp_name+".BUKRS AND")
     ret.append(rseg_name+".GJAHR = "+rbkp_name+".GJAHR AND")
     ret.append(rseg_name+".BELNR = "+rbkp_name+".BELNR")
-    columns = ["MANDT", "BUKRS", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR", "BELNRGJAHR", "BELNRBUZEIGJAHR"]
+    columns = ["MANDT", "GJAHR", "BELNR", "BUZEI", "EBELN", "EBELNEBELP", "BLDAT", "BUDAT", "USNAM", "TCODE", "LIFNR", "BELNRGJAHR", "BELNRBUZEIGJAHR"]
     return sqlparse.format(" ".join(ret), reindent=True), columns
 
 
 def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_bseg_name="invoicebseg", payment_bkpf_name="paymentbkpf", payment_bseg_name="paymentbseg"):
     ret = []
-    ret.append("SELECT " + payment_bseg_name + ".MANDT AS MANDT, " + payment_bseg_name + ".BUKRS AS BUKRS, " + payment_bseg_name + ".GJAHR AS GJAHR, ACCDOCBELNRGJAHR, ACCDOCBELNRBUZEIGJAHR, INVOICEBELNRGJAHR, INVOICEBELNRBUZEIGJAHR, PAYMENTBSEGBSCHL, PAYMENTBLDAT, PAYMENTBUDAT, PAYMENTBLART, PAYMENTUSNAM")
+    ret.append("SELECT " + payment_bseg_name + ".MANDT AS MANDT, " + payment_bseg_name + ".GJAHR AS GJAHR, ACCDOCBELNRGJAHR, ACCDOCBELNRBUZEIGJAHR, INVOICEBELNRGJAHR, INVOICEBELNRBUZEIGJAHR, PAYMENTBSEGBSCHL, PAYMENTBLDAT, PAYMENTBUDAT, PAYMENTBLART, PAYMENTUSNAM")
     ret.append("FROM (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI AS PAYMENTBSEGBUZEI, CONCAT(BELNR, GJAHR) AS ACCDOCBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS ACCDOCBELNRBUZEIGJAHR, BSCHL AS PAYMENTBSEGBSCHL FROM")
     ret.append(parameters["prefix"]+"BSEG")
@@ -90,12 +90,35 @@ def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_b
     ret.append("AND " + rseg_name +".BUKRS = " + invoice_bkpf_name + ".BUKRS")
     ret.append("AND " + rseg_name +".INVOICEBELNRGJAHR = " + invoice_bkpf_name + ".AWKEY")
 
-    columns = ["MANDT", "BUKRS", "GJAHR", "ACCDOCBELNRGJAHR", "ACCDOCBELNRBUZEIGJAHR", "INVOICEBELNRGJAHR", "INVOICEBELNRBUZEIGJAHR", "PAYMENTBSEGBSCHL", "PAYMENTBLDAT", "PAYMENTBUDAT", "PAYMENTBLART", "PAYMENTUSNAM"]
+    columns = ["MANDT", "GJAHR", "ACCDOCBELNRGJAHR", "ACCDOCBELNRBUZEIGJAHR", "INVOICEBELNRGJAHR", "INVOICEBELNRBUZEIGJAHR", "PAYMENTBSEGBSCHL", "PAYMENTBLDAT", "PAYMENTBUDAT", "PAYMENTBLART", "PAYMENTUSNAM"]
 
     #ret.append(")")
     #columns = ["COUNT"]
 
     return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
+def form_query_goods_receipt(ekbe_name="EKBE"):
+    ret = []
+    ret.append("SELECT MANDT, EBELN, EBELP, BUDAT, ERNAM FROM ")
+    ret.append(parameters["prefix"]+"EKBE "+ekbe_name)
+    ret.append("WHERE VGABE = '1'")
+
+    columns = ["MANDT", "EBELN", "EBELP", "BUDAT", "ERNAM"]
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
+
+def form_query_invoice_receipt(ekbe_name="EKBE"):
+    ret = []
+    ret.append("SELECT MANDT, BELNR, BUZEI, BUDAT, ERNAM FROM ")
+    ret.append(parameters["prefix"]+"EKBE "+ekbe_name)
+    ret.append("WHERE VGABE = '2'")
+
+    columns = ["MANDT", "BELNR", "BUZEI", "BUDAT", "ERNAM"]
+
+    return sqlparse.format(" ".join(ret), reindent=True), columns
+
 
 
 def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
@@ -132,7 +155,6 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     rseg_query, rseg_columns = form_rseg_query()
 
     fields.append(rseg_name+".MANDT")
-    fields.append(rseg_name+".BUKRS")
     fields.append(rseg_name+".GJAHR")
     fields.append(rseg_name+".BELNR")
     fields.append(rseg_name+".BUZEI")
@@ -182,7 +204,7 @@ def changes_rbkp():
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
     ret.append(") a")
     ret.append("JOIN")
-    ret.append("(SELECT MANDT, CONCAT(BUKRS, CONCAT(BELNR, GJAHR)) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
+    ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")
     ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
     ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
@@ -236,6 +258,13 @@ if __name__ == "__main__":
 
     bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
     write_result("chngsbkpf", bkpf_chng_query, bkpf_chng_columns)
+
+    ekbe_gr_query, ekbe_gr_columns = form_query_goods_receipt()
+    write_result("ekbegoods", ekbe_gr_query, ekbe_gr_columns)
+
+    """ekbe_ir_query, ekbe_ir_columns = form_query_invoice_receipt()
+    write_result("ekbeinvreceipts", ekbe_ir_query, ekbe_ir_columns)"""
+
 
     """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
