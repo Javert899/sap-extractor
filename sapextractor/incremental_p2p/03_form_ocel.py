@@ -30,7 +30,6 @@ def read_dataframe_po():
     dictio_ebelnebelps = dataframe.groupby("EID")["EBELNEBELP"].apply(set).to_dict()
     ordering = 2
 
-    dataframe = dataframe.groupby("EID").first().reset_index()
     for index, row in dataframe.iterrows():
         activity = "Create Purchase Order Item"
         timestamp = row["AEDAT"]
@@ -55,7 +54,7 @@ def read_dataframe_po():
 
 def read_dataframe_pr():
     dataframe = pd.read_csv("dataframe_pr.csv", dtype=str)
-    dataframe.columns = [x.split(".")[1] for x in dataframe.columns]
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
     dataframe["BADAT"] = pd.to_datetime(dataframe["BADAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["BADAT"])
     dataframe["EID"] = "EBANROW_" + dataframe.index.astype(str)
@@ -69,7 +68,6 @@ def read_dataframe_pr():
     dictio_banfnbnfpos = dataframe.groupby("EID")["BANFNBNFPO"].apply(set).to_dict()
     ordering = 1
 
-    dataframe = dataframe.groupby("EID").first().reset_index()
     for index, row in dataframe.iterrows():
         activity = "Create Purchase Requisition Item"
         timestamp = row["BADAT"]
@@ -101,13 +99,13 @@ def read_dataframe_pr():
 
 def read_dataframe_invp():
     dataframe = pd.read_csv("dataframe_invp.csv", dtype=str)
-    dataframe.columns = [x.split(".")[1] for x in dataframe.columns]
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
     dataframe["BUDAT"] = pd.to_datetime(dataframe["BUDAT"], format=parameters["date_column_format"], errors="coerce")
     dataframe = dataframe.dropna(subset=["BUDAT"])
     dataframe["EID"] = "EBANROW_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" +dataframe["EBELN"]
     dataframe["EBELNEBELP"] = "EBELNEBELP_" + dataframe["MANDT"] + "_" +dataframe["EBELNEBELP"]
-    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRGJAHR"]
+    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] +dataframe["BELNRGJAHR"]
     dataframe["BELNRBUZEIGJAHR"] = "BELNRBUZEIGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BUKRS"] + "_" +dataframe["BELNRBUZEIGJAHR"]
     dictio_ebelns = dataframe.dropna(subset=["EBELN"]).groupby("EID")["EBELN"].apply(set).to_dict()
     dictio_ebelnebelps = dataframe.dropna(subset=["EBELNEBELP"]).groupby("EID")["EBELNEBELP"].apply(set).to_dict()
@@ -115,7 +113,6 @@ def read_dataframe_invp():
     dictio_belnrbuzeigjahr = dataframe.groupby("EID")["BELNRBUZEIGJAHR"].apply(set).to_dict()
     ordering = 4
 
-    dataframe = dataframe.groupby("EID").first().reset_index()
     for index, row in dataframe.iterrows():
         activity = "Create Invoice Item"
         timestamp = row["BUDAT"]
@@ -145,10 +142,67 @@ def read_dataframe_invp():
             relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
 
 
+def read_dataframe_changes_ekko():
+    dataframe = pd.read_csv("dataframe_chngsekko.csv", dtype=str)
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
+    dataframe["TIMESTAMP"] = dataframe["UDATE"] + " " + dataframe["UTIME"]
+    dataframe["TIMESTAMP"] = pd.to_datetime(dataframe["TIMESTAMP"], errors="coerce")
+    dataframe = dataframe.dropna(subset=["TIMESTAMP"])
+    dataframe["EID"] = "CDHDR_EKKO_" + dataframe.index.astype(str)
+    dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["EBELN"]
+    ordering = 2.5
+
+    for index, row in dataframe.iterrows():
+        activity = "Change Purchase Order (" + row["TCODE"] + ")"
+        timestamp = row["TIMESTAMP"]
+        eid = row["EID"]
+
+        this_objects = {row["EBELN"]: "EBELN"}
+
+        events.append({"ocel:eid": eid, "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:omap": list(this_objects), "ordering": ordering})
+
+        for ob in this_objects:
+            if ob not in added_objects:
+                added_objects.add(ob)
+                objects.append({"ocel:oid": ob, "ocel:type": this_objects[ob]})
+
+            relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
+
+
+def read_dataframe_changes_rbkp():
+    dataframe = pd.read_csv("dataframe_chngsrbkp.csv", dtype=str)
+    dataframe.columns = [x.split(".")[-1] for x in dataframe.columns]
+    dataframe["TIMESTAMP"] = dataframe["UDATE"] + " " + dataframe["UTIME"]
+    dataframe["TIMESTAMP"] = pd.to_datetime(dataframe["TIMESTAMP"], errors="coerce")
+    dataframe = dataframe.dropna(subset=["TIMESTAMP"])
+    dataframe["EID"] = "CDHDR_RBKP_" + dataframe.index.astype(str)
+    dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BELNRGJAHR"]
+
+    ordering = 3.5
+
+    for index, row in dataframe.iterrows():
+        activity = "Change Invoice (" + row["TCODE"] + ")"
+        timestamp = row["TIMESTAMP"]
+        eid = row["EID"]
+
+        this_objects = {row["BELNRGJAHR"]: "BELNRGJAHR"}
+
+        events.append({"ocel:eid": eid, "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:omap": list(this_objects), "ordering": ordering})
+
+        for ob in this_objects:
+            if ob not in added_objects:
+                added_objects.add(ob)
+                objects.append({"ocel:oid": ob, "ocel:type": this_objects[ob]})
+
+            relations.append({"ocel:eid": row["EID"], "ocel:activity": activity, "ocel:timestamp": timestamp, "ocel:oid": ob, "ocel:type": this_objects[ob], "ordering": ordering})
+
+
 if __name__ == "__main__":
     read_dataframe_pr()
     read_dataframe_po()
     read_dataframe_invp()
+    read_dataframe_changes_ekko()
+    read_dataframe_changes_rbkp()
 
     events = pd.DataFrame(events)
     objects = pd.DataFrame(objects)
