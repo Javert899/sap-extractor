@@ -150,10 +150,13 @@ def read_dataframe_changes_ekko():
     dataframe = dataframe.dropna(subset=["TIMESTAMP"])
     dataframe["EID"] = "CDHDR_EKKO_" + dataframe.index.astype(str)
     dataframe["EBELN"] = "EBELN_" + dataframe["MANDT"] + "_" + dataframe["EBELN"]
+    dataframe["TCODE"] = dataframe["TCODE"].fillna("EMPTYTCODE")
+    dataframe["FNAME"] = dataframe["FNAME"].fillna("EMPTYFNAME")
+    dataframe["TCODEFNAME"] = "TCODE="+dataframe["TCODE"] + " FNAME=" + dataframe["FNAME"]
     ordering = 2.5
 
     for index, row in dataframe.iterrows():
-        activity = "Change Purchase Order (" + row["TCODE"] + ")"
+        activity = "Change Purchase Order (" + row["TCODEFNAME"] + ")"
         timestamp = row["TIMESTAMP"]
         eid = row["EID"]
 
@@ -233,11 +236,14 @@ def read_dataframe_changes_rbkp():
     dataframe = dataframe.dropna(subset=["TIMESTAMP"])
     dataframe["EID"] = "CDHDR_RBKP_" + dataframe.index.astype(str)
     dataframe["BELNRGJAHR"] = "BELNRGJAHR_" + dataframe["MANDT"] + "_" + dataframe["BELNRGJAHR"]
+    dataframe["TCODE"] = dataframe["TCODE"].fillna("EMPTYTCODE")
+    dataframe["FNAME"] = dataframe["FNAME"].fillna("EMPTYFNAME")
+    dataframe["TCODEFNAME"] = "TCODE="+dataframe["TCODE"] + " FNAME=" + dataframe["FNAME"]
 
     ordering = 3.5
 
     for index, row in dataframe.iterrows():
-        activity = "Change Invoice (" + row["TCODE"] + ")"
+        activity = "Change Invoice (" + row["TCODEFNAME"] + ")"
         timestamp = row["TIMESTAMP"]
         eid = row["EID"]
 
