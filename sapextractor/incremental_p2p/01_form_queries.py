@@ -10,10 +10,21 @@ connection_parameters = json.load(open("connection_parameters.json", "r"))
 tables_count = json.load(open("tables_count.json", "r")) if os.path.exists("tables_count.json") else {}
 
 import sqlparse
+import os
 
+for file in os.listdir("."):
+    if file.startswith("query_"):
+        os.remove(file)
+    elif file.startswith("dataframe_"):
+        os.remove(file)
 
+target_ebeln = "3000000008"
 target_ebeln = None
+left_join = "LEFT JOIN"
 enable_payments = True
+if target_ebeln is not None:
+    enable_payments = False
+    left_join = "JOIN"
 
 
 def get_table_count(table):
@@ -155,7 +166,7 @@ def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
     ret.append(", ".join(fields))
     ret.append(" FROM (")
     ret.append(eban_query)
-    ret.append(") "+eban_name+" LEFT JOIN (")
+    ret.append(") "+eban_name+" "+left_join+" (")
     ret.append("SELECT MANDT, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM "+parameters["prefix"]+"EKPO")
     if target_ebeln is not None:
         ret.append("WHERE EBELN = '"+target_ebeln+"'")
@@ -190,7 +201,7 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     ret.append(", ".join(fields))
     ret.append(" FROM (")
     ret.append(rseg_query)
-    ret.append(") "+rseg_name+" LEFT JOIN (")
+    ret.append(") "+rseg_name+" "+left_join+" (")
     ret.append("SELECT MANDT, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP FROM "+parameters["prefix"]+"EKPO")
     if target_ebeln is not None:
         ret.append("WHERE EBELN = '"+target_ebeln+"'")
