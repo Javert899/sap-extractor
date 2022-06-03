@@ -12,6 +12,10 @@ tables_count = json.load(open("tables_count.json", "r")) if os.path.exists("tabl
 import sqlparse
 
 
+target_ebeln = None
+enable_payments = True
+
+
 def get_table_count(table):
     if table in tables_count:
         return str(tables_count[table] + 1)
@@ -22,9 +26,13 @@ def form_ekpo_query(ekko_name="ekko", ekpo_name="ekpo"):
     ret = ["SELECT "+ekpo_name+".MANDT AS MANDT, "+ekpo_name+".EBELN AS EBELN, "+ekpo_name+".EBELP AS EBELP, "+ekpo_name+".EBELNEBELP AS EBELNEBELP, "+ekpo_name+".BANFN, "+ekpo_name+".BNFPO, "+ekko_name+".ERNAM AS ERNAM, "+ekko_name+".AEDAT AS AEDAT, "+ekko_name+".LIFNR AS LIFNR, "+ekko_name+".ZTERM AS ZTERM FROM"]
     ret.append("(SELECT MANDT, EBELN, EBELP, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM")
     ret.append(parameters["prefix"]+"EKPO")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") " + ekpo_name+" JOIN (")
     ret.append("SELECT MANDT, EBELN, ERNAM, AEDAT, LIFNR, ZTERM FROM")
     ret.append(parameters["prefix"]+"EKKO")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") "+ekko_name)
     ret.append("ON "+ekpo_name+".MANDT = "+ekko_name+".MANDT AND "+ekpo_name+".EBELN = "+ekko_name+".EBELN")
     columns = ["MANDT", "EBELN", "EBELP", "EBELNEBELP", "BANFN", "BNFPO", "ERNAM", "AEDAT", "LIFNR", "ZTERM"]
@@ -43,6 +51,8 @@ def form_rseg_query(rseg_name="rseg", rbkp_name="rbkp"):
     ret.append("FROM (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BUZEI, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, CONCAT(BELNR, GJAHR) AS BELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS BELNRBUZEIGJAHR FROM")
     ret.append(parameters["prefix"]+"RSEG")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") "+rseg_name+" JOIN (")
     ret.append("SELECT MANDT, BUKRS, GJAHR, BELNR, BLDAT, BUDAT, USNAM, TCODE, LIFNR FROM")
     ret.append(parameters["prefix"]+"RBKP")
@@ -86,6 +96,8 @@ def form_bkpf_query(rseg_name="rseg", invoice_bkpf_name="invoicebkpf", invoice_b
     ret.append("JOIN (")
     ret.append("SELECT MANDT, BUKRS, CONCAT(BELNR, GJAHR) AS INVOICEBELNRGJAHR, CONCAT(CONCAT(BELNR, BUZEI), GJAHR) AS INVOICEBELNRBUZEIGJAHR, BUZEI AS RSEGBUZEI FROM")
     ret.append(parameters["prefix"]+"RSEG")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") " + rseg_name +" ON " + invoice_bkpf_name + ".MANDT = " + rseg_name + ".MANDT")
     ret.append("AND " + rseg_name +".BUKRS = " + invoice_bkpf_name + ".BUKRS")
     ret.append("AND " + rseg_name +".INVOICEBELNRGJAHR = " + invoice_bkpf_name + ".AWKEY")
@@ -103,6 +115,8 @@ def form_query_goods_receipt(ekbe_name="EKBE"):
     ret.append("SELECT MANDT, EBELN, EBELP, BUDAT, ERNAM FROM ")
     ret.append(parameters["prefix"]+"EKBE "+ekbe_name)
     ret.append("WHERE VGABE = '1'")
+    if target_ebeln is not None:
+        ret.append("AND EBELN = '"+target_ebeln+"'")
 
     columns = ["MANDT", "EBELN", "EBELP", "BUDAT", "ERNAM"]
 
@@ -114,6 +128,8 @@ def form_query_invoice_receipt(ekbe_name="EKBE"):
     ret.append("SELECT MANDT, BELNR, BUZEI, BUDAT, ERNAM, GJAHR FROM ")
     ret.append(parameters["prefix"]+"EKBE "+ekbe_name)
     ret.append("WHERE VGABE = '2'")
+    if target_ebeln is not None:
+        ret.append("AND EBELN = '"+target_ebeln+"'")
 
     columns = ["MANDT", "BELNR", "BUZEI", "BUDAT", "ERNAM", "GJAHR"]
 
@@ -141,6 +157,8 @@ def final_query_purchase_requisitions(eban_name="a", ekpo_name="b"):
     ret.append(eban_query)
     ret.append(") "+eban_name+" LEFT JOIN (")
     ret.append("SELECT MANDT, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP, BANFN, BNFPO FROM "+parameters["prefix"]+"EKPO")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") "+ekpo_name)
     ret.append("ON "+eban_name+".MANDT = "+ekpo_name+".MANDT")
     ret.append("AND "+eban_name+".BANFN = "+ekpo_name+".BANFN")
@@ -174,6 +192,8 @@ def final_query_invoice_processing(rseg_name="a", ekpo_name="b"):
     ret.append(rseg_query)
     ret.append(") "+rseg_name+" LEFT JOIN (")
     ret.append("SELECT MANDT, EBELN, CONCAT(EBELN, EBELP) AS EBELNEBELP FROM "+parameters["prefix"]+"EKPO")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
     ret.append(") "+ekpo_name)
     ret.append("ON "+rseg_name+".MANDT = "+ekpo_name+".MANDT")
     ret.append("AND "+rseg_name+".EBELN = "+ekpo_name+".EBELN")
@@ -189,7 +209,10 @@ def changes_ekko():
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
     ret.append(") a")
     ret.append("JOIN")
-    ret.append("(SELECT MANDT, EBELN FROM "+parameters["prefix"]+"EKKO) b")
+    ret.append("(SELECT MANDT, EBELN FROM "+parameters["prefix"]+"EKKO")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
+    ret.append(") b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.EBELN JOIN")
     ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
     ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
@@ -204,7 +227,10 @@ def changes_rbkp():
     ret.append("(SELECT MANDANT, OBJECTID, CHANGENR, TABNAME, FNAME, CHNGIND, VALUE_NEW, VALUE_OLD FROM "+parameters["prefix"]+"CDPOS")
     ret.append(") a")
     ret.append("JOIN")
-    ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RBKP) b")
+    ret.append("(SELECT MANDT, CONCAT(BELNR, GJAHR) AS BELNRGJAHR FROM "+parameters["prefix"]+"RSEG")
+    if target_ebeln is not None:
+        ret.append("WHERE EBELN = '"+target_ebeln+"'")
+    ret.append(") b")
     ret.append("ON a.MANDANT = b.MANDT AND a.OBJECTID = b.BELNRGJAHR JOIN")
     ret.append("(SELECT MANDANT, CHANGENR, USERNAME, UDATE, UTIME, TCODE FROM "+parameters["prefix"]+"CDHDR) c")
     ret.append("ON a.MANDANT = c.MANDANT AND a.CHANGENR = c.CHANGENR")
@@ -247,17 +273,11 @@ if __name__ == "__main__":
     inv_query, inv_columns = final_query_invoice_processing()
     write_result("invp", inv_query, inv_columns)
 
-    bkpf_query, bkpf_columns = form_bkpf_query()
-    write_result("bkpf", bkpf_query, bkpf_columns)
-
     ekko_chng_query, ekko_chng_columns = changes_ekko()
     write_result("chngsekko", ekko_chng_query, ekko_chng_columns)
 
     rbkp_chng_query, rbkp_chng_columns = changes_rbkp()
     write_result("chngsrbkp", rbkp_chng_query, rbkp_chng_columns)
-
-    bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
-    write_result("chngsbkpf", bkpf_chng_query, bkpf_chng_columns)
 
     ekbe_gr_query, ekbe_gr_columns = form_query_goods_receipt()
     write_result("ekbegoods", ekbe_gr_query, ekbe_gr_columns)
@@ -265,6 +285,12 @@ if __name__ == "__main__":
     ekbe_ir_query, ekbe_ir_columns = form_query_invoice_receipt()
     write_result("ekbeinvreceipts", ekbe_ir_query, ekbe_ir_columns)
 
+    if enable_payments:
+        bkpf_query, bkpf_columns = form_bkpf_query()
+        write_result("bkpf", bkpf_query, bkpf_columns)
+
+        bkpf_chng_query, bkpf_chng_columns = changes_bkpf()
+        write_result("chngsbkpf", bkpf_chng_query, bkpf_chng_columns)
 
     """from sapextractor.incremental_p2p.DB_CONNECTION import get_connection
 
