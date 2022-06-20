@@ -1,6 +1,8 @@
 from plantuml import *
 import tempfile
 import os
+import sys
+import shutil
 
 
 def apply(filename):
@@ -12,3 +14,10 @@ def apply(filename):
     pl.processes_file(filename, directory=dir_name, outfile=basename)
     fullpath = os.path.join(dir_name, basename)
     return fullpath
+
+
+if __name__ == "__main__":
+	result = apply(sys.argv[1])
+	basename = os.path.basename(result)
+	print(basename)
+	shutil.copy(result, basename)
