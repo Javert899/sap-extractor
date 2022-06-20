@@ -1,0 +1,12 @@
+class "Table" {
+}
+
+class "Transaction" {
+}
+
+class "Document Class" {
+}
+
+"Table" }o..o{ "Table"
+"Transaction" }o..|{ "Table"
+"Document Class" }o..|{ "Table"

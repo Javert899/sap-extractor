@@ -1,0 +1,30 @@
+class "Document" {
+}
+
+class "Document Item" {
+}
+
+class "Document Class" {
+}
+
+class "Transaction" {
+}
+
+class "Attribute" {
+}
+
+class "Table" {
+}
+
+"Document" }o..o{ "Document"
+"Document Item" }o..o{ "Document Item"
+"Document" }|..|| "Document Class"
+"Document Item" }|..|| "Document"
+"Transaction" }o..o{ "Document"
+"Transaction" }o..o{ "Document Item"
+"Attribute" }o..o{ "Document"
+"Attribute" }o..o{ "Document Item"
+"Table" }o..o{ "Table"
+"Transaction" }o..|{ "Table"
+"Document Class" }o..|{ "Table"
+
