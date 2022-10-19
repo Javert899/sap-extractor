@@ -1,0 +1,34 @@
+@startuml
+
+entity Attribute {
+
+}
+
+entity Domain {
+
+}
+
+entity Table {
+
+}
+
+entity Row {
+
+}
+
+entity Object {
+
+}
+
+entity Transaction {
+
+}
+
+Table ||--|{ Row
+Row ||--|| Object
+Row ||--o| Transaction
+Row ||--|{ Attribute
+Attribute }|--|| Domain
+
+
+@enduml
