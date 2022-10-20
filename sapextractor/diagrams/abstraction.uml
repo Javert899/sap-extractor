@@ -24,11 +24,16 @@ entity Transaction {
 
 }
 
+entity ObjectType {
+
+}
+
 Table ||--|{ Row
 Row ||--|| Object
+Object }|--|{ Object
 Row ||--o| Transaction
 Row ||--|{ Attribute
 Attribute }|--|| Domain
-
+ObjectType ||--|{ Object
 
 @enduml
