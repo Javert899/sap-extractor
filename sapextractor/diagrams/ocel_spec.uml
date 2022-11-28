@@ -1,0 +1,23 @@
+@startuml
+
+entity Events {
+    ocel:eid : string <<pk>>
+    ocel:activity : string
+    ocel:timestamp : datetime
+}
+
+entity Objects {
+    ocel:oid : string <<pk>>
+    ocel:type : string
+}
+
+entity Relations {
+    ocel:eid : string <<pk>> <<fk>>
+    ocel:activity : string <<fk>>
+    ocel:timestamp : datetime <<fk>>
+    ocel:oid : string <<pk>> <<fk>>
+    ocel:type : string <<fk>>
+}
+
+Relations }|--|| Events
+Relations }|--|| Objects
